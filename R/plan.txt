@@ -48,7 +48,7 @@ Files (1 function per file)
 		the embryo,
 		biopsy size,
 	Outputs:
-		a type: euploid, mosaic, aneuploid
+		a type (represented by ints): euploid, mosaic, aneuploid
 	Notes:
 		- Tessera code
 	Questions:
@@ -63,6 +63,7 @@ Files (1 function per file)
 	
 	Notes:
 		- Need to call multiple create_embryo and take biopsy (?)
+		- Need to convert the biopsy integers to corresponding types
 		- Can convert the number of types to percentages
 	Questions:
 		1. This file requires multiple data, so where to insert the number of embryos between file 3 and 4?
