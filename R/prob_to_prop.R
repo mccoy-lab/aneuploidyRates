@@ -12,18 +12,32 @@
 #' this embryo.
 
 prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
-  cells_affected <- 0
-  total_cells <- 2 ^ num_division
+  # Error messages
+  if(prob.meio < 0 | prob.mito < 0){
+    stop(paste0("The probabilities: ", prob.meio, ", ",
+                prob.mito, " must be greater than 0"))
+  }
+  if(prob.meio > 1 | prob.mito > 1){
+    stop(paste0("The probabilities: ", prob.meio, ", ",
+                prob.mito, " must be less than 1"))
+  }
+  if(num.division %% 1 != 0){
+    stop(paste0("The number of cell division: ", 
+                num.division, "should be an integer"))
+  }
+  
+  cells.affected <- 0
+  total.cells <- 2 ^ num.division
   
   # Meiotic check:
-  has_meio_error <- runif(1) < prob_meio
-  if (has_meio_error) {
+  has.meio.error <- runif(1) < prob.meio
+  if (has.meio.error) {
     return(1)
   } else{
     # Mitotic errors
     return(
       mito_aneu_cells(n.division = num.division,
-                      prob.affected = prob.mito) / total_cells
+                      prob.affected = prob.mito) / total.cells
     )
   }
 }
@@ -44,13 +58,28 @@ mito_aneu_cells <- function(cells.affected = 0,
                             n.division = 8,
                             prob.affected = 0.5,
                             currently.affected = F) {
-  # print(paste0("CURRENT DIVISION: ", n.division))
+  # Error messages
+  if(prob.affected < 0){
+    stop(paste0("The probability of being affected: ",
+                prob.affected, " must be greater than 0"))
+  }
+  if(prob.affected > 1){
+    stop(paste0("The probability of being affected: ",
+                prob.affected, " must be less than 1"))
+  }
+  if(cells.affected %% 1 != 0){
+    stop(paste0("The number of cells affected: ", 
+                cells.affected, "should be an integer"))
+  }
+  if(n.division %% 1 != 0){
+    stop(paste0("The number of cell division: ", 
+                n.division, "should be an integer"))
+  }
   
+  # Short cut
   if (currently.affected) {
     # stop and add all its children cells to cells affected
     cells.affected <- cells.affected + (2 ^ n.division)
-    # print(paste0("cell affected at division: ", n.division))
-    # print(paste0("total affected cells: ", cells.affected))
     return(cells.affected)
   }
   
@@ -59,17 +88,16 @@ mito_aneu_cells <- function(cells.affected = 0,
     # for the next two cells it splits into
     for (i in 1:2) {
       rand <- runif(1)
-      # print(rand)
       # randomly set if the next cell is affected
       if (rand < prob.affected) {
-        cells.affected <-  aneu.cells(
+        cells.affected <-  mito_aneu_cells(
           cells.affected = cells.affected,
           n.division = n.division - 1,
           prob.affected = prob.affected,
           currently.affected = T
         )
       } else{
-        cells.affected <-  aneu.cells(
+        cells.affected <-  mito_aneu_cells(
           cells.affected = cells.affected,
           n.division = n.division - 1,
           prob.affected = prob.affected,
@@ -79,6 +107,5 @@ mito_aneu_cells <- function(cells.affected = 0,
     }
   }
   # if all divisions are completed
-  # print(paste0("total cells affected: ", cells.affected))
   return(cells.affected)
 }
