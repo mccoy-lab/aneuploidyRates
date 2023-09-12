@@ -1,6 +1,9 @@
 #' This file creates an embryo object.
 #' code used from line 9-   are referenced from the Tessera package
-#' 
+#'
+#' (Maybe just use the original package? Then how do we write
+#' this file if there are no new functions?)
+library(tessera)
 
 # Set up Embryo -----------------------------------------------------------
 
