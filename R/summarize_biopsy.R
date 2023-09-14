@@ -82,3 +82,6 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
   result <- cbind(result[, 1:2], result[, 3:5] / num.em)
   return(result)
 }
+
+# result = summarize_biopsy(meio = 1, mito = 0.5)
+# print(result[1,3:5] == list(0,0,1))
