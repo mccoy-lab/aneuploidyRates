@@ -9,41 +9,76 @@ source("R/take_biopsy.R")
 #' @param num.em the number of embryos to be created
 #' @param meio the probability of having a meiotic error
 #' @param mito the probability of having a meiotic error
-#' (try with probability ranges instead of )
-summarize_biopsy <- function(num.em = 1000, meio, mito){
-  # convert probs to prop.aneu
-  # create embryos
-  # take biopsies
-  # summarize the result
+#'
+#' @return a single-row list with columns "prob.meio", "prob.mito", and the three
+#' biopsy types shown as percentages.
+#'
+
+summarize_biopsy <- function(num.em = 100, meio, mito) {
+  # Error messages
+  if (meio < 0 | mito < 0) {
+    stop(paste0(
+      "The probabilities: ",
+      meio,
+      ", ",
+      mito,
+      " must be at least 0"
+    ))
+  }
+  if (meio > 1 | mito > 1) {
+    stop(paste0(
+      "The probabilities: ",
+      meio,
+      ", ",
+      mito,
+      " must be at most 1"
+    ))
+  }
+  if (num.em %% 1 != 0) {
+    stop(paste0(
+      "The number of cell division: ",
+      num.division,
+      "should be an integer"
+    ))
+  }
+  if(num.em < 0){
+    stop(paste0(
+      "The number of embryos: ",
+      num.em,
+      " must be at least 0"
+    ))
+  }
 
   # set up result file
-  result = data.frame(matrix(ncol = 5, nrow = num.em))
-  colnames(sum) <-
-    c("prob.meio", "prob.mito", "euploid", "mosaic", "aneuploid")
-  euploid <- 0
-  mosaic <- 0
-  aneuploid <- 0
-  for(i in 1:num.em){
+  result <- data.frame(
+    prob.meio = meio,
+    prob.mito = mito,
+    euploid = 0,
+    mosaic = 0,
+    aneuploid = 0
+  )
+  # run embryos
+  for (i in 1:num.em) {
     # convert to prop.aneu
     prop.aneu <- prob_to_prop(prob.meio = meio, prob.mito = mito)
     # create an embryo
     em <- create_embryo(prop.aneuploid = prop.aneu)
-    print(prop.aneu)
     # take biopsy
     type <- take_biopsy(em)
     # add to result
-    if(type == 0){
-      euploid = euploid + 1;
-    }else if(type == 1){
-      mosaic = mosaic + 1;
-    }else{
-      aneuploid = aneuploid + 1;
+    if (type == 0) {
+      result$euploid <- result$euploid + 1
+
+    } else if (type == 1) {
+      result$mosaic <- result$mosaic + 1
+
+    } else{
+      result$aneuploid <- result$aneuploid + 1
+
     }
   }
-    result <- c(meio, mito, euploid, mosaic, aneuploid);
 
-  print(result)
+  # convert the types to percentages
+  result <- cbind(result[, 1:2], result[, 3:5] / num.em)
   return(result)
-  }
-
-
+}
