@@ -56,7 +56,7 @@ Files (1 function per file)
 
 4. summarize_biopsies (needed if file 2 and 3 are for single results)
 	Inputs: (wrapper function?)
-		number of embryos,
+		number of embryos, two probabilities
 	Outputs:
 		an organized dataframe summary with headers like this:
 	prob.meio	prob.mito	#euploid	#mosaic		#aneuploid
@@ -67,6 +67,7 @@ Files (1 function per file)
 		- Can convert the number of types to percentages
 	Questions:
 		1. This file requires multiple data, so where to insert the number of embryos between file 3 and 4?
+		2. Should the two probabilities be included as inputs or randomly selected data from a range?
 
 5. find_rates
 	Inputs:
