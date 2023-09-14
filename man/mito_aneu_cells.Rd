@@ -4,7 +4,8 @@
 \alias{mito_aneu_cells}
 \title{Simulate cell division and count the number of affected (aneuploid) cells.
 Recursive.
-Don't keep track of aneuploidies: just stop and do math.}
+The derived cells of an aneuploid cell will all be aneuploids. Therefore,
+we can tally the number of affected cells mathematically.}
 \usage{
 mito_aneu_cells(
   cells.affected = 0,
@@ -28,5 +29,6 @@ total number of affected cells in this simulation
 \description{
 Simulate cell division and count the number of affected (aneuploid) cells.
 Recursive.
-Don't keep track of aneuploidies: just stop and do math.
+The derived cells of an aneuploid cell will all be aneuploids. Therefore,
+we can tally the number of affected cells mathematically.
 }

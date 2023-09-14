@@ -73,3 +73,10 @@ test_that("Clustered embryos have all aneuploid cells adjacent to another", {
   }
 })
 
+test_that("Error messages work", {
+  expect_error(create_embryo(n.cells = -1))
+  expect_error(create_embryo(euploidy = -1))
+  expect_error(create_embryo(n.chrs = -1))
+  expect_error(create_embryo(prop.aneuploid = -1))
+})
+
