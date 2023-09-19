@@ -18,11 +18,46 @@ source("R/summarize_biopsy.R")
 
 #' Return two ranges of the error probabilities
 #'
+#'@param meio.range a double for the uniform distribution range to generate a meiotic error rate
+#'@param mito.range a double for the uniform distribution range to generate a mitotic error rate
+#'@param num.trials the number of trials to run the simulation. Each trial
+#'generates a data point with the two error rates.
 #'
+#'@return the list of data points that will generate
 #'
 find_rates <- function(meio.range = c(0, 1),
                        mito.range = c(0, 1),
                        num.trials = 100) {
+  # Error messages
+  if(length(meio.range) != 2 | length(mito.range) != 2){
+    stop(paste0("Must input a range (e.g. (0,1)) for the error ranges"))
+  }
+  if (meio.range[1] < 0 | mito.range[1] < 0) {
+    stop(paste0(
+      "The probabilities: ",
+      meio.range[1],
+      ", ",
+      mito.range[1],
+      " must be at least 0"
+    ))
+  }
+  if (meio.range[2] > 1 | mito.range[2] > 1) {
+    stop(paste0(
+      "The probabilities: ",
+      meio.range[2],
+      ", ",
+      mito.range[2],
+      " must be at most 1"
+    ))
+  }
+  if (num.trials %% 1 != 0) {
+    stop(paste0(
+      "The number of trials for the simulation: ",
+      num.trials,
+      "should be an integer"
+    ))
+  }
+
   # Set the model
   rates_model <- function(probs) {
     summarize_biopsy(meio = probs[1],
@@ -39,11 +74,15 @@ find_rates <- function(meio.range = c(0, 1),
     ABC_rejection(
       model = rates_model,
       prior = rates_prior,
-      nb_simul = num.trials ,
+      nb_simul = num.trials,
       summary_stat_target = sum_stat_obs,
       tol = tolerance
     )
   print(rates_sim)
+
+  # Set up return format
+  result <- cbind(rates_sim$param,rates_sim$stats)
+  colnames(result) <- c("prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
+  return(result)
 }
 
-find_rates(num.trials = 10)
