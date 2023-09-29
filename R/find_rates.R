@@ -25,8 +25,8 @@ source("R/summarize_biopsy.R")
 #'
 #'@return the list of data points that will generate
 #'
-find_rates <- function(meio.range = c(0, 1),
-                       mito.range = c(0, 1),
+find_rates <- function(meio.range = list(0, 1),
+                       mito.range = list(0, 1),
                        num.trials = 100) {
   # Error messages
   if(length(meio.range) != 2 | length(mito.range) != 2){
@@ -35,18 +35,18 @@ find_rates <- function(meio.range = c(0, 1),
   if (meio.range[1] < 0 | mito.range[1] < 0) {
     stop(paste0(
       "The probabilities: ",
-      meio.range[1],
+      meio.range[[1]],
       ", ",
-      mito.range[1],
+      mito.range[[1]],
       " must be at least 0"
     ))
   }
   if (meio.range[2] > 1 | mito.range[2] > 1) {
     stop(paste0(
       "The probabilities: ",
-      meio.range[2],
+      meio.range[[2]],
       ", ",
-      mito.range[2],
+      mito.range[[2]],
       " must be at most 1"
     ))
   }
@@ -60,13 +60,13 @@ find_rates <- function(meio.range = c(0, 1),
 
   # Set the model
   rates_model <- function(probs) {
-    summarize_biopsy(meio = probs[1],
-                     mito = probs[2])[1,3:5]
+    summarize_biopsy(meio = probs[[1]],
+                     mito = probs[[2]])[1,3:5]
   }
   # Choose the distribution to draw input
-  rates_prior <- list(c("unif", meio.range[1], meio.range[2]),
-                      c("unif", mito.range[1], mito.range[2]))
-  tolerance = 0.05
+  rates_prior <- list(c("unif", meio.range[[1]], meio.range[[2]]),
+                      c("unif", mito.range[[1]], mito.range[[2]]))
+  tolerance = 0.1
   # The expected value: euploid-0.388, aneu-0.186, mosaic-0.426
   sum_stat_obs = list(0.388, 0.186, 0.426)
 
@@ -82,7 +82,24 @@ find_rates <- function(meio.range = c(0, 1),
 
   # Set up return format
   result <- cbind(rates_sim$param,rates_sim$stats)
+  rownames(result) <- 1:nrow(result)
   colnames(result) <- c("prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
-  return(result)
+  return(data.frame(result))
 }
 
+
+test <- find_rates(num.trials = 100)
+print(test)
+hist(test$prob.meio)
+hist(test$prob.mito)
+# prob.meio  prob.mito euploid mosaic aneuploid
+# 1  0.4509941 0.01417487    0.40   0.09      0.51
+# 2  0.5005958 0.05512557    0.20   0.26      0.54
+# 3  0.1884886 0.11449904    0.12   0.45      0.43
+# 4  0.3734552 0.01288186    0.38   0.17      0.45
+# 5  0.4389518 0.05788959    0.25   0.33      0.42
+# 6  0.1889352 0.05368468    0.37   0.36      0.27
+# 7  0.1092251 0.10216679    0.21   0.44      0.35
+# 8  0.3586129 0.02510483    0.48   0.13      0.39
+# 9  0.4923595 0.02363235    0.34   0.09      0.57
+# 10 0.2698863 0.03576520    0.49   0.23      0.28
