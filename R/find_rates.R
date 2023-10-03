@@ -1,3 +1,5 @@
+#! /usr/bin/env RScript
+
 #' This file runs through a range of meiotic and mitotic probabilities and
 #' select the most fitting rates that deduces the real-life data.
 #'
