@@ -80,7 +80,7 @@ find_rates <- function(meio.range = list(0, 1),
       summary_stat_target = sum_stat_obs,
       tol = tolerance
     )
-  print(rates_sim)
+  # print(rates_sim)
 
   # Set up return format
   result <- cbind(rates_sim$param,rates_sim$stats)
