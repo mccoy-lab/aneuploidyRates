@@ -10,11 +10,13 @@
 
 
 module load r
-cd /home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates/
+# cd /home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates/
+cd ..
+filepath=$(pwd)
 
-export basisdir=/home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates
-export workdir=/home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates
+export basedir=${filepath}
+export workdir=${filepath}
 
-echo ${basisdir}
+echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
-Rscript ${basisdir}/R/find_rates.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
+Rscript ${basedir}/R/find_rates.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
