@@ -90,7 +90,7 @@ find_rates <- function(meio.range = list(0, 1),
 }
 
 
-test <- find_rates(num.trials = 100)
+test <- find_rates(num.trials = 1000)
 print(test)
 hist(test$prob.meio)
 hist(test$prob.mito)
