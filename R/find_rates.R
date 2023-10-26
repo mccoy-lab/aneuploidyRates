@@ -1,4 +1,4 @@
-#! /usr/bin/env RScript
+
 
 #' This file runs through a range of meiotic and mitotic probabilities and
 #' select the most fitting rates that deduces the real-life data.
@@ -15,6 +15,8 @@
 #'
 #' (return range or data points?)
 #' The selection process will be done by EasyABC
+# install.packages("EasyABC")
+
 library(EasyABC)
 source("R/summarize_biopsy.R")
 
@@ -29,6 +31,8 @@ source("R/summarize_biopsy.R")
 #'
 find_rates <- function(meio.range = list(0, 1),
                        mito.range = list(0, 1),
+                       expected = c(0.388, 0.186, 0.426),
+                       tolerance = 0.05,
                        num.trials = 100) {
   # Error messages
   if(length(meio.range) != 2 | length(mito.range) != 2){
@@ -59,25 +63,37 @@ find_rates <- function(meio.range = list(0, 1),
       "should be an integer"
     ))
   }
+  if (tolerance <= 0 | tolerance > 1) {
+    stop(paste0(
+      "The tolerance: ",
+      tolerance,
+      " should be in the range (0, 1]"
+    ))
+  }
+  if(sum(expected) != 1){
+    stop(paste0("The expected percentages of all three embryo types should
+                sum up to 1"))
+  }
+
+  # summary <- data.frame(matrix(ncols = 6, nrows = num.trials));
 
   # Set the model
   rates_model <- function(probs) {
-    summarize_biopsy(meio = probs[[1]],
-                     mito = probs[[2]])[1,3:5]
+    biopsy <- summarize_biopsy(meio = probs[[1]],
+                     mito = probs[[2]])
+    return(biopsy[1, 4:6])
   }
+  print(summary)
   # Choose the distribution to draw input
   rates_prior <- list(c("unif", meio.range[[1]], meio.range[[2]]),
                       c("unif", mito.range[[1]], mito.range[[2]]))
-  tolerance = 0.1
-  # The expected value: euploid-0.388, aneu-0.186, mosaic-0.426
-  sum_stat_obs = list(0.388, 0.186, 0.426)
 
   rates_sim <-
     ABC_rejection(
       model = rates_model,
       prior = rates_prior,
       nb_simul = num.trials,
-      summary_stat_target = sum_stat_obs,
+      summary_stat_target = expected,
       tol = tolerance
     )
   print(rates_sim)
@@ -90,7 +106,7 @@ find_rates <- function(meio.range = list(0, 1),
 }
 
 
-test <- find_rates(num.trials = 100)
+test <- find_rates(num.trials = 50)
 print(test)
 hist(test$prob.meio)
 hist(test$prob.mito)
