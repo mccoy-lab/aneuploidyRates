@@ -68,7 +68,7 @@ find_rates <- function(meio.range = list(0, 1),
   # Choose the distribution to draw input
   rates_prior <- list(c("unif", meio.range[[1]], meio.range[[2]]),
                       c("unif", mito.range[[1]], mito.range[[2]]))
-  tolerance = 0.1
+  tolerance = 0.05
   # The expected value: euploid-0.388, aneu-0.186, mosaic-0.426
   sum_stat_obs = list(0.388, 0.186, 0.426)
 
