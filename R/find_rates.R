@@ -75,15 +75,18 @@ find_rates <- function(meio.range = list(0, 1),
                 sum up to 1"))
   }
 
-  # summary <- data.frame(matrix(ncols = 6, nrows = num.trials));
+   remaining.data <- data.frame(prop.aneu = NULL);
 
   # Set the model
   rates_model <- function(probs) {
     biopsy <- summarize_biopsy(meio = probs[[1]],
                      mito = probs[[2]])
+    # print(biopsy)
+    remaining.data <<- rbind(remaining.data, biopsy[,1:3])
+    # print(remaining.data$prob.mito)
     return(biopsy[1, 4:6])
   }
-  print(summary)
+
   # Choose the distribution to draw input
   rates_prior <- list(c("unif", meio.range[[1]], meio.range[[2]]),
                       c("unif", mito.range[[1]], mito.range[[2]]))
@@ -97,16 +100,20 @@ find_rates <- function(meio.range = list(0, 1),
       tol = tolerance
     )
   print(rates_sim)
+  # print(remaining.data$prob.meio)
 
   # Set up return format
-  result <- cbind(rates_sim$param,rates_sim$stats)
+  colnames(remaining.data) <- c("prop.aneu", "prob.meio", "prob.mito");
+  remaining.data <- remaining.data[remaining.data$prob.meio %in% rates_sim$param[,1]
+                                   & remaining.data$prob.mito %in% rates_sim$param[,2],1]
+  result <- cbind(remaining.data, rates_sim$param,rates_sim$stats)
   rownames(result) <- 1:nrow(result)
-  colnames(result) <- c("prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
+  colnames(result) <- c("prop.aneu","prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
   return(data.frame(result))
 }
 
 
-test <- find_rates(num.trials = 50)
+test <- find_rates(num.trials = 100)
 print(test)
 hist(test$prob.meio)
 hist(test$prob.mito)
