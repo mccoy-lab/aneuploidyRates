@@ -100,7 +100,7 @@ find_rates <- function(meio.range = list(0, 1),
       tol = tolerance
     )
   print(rates_sim)
-  # print(remaining.data$prob.meio)
+  # print(remaining.data)
 
   # Set up return format
   colnames(remaining.data) <- c("prop.aneu", "prob.meio", "prob.mito");
@@ -113,18 +113,13 @@ find_rates <- function(meio.range = list(0, 1),
 }
 
 
-test <- find_rates(num.trials = 100)
-print(test)
-hist(test$prob.meio)
-hist(test$prob.mito)
-# prob.meio  prob.mito euploid mosaic aneuploid
-# 1  0.4509941 0.01417487    0.40   0.09      0.51
-# 2  0.5005958 0.05512557    0.20   0.26      0.54
-# 3  0.1884886 0.11449904    0.12   0.45      0.43
-# 4  0.3734552 0.01288186    0.38   0.17      0.45
-# 5  0.4389518 0.05788959    0.25   0.33      0.42
-# 6  0.1889352 0.05368468    0.37   0.36      0.27
-# 7  0.1092251 0.10216679    0.21   0.44      0.35
-# 8  0.3586129 0.02510483    0.48   0.13      0.39
-# 9  0.4923595 0.02363235    0.34   0.09      0.57
-# 10 0.2698863 0.03576520    0.49   0.23      0.28
+# test <- find_rates(num.trials = 100)
+# print(test)
+# hist(test$prob.meio)
+# hist(test$prob.mito)
+# prop.aneu prob.meio  prob.mito euploid mosaic aneuploid
+# 1 0.4776953 0.3437730 0.02664748    0.38   0.25      0.37
+# 2 0.7347656 0.5536075 0.04644948    0.17   0.18      0.65
+# 3 0.5870703 0.2700669 0.06577964    0.27   0.38      0.35
+# 4 0.4724609 0.2074682 0.05325346    0.33   0.38      0.29
+# 5 0.7059375 0.3082673 0.09855301    0.11   0.34      0.55
