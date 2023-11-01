@@ -1,20 +1,22 @@
 #! /bin/bash
 #SBATCH --job-name="aneuploidy_rates_run"
-#SBATCH --output="rates_file"
 #SBATCH --partition=defq
-#SBATCH --t 00-00:20:00
-#SBATCH --nodes-2
-#SBATCH --cpus-per-task=8
+#SBATCH --time 00-08:30:00
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
-#SBATCH --array=1-2%2
+#SBATCH --array=1-100%10
 #SBATCH --account=rmccoy22
 
+
 module load r
+# cd /home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates/
+cd ..
+filepath=$(pwd)
 
-export basisdir=/home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates
-export workdir=/home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates
+export basedir=${filepath}
+export workdir=${filepath}
 
-echo
-Rscript ${basisdir}/R/find_rates.R > $workdir/data/a.out
+echo ${basedir}
+echo ${SLURM_ARRAY_TASK_ID}
+Rscript ${basedir}/R/find_rates.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
