@@ -51,6 +51,7 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
 
   # set up result file
   result <- data.frame(
+    prop.aneu = 0,
     prob.meio = meio,
     prob.mito = mito,
     euploid = 0,
@@ -61,6 +62,8 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
   for (i in 1:num.em) {
     # convert to prop.aneu
     prop.aneu <- prob_to_prop(prob.meio = meio, prob.mito = mito)
+    # store the sum of all prop.aneus (will take the average later)
+    result$prop.aneu <- result$prop.aneu + prop.aneu
     # create an embryo
     em <- create_embryo(prop.aneuploid = prop.aneu)
     # take biopsy
@@ -78,10 +81,11 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
     }
   }
 
-  # convert the types to percentages
-  result <- cbind(result[, 1:2], result[, 3:5] / num.em)
+  # calculate the average prop.aneu and convert the types to percentages
+  result <- cbind(result[, 1]/num.em, result[2:3], result[, 4:6] / num.em)
   return(result)
 }
-
+#
 # result = summarize_biopsy(meio = 1, mito = 0.5)
-# print(result[1,3:5] == list(0,0,1))
+# print(result[1,4:6] == list(0,0,1))
+# print(result)
