@@ -24,7 +24,12 @@ source("R/summarize_biopsy.R")
 #'
 #'@param meio.range a double for the uniform distribution range to generate a meiotic error rate
 #'@param mito.range a double for the uniform distribution range to generate a mitotic error rate
+#'@param expected   a list of ratios derived from published data, used for selecting
+#'the fitting error rates
+#'@param tolerance  the percent of simulations to be kept near the expected values
 #'@param num.trials the number of trials to run the simulation. Each trial
+#'@param hide.param a boolean to show/hide the constant default parameters: num.cells,
+#'num.chr, dispersal, concordance
 #'generates a data point with the two error rates.
 #'
 #'@return the list of data points that will generate
@@ -33,7 +38,8 @@ find_rates <- function(meio.range = list(0, 1),
                        mito.range = list(0, 1),
                        expected = c(0.388, 0.186, 0.426),
                        tolerance = 0.05,
-                       num.trials = 100) {
+                       num.trials = 100,
+                       hide.param = TRUE) {
   # Error messages
   if(length(meio.range) != 2 | length(mito.range) != 2){
     stop(paste0("Must input a range (e.g. (0,1)) for the error ranges"))
@@ -80,9 +86,14 @@ find_rates <- function(meio.range = list(0, 1),
   # Set the model
   rates_model <- function(probs) {
     biopsy <- summarize_biopsy(meio = probs[[1]],
-                     mito = probs[[2]])
+                     mito = probs[[2]],
+                     hide.default.param = hide.param)
     # print(biopsy)
+    if(hide.param){
     remaining.data <<- rbind(remaining.data, biopsy[,1:3])
+    }else{ # keep track of the hidden parameters
+      remaining.data <<- rbind(remaining.data, biopsy[,c(1:3, 7:10)])
+    }
     # print(remaining.data$prob.mito)
     return(biopsy[1, 4:6])
   }
@@ -99,22 +110,31 @@ find_rates <- function(meio.range = list(0, 1),
       summary_stat_target = expected,
       tol = tolerance
     )
-  print(rates_sim)
+  # print(rates_sim)
   # print(remaining.data)
 
   # Set up return format
-  colnames(remaining.data) <- c("prop.aneu", "prob.meio", "prob.mito");
-  remaining.data <- remaining.data[remaining.data$prob.meio %in% rates_sim$param[,1]
-                                   & remaining.data$prob.mito %in% rates_sim$param[,2],1]
-  result <- cbind(remaining.data, rates_sim$param,rates_sim$stats)
-  rownames(result) <- 1:nrow(result)
-  colnames(result) <- c("prop.aneu","prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
+  if(hide.param){
+    remaining.data <- remaining.data[remaining.data$prob.meio %in% rates_sim$param[,1]
+                                     & remaining.data$prob.mito %in% rates_sim$param[,2],1]
+    result <- cbind(remaining.data, rates_sim$param,rates_sim$stats)
+    rownames(result) <- 1:nrow(result)
+    colnames(result) <- c("prop.aneu","prob.meio", "prob.mito","euploid", "mosaic", "aneuploid")
+  }
+  else{ # Display the hidden default parameters
+    remaining.data <- cbind(remaining.data[remaining.data$prob.meio %in% rates_sim$param[,1]
+                                     & remaining.data$prob.mito %in% rates_sim$param[,2],])
+    result <- cbind(remaining.data[,1],rates_sim$param,rates_sim$stats, remaining.data[,4:7])
+    rownames(result) <- 1:nrow(result)
+    colnames(result) <- c("prop.aneu","prob.meio", "prob.mito","euploid", "mosaic"
+                          , "aneuploid", "num.cell", "num.chr", "dispersal", "concordance")
+  }
   return(data.frame(result))
 }
 
 
-# test <- find_rates(num.trials = 100)
-# print(test)
+test <- find_rates(num.trials = 1000, hide.param = TRUE)
+print(test)
 # hist(test$prob.meio)
 # hist(test$prob.mito)
 # prop.aneu prob.meio  prob.mito euploid mosaic aneuploid

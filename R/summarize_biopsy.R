@@ -14,7 +14,15 @@ source("R/take_biopsy.R")
 #' biopsy types shown as percentages.
 #'
 
-summarize_biopsy <- function(num.em = 100, meio, mito) {
+summarize_biopsy <- function(
+    num.em = 100,
+    meio,
+    mito,
+    num.cell = 200,
+    num.chr = 1,
+    dispersal = 0,
+    concordance = 0,
+    hide.default.param = TRUE) {
   # Error messages
   if (meio < 0 | mito < 0) {
     stop(paste0(
@@ -50,6 +58,8 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
   }
 
   # set up result file
+  # without the default settings
+  if(hide.default.param){
   result <- data.frame(
     prop.aneu = 0,
     prob.meio = meio,
@@ -58,6 +68,20 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
     mosaic = 0,
     aneuploid = 0
   )
+  }else{ # include all the constant parameters to set up the embryo
+    result <- data.frame(
+      prop.aneu = 0,
+      prob.meio = meio,
+      prob.mito = mito,
+      euploid = 0,
+      mosaic = 0,
+      aneuploid = 0,
+      num.cell = 0,
+      num.chr = 0,
+      dispersal = 0,
+      concordance = 0
+    )
+  }
   # run embryos
   for (i in 1:num.em) {
     # convert to prop.aneu
@@ -65,7 +89,13 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
     # store the sum of all prop.aneus (will take the average later)
     result$prop.aneu <- result$prop.aneu + prop.aneu
     # create an embryo
-    em <- create_embryo(prop.aneuploid = prop.aneu)
+    em <- create_embryo(
+      prop.aneuploid = prop.aneu,
+      n.cell = num.cell,
+      n.chr = num.chr,
+      dispersal = dispersal,
+      concordance = concordance
+      )
     # take biopsy
     type <- take_biopsy(em)
     # add to result
@@ -82,10 +112,14 @@ summarize_biopsy <- function(num.em = 100, meio, mito) {
   }
 
   # calculate the average prop.aneu and convert the types to percentages
-  result <- cbind(result[, 1]/num.em, result[2:3], result[, 4:6] / num.em)
+  result <- cbind(result$prop.aneu/num.em, result[,2:3], result[, 4:6] / num.em)
+  # if needed: store the underlying parameters
+  if(!hide.default.param){
+    result <- cbind(result, num.cell, num.chr, dispersal, concordance)
+  }
   return(result)
 }
 #
-# result = summarize_biopsy(meio = 1, mito = 0.5)
+# result = summarize_biopsy(meio = 1, mito = 0.5, hide.default.param = FALSE)
 # print(result[1,4:6] == list(0,0,1))
 # print(result)
