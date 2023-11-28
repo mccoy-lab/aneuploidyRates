@@ -134,8 +134,6 @@ find_rates <- function(meio.range = list(0, 1),
 }
 
 
-test <- find_rates(num.trials = 1000, hide.param = TRUE)
-print(test)
 # hist(test$prob.meio)
 # hist(test$prob.mito)
 # prop.aneu prob.meio  prob.mito euploid mosaic aneuploid
