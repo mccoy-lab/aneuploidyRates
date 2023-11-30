@@ -25,10 +25,17 @@ for(i in 2:100){
 }
 
 
-print(my_data)
+# print(my_data)
 
-ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
-+ geom_point()
+ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito)) + geom_point()
 
-ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
-+ geom_bin2d()
+# 0.01 tolerance
+# 95% Quantiles
+
+# Prob. meio
+# 2.5%     97.5%
+# 0.1583445 0.5501766
+
+# Prob. mito
+# 2.5%       97.5%
+# 0.009530512 0.126553831
