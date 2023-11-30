@@ -19,4 +19,4 @@ export workdir=${filepath}
 
 echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
-Rscript ${basedir}/R/find_rates.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
+Rscript ${basedir}/data/generate_data.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
