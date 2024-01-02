@@ -111,15 +111,23 @@ summarize_biopsy <- function(
     }
   }
 
+  # # calculate the average prop.aneu and convert the types to percentages
+  # result <- cbind(result$prop.aneu/num.em, result[,2:3], result[, 4:6] / num.em)
+  # # if needed: store the underlying parameters
+  # if(!hide.default.param){
+  #   result <- cbind(result, num.cell, num.chr, dispersal, concordance)
+  # }
+
+  # Add dispersal as a potential parameter
   # calculate the average prop.aneu and convert the types to percentages
-  result <- cbind(result$prop.aneu/num.em, result[,2:3], result[, 4:6] / num.em)
+  result <- cbind(result$prop.aneu/num.em, result[,2:3], dispersal, result[, 4:6] / num.em)
   # if needed: store the underlying parameters
   if(!hide.default.param){
-    result <- cbind(result, num.cell, num.chr, dispersal, concordance)
+    result <- cbind(result, num.cell, num.chr, concordance)
   }
   return(result)
 }
 #
-# result = summarize_biopsy(meio = 1, mito = 0.5, hide.default.param = FALSE)
+# result = summarize_biopsy(meio = 1, mito = 0.5, dispersal = 0.5, hide.default.param = TRUE)
 # print(result[1,4:6] == list(0,0,1))
 # print(result)
