@@ -38,10 +38,10 @@ prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
       "should be an integer"
     ))
   }
-  
+
   cells.affected <- 0
   total.cells <- 2 ^ num.division
-  
+
   # Meiotic check:
   has.meio.error <- runif(1) < prob.meio
   if (has.meio.error) {
@@ -104,7 +104,7 @@ mito_aneu_cells <- function(cells.affected = 0,
       "should be an integer"
     ))
   }
-  
+
   # Short cut: since every cell derived from an affected cell
   # is also affected, we can just calculate and return the tally.
   if (currently.affected) {
@@ -112,7 +112,7 @@ mito_aneu_cells <- function(cells.affected = 0,
     cells.affected <- cells.affected + (2 ^ n.division)
     return(cells.affected)
   }
-  
+
   # if the cells are still dividing
   if (n.division != 0) {
     # for the next two cells it splits into
@@ -127,12 +127,12 @@ mito_aneu_cells <- function(cells.affected = 0,
           currently.affected = T
         )
       } else{
-          cells.affected <-  mito_aneu_cells(
-            cells.affected = cells.affected,
-            n.division = n.division - 1,
-            prob.affected = prob.affected,
-            currently.affected = currently.affected
-          )
+        cells.affected <-  mito_aneu_cells(
+          cells.affected = cells.affected,
+          n.division = n.division - 1,
+          prob.affected = prob.affected,
+          currently.affected = currently.affected
+        )
       }
     }
   }

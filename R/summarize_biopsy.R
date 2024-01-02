@@ -14,33 +14,28 @@
 #' biopsy types shown as percentages.
 #'
 
-summarize_biopsy <- function(
-    num.em = 100,
-    meio,
-    mito,
-    num.cell = 200,
-    num.chr = 1,
-    dispersal = 0,
-    concordance = 0,
-    hide.default.param = TRUE) {
+summarize_biopsy <- function(num.em = 100,
+                             meio,
+                             mito,
+                             num.cell = 200,
+                             num.chr = 1,
+                             dispersal = 0,
+                             concordance = 0,
+                             hide.default.param = TRUE) {
   # Error messages
   if (meio < 0 | mito < 0) {
-    stop(paste0(
-      "The probabilities: ",
-      meio,
-      ", ",
-      mito,
-      " must be at least 0"
-    ))
+    stop(paste0("The probabilities: ",
+                meio,
+                ", ",
+                mito,
+                " must be at least 0"))
   }
   if (meio > 1 | mito > 1) {
-    stop(paste0(
-      "The probabilities: ",
-      meio,
-      ", ",
-      mito,
-      " must be at most 1"
-    ))
+    stop(paste0("The probabilities: ",
+                meio,
+                ", ",
+                mito,
+                " must be at most 1"))
   }
   if (num.em %% 1 != 0) {
     stop(paste0(
@@ -49,27 +44,26 @@ summarize_biopsy <- function(
       "should be an integer"
     ))
   }
-  if(num.em < 0){
-    stop(paste0(
-      "The number of embryos: ",
-      num.em,
-      " must be at least 0"
-    ))
+  if (num.em < 0) {
+    stop(paste0("The number of embryos: ",
+                num.em,
+                " must be at least 0"))
   }
 
   # set up result file
   # without the default settings
-  if(hide.default.param){
-  result <- data.frame(
-    prop.aneu = 0,
-    prob.meio = meio,
-    prob.mito = mito,
-    dispersal = 0,
-    euploid = 0,
-    mosaic = 0,
-    aneuploid = 0
-  )
-  }else{ # include all the constant parameters to set up the embryo
+  if (hide.default.param) {
+    result <- data.frame(
+      prop.aneu = 0,
+      prob.meio = meio,
+      prob.mito = mito,
+      dispersal = 0,
+      euploid = 0,
+      mosaic = 0,
+      aneuploid = 0
+    )
+  } else{
+    # include all the constant parameters to set up the embryo
     result <- data.frame(
       prop.aneu = 0,
       prob.meio = meio,
@@ -96,7 +90,7 @@ summarize_biopsy <- function(
       n.chr = num.chr,
       dispersal = dispersal,
       concordance = concordance
-      )
+    )
     # take biopsy
     type <- take_biopsy(em)
     # add to result
@@ -121,15 +115,21 @@ summarize_biopsy <- function(
 
   # Add dispersal as a potential parameter
   # calculate the average prop.aneu and convert the types to percentages
-  prop.aneu<- result$prop.aneu/num.em
-  result <- cbind(prop.aneu, result[,2:3], dispersal, result[,5:7] / num.em)
+  prop.aneu <- result$prop.aneu / num.em
+  result <-
+    cbind(prop.aneu, result[, 2:3], dispersal, result[, 5:7] / num.em)
   # if needed: store the underlying parameters
-  if(!hide.default.param){
+  if (!hide.default.param) {
     result <- cbind(result, num.cell, num.chr, concordance)
   }
   return(result)
 }
 #
-result = summarize_biopsy(meio = 0, mito = 0.3, dispersal = 0.5, hide.default.param = TRUE)
-print(result[1,4:6] == list(0,0,1))
+result = summarize_biopsy(
+  meio = 0,
+  mito = 0.3,
+  dispersal = 0.5,
+  hide.default.param = TRUE
+)
+print(result[1, 4:6] == list(0, 0, 1))
 print(result)
