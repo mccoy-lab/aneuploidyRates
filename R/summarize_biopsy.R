@@ -1,9 +1,9 @@
 # This file returns a data frame of a summary of multiple trials
 # (Will this file be doing too much jobs by calling all the previous functions?)
 
-# source("R/create_embryo.R")
-# source("R/prob_to_prop.R")
-# source("R/take_biopsy.R")
+source("R/create_embryo.R")
+source("R/prob_to_prop.R")
+source("R/take_biopsy.R")
 
 #' A wrapper function for generating the biopsy results
 #' @param num.em the number of embryos to be created
@@ -125,11 +125,11 @@ summarize_biopsy <- function(num.em = 100,
   return(result)
 }
 #
-result = summarize_biopsy(
-  meio = 0,
-  mito = 0.3,
-  dispersal = 0.5,
-  hide.default.param = TRUE
-)
-print(result[1, 4:6] == list(0, 0, 1))
-print(result)
+# result = summarize_biopsy(
+#   meio = 0,
+#   mito = 0.3,
+#   dispersal = 0.5,
+#   hide.default.param = TRUE
+# )
+# print(result[1, 4:6] == list(0, 0, 1))
+# print(result)

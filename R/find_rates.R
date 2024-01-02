@@ -21,7 +21,7 @@
 # install.packages("EasyABC")
 
 library(EasyABC)
-# source("R/summarize_biopsy.R")
+source("R/summarize_biopsy.R")
 
 #' Return a data frame of the selected error probabilities and dispersal
 #'
