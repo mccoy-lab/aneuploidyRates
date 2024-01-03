@@ -9,7 +9,8 @@
 #SBATCH --account=rmccoy22
 
 
-module load r
+# module load r
+conda activate aneuploidy_rates
 # cd /home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates/
 cd ..
 filepath=$(pwd)
@@ -19,4 +20,4 @@ export workdir=${filepath}
 
 echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
-Rscript ${basedir}/data/generate_data.R > $workdir/data/${SLURM_ARRAY_TASK_ID}.txt
+Rscript ${basedir}/data/generate_data.R > $workdir/data/${SLURM_ARRAY_TASK_ID}_dispersal.txt

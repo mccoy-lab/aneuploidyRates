@@ -114,3 +114,4 @@ result <- summarize_biopsy(
 # print(result[c(1, 5:7)] == list(1, 0, 0, 1))
 # print(result)
 # print(typeof(result))
+

@@ -4,7 +4,6 @@
 source("R/find_rates.R")
 library(microbenchmark)
 
-
 # find_rates(num.trials = 1000, tolerance = 0.01)
 
 # Performance check
@@ -21,3 +20,4 @@ library(microbenchmark)
 #   df2 <- find_rates(num.trials = 50)
 # )
 # microbenchmark(df1, df2, times = 10000)
+
