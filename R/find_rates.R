@@ -183,32 +183,6 @@ find_rates <- function(meio.range = list(0, 1),
         "concordance"
       )
   }
-  # }
-  # else{
-  # Display the hidden default parameters
-  # remaining.data <-
-  #   cbind(remaining.data[remaining.data$prob.meio %in% rates_sim$param[, 1]
-  #                        &
-  #                          remaining.data$prob.mito %in% rates_sim$param[, 2], ])
-  # result <-
-  #   cbind(remaining.data[, 1],
-  #         rates_sim$param,
-  #         rates_sim$stats,
-  #         remaining.data[, 5:7])
-  # rownames(result) <- 1:nrow(result)
-  # colnames(result) <-
-  #   c(
-  #     "prop.aneu",
-  #     "prob.meio",
-  #     "prob.mito",
-  #     "dispersal",
-  #     "euploid",
-  #     "mosaic",
-  #     "aneuploid",
-  #     "num.cell",
-  #     "num.chr",
-  #     "concordance"
-  #   )
-  # }
+
   return(data.frame(result))
 }
