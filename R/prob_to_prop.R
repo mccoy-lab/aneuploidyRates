@@ -105,20 +105,23 @@ mito_aneu_cells <- function(cells.affected = 0,
     ))
   }
 
-  # Short cut: since every cell derived from an affected cell
-  # is also affected, we can just calculate and return the tally.
+  # The current cell is already affected:
+  # Since every cell derived from an affected cell is also affected, we can just
+  # calculate the number of cells below this branch and return the tally.
   if (currently.affected) {
     # add all its children cells to cells affected
     cells.affected <- cells.affected + (2 ^ n.division)
     return(cells.affected)
   }
 
-  # if the cells are still dividing
+
+  # The current cell is euploid
+  # If the cell is still dividing
   if (n.division != 0) {
-    # for the next two cells it splits into
+    # For the next two cells it splits into, randomly set if the next cell is affected
+    # Call this function again to keep dividing/check the derived cells
     for (i in 1:2) {
       rand <- runif(1)
-      # randomly set if the next cell is affected
       if (rand < prob.affected) {
         cells.affected <-  mito_aneu_cells(
           cells.affected = cells.affected,

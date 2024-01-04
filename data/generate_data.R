@@ -5,10 +5,11 @@ source("R/find_rates.R")
 library(microbenchmark)
 
 # find_rates(num.trials = 1000, tolerance = 0.01)
+# find_rates(num.trials = 50)
 
 # Performance check
 # system.time(
-#   df <- find_rates_faster(num.trials = 50)
+#   df <- find_rates(num.trials = 50)
 # )
 # print(typeof(df))
 # print(df)

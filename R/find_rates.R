@@ -3,6 +3,7 @@
 
 
 
+
 #' This file runs through a range of meiotic and mitotic probabilities and
 #' select the most fitting rates that deduces the real-life data.
 #'
@@ -47,13 +48,13 @@ find_rates <- function(meio.range = list(0, 1),
                        num.trials = 100,
                        hide.param = TRUE) {
   # Error messages
-  if ((length(meio.range) != 2 |
-       length(mito.range) != 2) | length(disp.range) != 2) {
+  if (length(meio.range) != 2 |
+      length(mito.range) != 2 | length(disp.range) != 2) {
     stop(paste0(
       "Must input a range (e.g. (0,1)) for the error and dispersal ranges"
     ))
   }
-  if ((meio.range[1] < 0 | mito.range[1] < 0) | disp.range[1] < 0) {
+  if (meio.range[1] < 0 | mito.range[1] < 0 | disp.range[1] < 0) {
     stop(
       paste0(
         "The probabilities: ",
@@ -66,7 +67,7 @@ find_rates <- function(meio.range = list(0, 1),
       )
     )
   }
-  if ((meio.range[2] > 1 | mito.range[2] > 1) | disp.range[2] > 1) {
+  if (meio.range[2] > 1 | mito.range[2] > 1 | disp.range[2] > 1) {
     stop(
       paste0(
         "The probabilities: ",
@@ -105,7 +106,7 @@ find_rates <- function(meio.range = list(0, 1),
   # print(remaining.data)
   if (!hide.param) {
     remaining.data <- cbind(remaining.data, matrix(ncol = 3))
-    }
+  }
 
   # Set the model
   rates_model <- function(probs) {
@@ -133,29 +134,31 @@ find_rates <- function(meio.range = list(0, 1),
   # Feed into EasyABC
   rates_sim <-
     ABC_rejection(
+      # previously set biopsy model, returns a list of biopsy type percentages
       model = rates_model,
+      # previously set distributions for error rates and dispersal inputs
       prior = rates_prior,
+      # number of simulations
       nb_simul = num.trials,
+      # expected values, used for selecting results
       summary_stat_target = expected,
+      # percentage of closest results to be selected
       tol = tolerance
     )
   # print(remaining.data)
 
- # remaining.data <- remaining.data[-1, ]
 
   # Set up return format
- #  if (hide.param) {
-    # find the prop.aneus according to the parameters
-    result <-
-      remaining.data[remaining.data[,2] %in% rates_sim$param[, 1]
-                     &
-                       remaining.data[,3] %in% rates_sim$param[, 2], ]
-    # result <-
-    #   cbind(remaining.data, rates_sim$param, rates_sim$stats)
-    rownames(result) <- 1:nrow(result)
+  result <-
+    remaining.data[remaining.data[, 2] %in% rates_sim$param[, 1]
+                   &
+                     remaining.data[, 3] %in% rates_sim$param[, 2],]
+  # result <-
+  #   cbind(remaining.data, rates_sim$param, rates_sim$stats)
+  rownames(result) <- 1:nrow(result)
 
-    if(hide.param){
-      colnames(result) <-
+  if (hide.param) {
+    colnames(result) <-
       c(
         "prop.aneu",
         "prob.meio",
@@ -165,47 +168,47 @@ find_rates <- function(meio.range = list(0, 1),
         "mosaic",
         "aneuploid"
       )
-    }else{
-      colnames(result) <-
-        c(
-          "prop.aneu",
-          "prob.meio",
-          "prob.mito",
-          "dispersal",
-          "euploid",
-          "mosaic",
-          "aneuploid",
-          "num.cell",
-          "num.chr",
-          "concordance"
-        )
-    }
+  } else{
+    colnames(result) <-
+      c(
+        "prop.aneu",
+        "prob.meio",
+        "prob.mito",
+        "dispersal",
+        "euploid",
+        "mosaic",
+        "aneuploid",
+        "num.cell",
+        "num.chr",
+        "concordance"
+      )
+  }
   # }
   # else{
-    # Display the hidden default parameters
-    # remaining.data <-
-    #   cbind(remaining.data[remaining.data$prob.meio %in% rates_sim$param[, 1]
-    #                        &
-    #                          remaining.data$prob.mito %in% rates_sim$param[, 2], ])
-    # result <-
-    #   cbind(remaining.data[, 1],
-    #         rates_sim$param,
-    #         rates_sim$stats,
-    #         remaining.data[, 5:7])
-    # rownames(result) <- 1:nrow(result)
-    # colnames(result) <-
-    #   c(
-    #     "prop.aneu",
-    #     "prob.meio",
-    #     "prob.mito",
-    #     "dispersal",
-    #     "euploid",
-    #     "mosaic",
-    #     "aneuploid",
-    #     "num.cell",
-    #     "num.chr",
-    #     "concordance"
-    #   )
- # }
+  # Display the hidden default parameters
+  # remaining.data <-
+  #   cbind(remaining.data[remaining.data$prob.meio %in% rates_sim$param[, 1]
+  #                        &
+  #                          remaining.data$prob.mito %in% rates_sim$param[, 2], ])
+  # result <-
+  #   cbind(remaining.data[, 1],
+  #         rates_sim$param,
+  #         rates_sim$stats,
+  #         remaining.data[, 5:7])
+  # rownames(result) <- 1:nrow(result)
+  # colnames(result) <-
+  #   c(
+  #     "prop.aneu",
+  #     "prob.meio",
+  #     "prob.mito",
+  #     "dispersal",
+  #     "euploid",
+  #     "mosaic",
+  #     "aneuploid",
+  #     "num.cell",
+  #     "num.chr",
+  #     "concordance"
+  #   )
+  # }
   return(data.frame(result))
 }
