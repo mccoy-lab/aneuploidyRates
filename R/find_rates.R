@@ -1,12 +1,6 @@
+#' This file runs through a range of meiotic and mitotic probabilities and dispersal,
+#' and select the most fitting values that deduces the expected data.
 
-
-
-
-
-
-#' This file runs through a range of meiotic and mitotic probabilities and
-#' select the most fitting rates that deduces the real-life data.
-#'
 #' Data for comparison:
 #' From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
 #' we leveraged their summary statistics presented in Figure 1A and calculated
@@ -16,8 +10,6 @@
 #' A total of 73218 embryos are collected, of which 38.8% (28,431) is euploid,
 #' 18.6% (13,602) is mosaic, and 42.6% (31,185) is aneuploid.
 
-#'
-#' (return range or data points?)
 #' The selection process will be done by EasyABC
 # install.packages("EasyABC")
 
@@ -37,8 +29,8 @@ source("R/summarize_biopsy.R")
 #'num.chr, concordance
 #'
 #'
-#'@return a data frame of the selected error rate pair, the dispersal,
-#'its corresponding embryo (prop.aneu), and biopsy information
+#'@return a data frame of the corresponding embryo (prop.aneu), the selected
+#'error rate pair, its dispersal, and biopsy information.
 #'
 find_rates <- function(meio.range = list(0, 1),
                        mito.range = list(0, 1),
@@ -103,12 +95,11 @@ find_rates <- function(meio.range = list(0, 1),
 
   # Set up matrix for later output
   remaining.data <- matrix(ncol = 7)
-  # print(remaining.data)
   if (!hide.param) {
     remaining.data <- cbind(remaining.data, matrix(ncol = 3))
   }
 
-  # Set the model
+  # Set the model for biopsy summary
   rates_model <- function(probs) {
     biopsy <- summarize_biopsy(
       meio = probs[[1]],
@@ -116,22 +107,21 @@ find_rates <- function(meio.range = list(0, 1),
       dispersal = probs[[3]],
       hide.default.param = hide.param
     )
-    # print(biopsy)
 
+    # Saves all datat (used for displaying prop.aneu and other default params later)
     remaining.data <<- rbind(remaining.data, biopsy)
-    # print(remaining.data)
     # Returns only the biopsy types
     return(biopsy[5:7])
   }
 
-  # Choose the distribution to draw inputs
+  # Choose the distribution to draw inputs. Assume uniform distributions.
   rates_prior <- list(
     c("unif", meio.range[[1]], meio.range[[2]]),
     c("unif", mito.range[[1]], mito.range[[2]]),
     c("unif", disp.range[[1]], disp.range[[2]])
   )
 
-  # Feed into EasyABC
+  # Feed into ABC_rejection
   rates_sim <-
     ABC_rejection(
       # previously set biopsy model, returns a list of biopsy type percentages
@@ -145,18 +135,18 @@ find_rates <- function(meio.range = list(0, 1),
       # percentage of closest results to be selected
       tol = tolerance
     )
-  # print(remaining.data)
 
-
-  # Set up return format
+  # Set up return format: from the saved data, select the rows with ABC_rej's
+  # returned parameters
   result <-
     remaining.data[remaining.data[, 2] %in% rates_sim$param[, 1]
                    &
-                     remaining.data[, 3] %in% rates_sim$param[, 2],]
-  # result <-
-  #   cbind(remaining.data, rates_sim$param, rates_sim$stats)
+                     remaining.data[, 3] %in% rates_sim$param[, 2], ]
+
+  # Set row names (numbers)
   rownames(result) <- 1:nrow(result)
 
+  # Set column names
   if (hide.param) {
     colnames(result) <-
       c(
