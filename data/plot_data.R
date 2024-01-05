@@ -3,11 +3,14 @@
 library(ggplot2)
 library(readr)
 # -------------Load and Process Data-------------------------
+# Locate the folder to investigate
+date <- "2024-01-04"
+
 # Set column names
 my_data_cols <-
-  read_table("data/1.txt", n_max  = 1, col_names = FALSE)
+  read_table(paste0("data/", date, "/1.txt"), n_max  = 1, col_names = FALSE)
 my_data_cols <- cbind('embryo', my_data_cols)
-my_data <- read_table("data/1.txt", skip = 1, col_names = FALSE)
+my_data <- read_table(paste0("data/", date, "/1.txt"), skip = 1, col_names = FALSE)
 # my_data <- my_data[,3:ncol(my_data_cols)]
 # read headers first
 # my_data <- read_table(file = "data/1.txt")
@@ -21,7 +24,7 @@ colnames(my_data) <- my_data_cols[1, ]
 # Read all the rest of the data
 for (i in 2:100) {
   temp <-
-    read_table(paste0("data/", i, ".txt"),
+    read_table(paste0("data/", date, "/", i, ".txt"),
                skip = 1,
                col_names = FALSE)
   colnames(temp) <- my_data_cols[1, ]
@@ -32,6 +35,8 @@ for (i in 2:100) {
 # print(my_data)
 
 ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito)) + geom_point()
+ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito, color = my_data$dispersal
+)) + geom_point()
 
 # 0.01 tolerance
 # 95% Quantiles
