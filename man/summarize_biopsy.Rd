@@ -4,15 +4,31 @@
 \alias{summarize_biopsy}
 \title{A wrapper function for generating the biopsy results}
 \usage{
-summarize_biopsy(num.em = 1000, meio, mito)
+summarize_biopsy(
+  num.em = 100,
+  meio,
+  mito,
+  num.cell = 200,
+  num.chr = 1,
+  dispersal = 0,
+  concordance = 0,
+  hide.default.param = TRUE
+)
 }
 \arguments{
 \item{num.em}{the number of embryos to be created}
 
 \item{meio}{the probability of having a meiotic error}
 
-\item{mito}{the probability of having a meiotic error
-(try with probability ranges instead of )}
+\item{mito}{the probability of having a meiotic error}
+
+\item{hide.default.param}{the boolean to exclude other parameters used in
+constructing the embryo: num.cell, num.chr, concordance. If false, the returned
+vector will contain these values.}
+}
+\value{
+a vector with columns: "prop.aneu", "prob.meio", "prob.mito", "dispersal",
+and the three biopsy types shown as percentages.
 }
 \description{
 A wrapper function for generating the biopsy results

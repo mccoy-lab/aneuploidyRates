@@ -73,7 +73,7 @@ setClass(
 #' standard deviation \code{embryo.size.sd}.
 #' @param euploidy the number of copies of a chromosome to consider euploid. For a diploid embryo this should be 2.
 #' @param rng.seed the seed for the rRandom Number Generation (RNG). Defaults to NULL. Use this to get the same embryo each time
-#'
+#' @export
 #' @return an Embryo object
 #'
 #' @examples

@@ -1,9 +1,9 @@
 # This file returns a vector of a biopsy summary for a batch of embryos with the
 # same meiotic and mitotic error rates.
 
-source("R/create_embryo.R")
-source("R/prob_to_prop.R")
-source("R/take_biopsy.R")
+# source("R/create_embryo.R")
+# source("R/prob_to_prop.R")
+# source("R/take_biopsy.R")
 
 
 #' A wrapper function for generating the biopsy results
@@ -16,7 +16,7 @@ source("R/take_biopsy.R")
 #'
 #' @return a vector with columns: "prop.aneu", "prob.meio", "prob.mito", "dispersal",
 #' and the three biopsy types shown as percentages.
-#'
+#' @export
 
 summarize_biopsy <- function(num.em = 100,
                              meio,

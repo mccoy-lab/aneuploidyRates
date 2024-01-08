@@ -14,7 +14,7 @@
 # install.packages("EasyABC")
 
 library(EasyABC)
-source("R/summarize_biopsy.R")
+# source("R/summarize_biopsy.R")
 
 #' Return a data frame of the selected error probabilities and dispersal
 #'
@@ -27,7 +27,7 @@ source("R/summarize_biopsy.R")
 #'@param num.trials the number of trials to run the simulation. Each trial
 #'@param hide.param a boolean to show/hide the constant default parameters: num.cells,
 #'num.chr, concordance
-#'
+#'@export
 #'
 #'@return a data frame of the corresponding embryo (prop.aneu), the selected
 #'error rate pair, its dispersal, and biopsy information.
@@ -133,7 +133,10 @@ find_rates <- function(meio.range = list(0, 1),
       # expected values, used for selecting results
       summary_stat_target = expected,
       # percentage of closest results to be selected
-      tol = tolerance
+      tol = tolerance,
+      use_seed = TRUE,
+      n_cluster = 5,
+      progress_bar = TRUE
     )
 
   # Set up return format: from the saved data, select the rows with ABC_rej's

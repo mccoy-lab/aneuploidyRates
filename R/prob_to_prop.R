@@ -10,7 +10,7 @@
 #'
 #' @return proportion of totally affected (aneuploidy) cells within
 #' this embryo.
-
+#' @export
 prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
   # Error messages
   if (prob.meio < 0 | prob.mito < 0) {

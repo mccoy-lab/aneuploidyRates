@@ -8,6 +8,7 @@ library(tessera)
 #' 0 = euploid
 #' @param em the embryo for the biopsy sampling
 #' @param biop.size the number of cells to be sampled
+#' @export
 #' @return an integer representing the biopsy type
 
 take_biopsy <- function(em, biop.size = 5) {
