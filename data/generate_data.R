@@ -1,10 +1,8 @@
-#' This file runs the aneuploidyRates package and writes
-#' the generated data to a csv file
+#' This file runs the aneuploidyRates package and writes the generated data to a csv file
 #'
 source("R/find_rates.R")
-# library(microbenchmark)
 
-find_rates(num.trials = 1000, tolerance = 0.01)
+find_rates(num.trials = 100, tolerance = 0.05)
 # find_rates(num.trials = 50)
 
 # Performance check
@@ -13,12 +11,3 @@ find_rates(num.trials = 1000, tolerance = 0.01)
 # )
 # print(typeof(df))
 # print(df)
-
-# system.time(
-#   df1 <- find_rates_faster(num.trials = 50)
-# )
-# system.time(
-#   df2 <- find_rates(num.trials = 50)
-# )
-# microbenchmark(df1, df2, times = 10000)
-
