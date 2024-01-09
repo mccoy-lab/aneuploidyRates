@@ -2,7 +2,8 @@
 % Please edit documentation in R/take_biopsy.R
 \name{take_biopsy}
 \alias{take_biopsy}
-\title{Take a biopsy of the given embryo, return an int corresponding to the biopsy types
+\title{This file takes the biopsy of an embryo object.
+Take a biopsy of the given embryo, return an int corresponding to the biopsy types
 2 = aneuploid
 1 = mosaic
 0 = euploid}
@@ -18,6 +19,7 @@ take_biopsy(em, biop.size = 5)
 an integer representing the biopsy type
 }
 \description{
+This file takes the biopsy of an embryo object.
 Take a biopsy of the given embryo, return an int corresponding to the biopsy types
 2 = aneuploid
 1 = mosaic

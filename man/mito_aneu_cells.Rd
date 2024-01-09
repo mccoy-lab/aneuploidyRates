@@ -15,13 +15,13 @@ mito_aneu_cells(
 )
 }
 \arguments{
+\item{cells.affected}{current total number of affected cells}
+
 \item{n.division}{number of divisions simulated}
 
 \item{prob.affected}{the likelihood of a cell to be an aneuploid.}
 
 \item{currently.affected}{True if the current cell is an aneuploid and False otherwise}
-
-\item{cell.affected}{current total number of affected cells}
 }
 \value{
 total number of affected cells in this simulation

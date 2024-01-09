@@ -1,7 +1,7 @@
-#' This file creates an embryo object.
-#' code used from line 9-511 are mainly referenced from the Tessera package,
-#' with more lines of comments, slight changes in line 332-343, and removal
-#' of the graphic
+# This file creates an embryo object.
+# code used from line 9-511 are mainly referenced from the Tessera package,
+# with more lines of comments, slight changes in line 332-343, and removal
+# of the graphic
 
 # library(tessera)
 
@@ -21,25 +21,17 @@
 #'
 setClass(
   "Embryo",
-  # Creates an "Embryo" class
-
-  # Define fields or slots that an embryo should have
   representation(
     x = "numeric",
-    # numeric types are decimal values
     y = "numeric",
     z = "numeric",
     aneu = "numeric",
     disp = "numeric",
     dists = "data.frame",
-    # Displayed like a table. Each column same data type
     neighbours = "data.frame",
-    # Why is this not explained?
     euploidy = "numeric",
     ploidy = "data.frame"
   ),
-
-  # Define defaults, the values for the embryo when nothing is set
   prototype(
     x = NA_real_,
     y = NA_real_,
@@ -47,7 +39,6 @@ setClass(
     aneu = NA_real_,
     disp = NA_real_,
     dists = data.frame(),
-    # empty table
     neighbours = data.frame(),
     euploidy = NA_real_,
     ploidy = data.frame()
@@ -71,28 +62,18 @@ setClass(
 #' standard deviation \code{embryo.size.sd}.
 #' @param euploidy the number of copies of a chromosome to consider euploid. For a diploid embryo this should be 2.
 #' @param rng.seed the seed for the rRandom Number Generation (RNG). Defaults to NULL. Use this to get the same embryo each time
+#'
 #' @export
 #' @return an Embryo object
 #'
 #' @examples
-#' Create an embryo with 200 cells, 20% aneuploid and a single pair of chromosomes
-#' per cell. Aneuploid cells are highly dispersed
-# embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
-#                  dispersal =  0.9)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9)
 #'
-#' Create the embryo above, but using a fixed seed for the random number generator
-#' so the resulting embryo is reproducible.
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
-#'                  dispersal =  0.9, rng.seed = 42)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9, rng.seed = 42)
 #'
-#' Create an embryo with 3 pairs of chromosomes per cell, with all chromosome pairs
-#' aneuploid in the same cells.
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2,
-#'                  dispersal =  0.9, concordance = 1)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2, dispersal =  0.9, concordance = 1)
 #'
-#' As above, but specifying a different aneuploidy level for each chromosome pair.
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = c(0.2, 0.1, 0.4),
-#'                  dispersal =  0.9)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
 create_embryo <-
   function(n.cells = 200,
            n.chrs = 1,
@@ -192,7 +173,7 @@ create_embryo <-
     # Make a sphere of evenly spaced points using the Fibonacci lattice
     indices <- seq(0, n.cells - 1, 1) + 0.5
     phi <-
-      acos(pmin(pmax(1 - 2 * indices / n.cells,-1.0), 1.0)) # constrain to avoid rounding errors
+      acos(pmin(pmax(1 - 2 * indices / n.cells, -1.0), 1.0)) # constrain to avoid rounding errors
     theta <- pi * (1 + sqrt(5)) * indices
 
     x <- cos(theta) * sin(phi)
@@ -227,13 +208,13 @@ create_embryo <-
       ))
     colnames(ploidy) <- paste0("chr", 1:n.chrs)
 
-    #' Set a cell to contain an aneuploid chromosome
-    #'
-    #' @param ploidy the embryo
-    #' @param cell.index the cell to affect
-    #' @param chromosome the chromosome to make aneuploid
-    #'
-    #' @return the modified ploidy table
+  # Set a cell to contain an aneuploid chromosome
+  #
+  # @param ploidy the embryo
+  # @param cell.index the cell to affect
+  # @param chromosome the chromosome to make aneuploid
+  #
+  # @return the modified ploidy table
     set.aneuploid <- function(ploidy, cell.index, chromosome) {
       if (chromosome < 1 | chromosome > n.chrs) {
         stop(paste0("Chromosome must be in range 1-", n.chrs))
@@ -261,12 +242,12 @@ create_embryo <-
 
     # Test if the given chromosome in the given cell is aneuploid
     #
-    #' @param embryo the embryo
-    #' @param cell.index the cell to test (0 for all cells)
-    #' @param chromosome the chromosome to test
-    #' @param euploidy the number of chromosome to be considered an euploid
-    #'
-    #' @return if cell.index is >0, return true if the chromosome is aneuploid,
+    # @param embryo the embryo
+    # @param cell.index the cell to test (0 for all cells)
+    # @param chromosome the chromosome to test
+    # @param euploidy the number of chromosome to be considered an euploid
+    #
+    # @return if cell.index is >0, return true if the chromosome is aneuploid,
     # false otherwise. If cell.index is 0, return true if any chromosome is
     # aneuploid.
     is.aneuploid <-
@@ -293,17 +274,17 @@ create_embryo <-
         return(ploidy[cell.index, chromosome] != euploidy)
       }
 
-    #' Set aneuploidies in an embryo
-    #'
-    #' Aneuploid cells are either adjacent or dispersed
-    #'
-    #' @param ploidy the ploidy matrix from the embryo
-    #' @param chromosome the chromosome to set aneuploidies for
-    #' @param prop.aneuploid the proportion of aneuploid cells (0-1)
-    #' @param dispersion the dispersion of the aneuploid cells (0-1)
-    #' @param concordance the concordance between aneuploid cells for each chromosome (0-1).
+    # Set aneuploidies in an embryo
     #
-    #' @return the ploidy matrix with aneuploidies
+    # Aneuploid cells are either adjacent or dispersed
+    #
+    # @param ploidy the ploidy matrix from the embryo
+    # @param chromosome the chromosome to set aneuploidies for
+    # @param prop.aneuploid the proportion of aneuploid cells (0-1)
+    # @param dispersion the dispersion of the aneuploid cells (0-1)
+    # @param concordance the concordance between aneuploid cells for each chromosome (0-1).
+    #
+    # @return the ploidy matrix with aneuploidies
     set.aneuploidies <-
       function(ploidy,
                chromosome,
@@ -470,8 +451,8 @@ create_embryo <-
       z = d[, 3],
       aneu = prop.aneuploid,
       disp = dispersal,
-      dists = d[,-(1:3)],
-      neighbours = n[,-(1:3)],
+      dists = d[, -(1:3)],
+      neighbours = n[, -(1:3)],
       euploidy = euploidy,
       ploidy = ploidy
     )

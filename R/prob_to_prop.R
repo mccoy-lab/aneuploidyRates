@@ -4,12 +4,12 @@
 
 
 #' Convert the probabilities to proportion.
-#' @param prob_meio the probability of having a meiotic error
-#' @param prob_mito the probability of having a mitotic error
-#' @param num_division the total number of divisions in this embryo
-#'
+#' @param prob.meio the probability of having a meiotic error
+#' @param prob.mito the probability of having a mitotic error
+#' @param num.division the total number of divisions in this embryo
 #' @return proportion of totally affected (aneuploidy) cells within
 #' this embryo.
+#'
 #' @export
 prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
   # Error messages
@@ -64,11 +64,10 @@ prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
 #' The derived cells of an aneuploid cell will all be aneuploids. Therefore,
 #' we can tally the number of affected cells mathematically.
 #'
-#' @param cell.affected current total number of affected cells
+#' @param cells.affected current total number of affected cells
 #' @param n.division number of divisions simulated
 #' @param prob.affected the likelihood of a cell to be an aneuploid.
 #' @param currently.affected True if the current cell is an aneuploid and False otherwise
-#'
 #' @return total number of affected cells in this simulation
 #'
 mito_aneu_cells <- function(cells.affected = 0,

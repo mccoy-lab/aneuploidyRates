@@ -1,30 +1,30 @@
-#' This file runs through a range of meiotic and mitotic probabilities and dispersal,
-#' and select the most fitting values that deduces the expected data.
+# This file runs through a range of meiotic and mitotic probabilities and dispersal,
+# and select the most fitting values that deduces the expected data.
 
-#' Data for comparison:
-#' From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
-#' we leveraged their summary statistics presented in Figure 1A and calculated
-#' a weighted average to determine percentage of aneuploidy, mosaicism, and euploidy
-#' biopsies across 5 clinics.
-#'
-#' A total of 73218 embryos are collected, of which 38.8% (28,431) is euploid,
-#' 18.6% (13,602) is mosaic, and 42.6% (31,185) is aneuploid.
+# Data for comparison:
+# From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
+# we leveraged their summary statistics presented in Figure 1A and calculated
+# a weighted average to determine percentage of aneuploidy, mosaicism, and euploidy
+# biopsies across 5 clinics.
+#
+# A total of 73218 embryos are collected, of which 38.8% (28,431) is euploid,
+# 18.6% (13,602) is mosaic, and 42.6% (31,185) is aneuploid.
 
-#' The selection process will be done by EasyABC
+# The selection process will be done by EasyABC
 # install.packages("EasyABC")
-if(!require(EasyABC)) {
-  # EasyABC dependency
-  if(!require(locfit)) install.packages("locfit", repos = "http://cran.us.r-project.org")
-  if(!require(nnet)) install.packages("nnet", repos = "http://cran.us.r-project.org")
-  if(!require(lattice)) install.packages("lattice", repos = "http://cran.us.r-project.org")
-  if(!require(survival)) install.packages("survival", repos = "http://cran.us.r-project.org")
-  if(!require(Matrix)) install.packages("Matrix", repos = "http://cran.us.r-project.org")
-  if(!require(MASS)) install.packages("MASS", repos = "http://cran.us.r-project.org")
-  if(!require(quantreg)) install.packages("quantreg", repos = "http://cran.us.r-project.org")
-
-  install.packages("EasyABC", repos = "http://cran.us.r-project.org")
-}
-library(EasyABC)
+# if(!require(EasyABC)) {
+#   # EasyABC dependency
+#   if(!require(locfit)) install.packages("locfit", repos = "http://cran.us.r-project.org")
+#   if(!require(nnet)) install.packages("nnet", repos = "http://cran.us.r-project.org")
+#   if(!require(lattice)) install.packages("lattice", repos = "http://cran.us.r-project.org")
+#   if(!require(survival)) install.packages("survival", repos = "http://cran.us.r-project.org")
+#   if(!require(Matrix)) install.packages("Matrix", repos = "http://cran.us.r-project.org")
+#   if(!require(MASS)) install.packages("MASS", repos = "http://cran.us.r-project.org")
+#   if(!require(quantreg)) install.packages("quantreg", repos = "http://cran.us.r-project.org")
+#
+#   install.packages("EasyABC", repos = "http://cran.us.r-project.org")
+# }
+# library(EasyABC)
 # source("R/summarize_biopsy.R")
 
 #' Return a data frame of the selected error probabilities and dispersal
@@ -38,6 +38,7 @@ library(EasyABC)
 #'@param num.trials the number of trials to run the simulation. Each trial
 #'@param hide.param a boolean to show/hide the constant default parameters: num.cells,
 #'num.chr, concordance
+#'
 #'@export
 #'
 #'@return a data frame of the corresponding embryo (prop.aneu), the selected
@@ -134,7 +135,7 @@ find_rates <- function(meio.range = list(0, 1),
 
   # Feed into ABC_rejection
   rates_sim <-
-    ABC_rejection(
+    EasyABC::ABC_rejection(
       # previously set biopsy model, returns a list of biopsy type percentages
       model = rates_model,
       # previously set distributions for error rates and dispersal inputs

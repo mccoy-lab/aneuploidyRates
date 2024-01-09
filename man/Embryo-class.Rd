@@ -3,13 +3,8 @@
 \docType{class}
 \name{Embryo-class}
 \alias{Embryo-class}
-\title{This file creates an embryo object.
-code used from line 9-511 are mainly referenced from the Tessera package,
-with more lines of comments, slight changes in line 332-343, and removal
-of the graphic}
+\title{An S4 class to model an embryo}
 \description{
-(Maybe just use the original package? Then how do we write
-this file if there are no new functions?)
 An S4 class to model an embryo
 }
 \section{Slots}{

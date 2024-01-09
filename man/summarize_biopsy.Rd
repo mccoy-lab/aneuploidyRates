@@ -22,6 +22,14 @@ summarize_biopsy(
 
 \item{mito}{the probability of having a meiotic error}
 
+\item{num.cell}{the number of cells in the embryo}
+
+\item{num.chr}{the number of chromosome pairs per cell}
+
+\item{dispersal}{the dispersion vector of the aneuploid cells (0-1)}
+
+\item{concordance}{the concordance between aneuploid cells for each chromosome (0-1).}
+
 \item{hide.default.param}{the boolean to exclude other parameters used in
 constructing the embryo: num.cell, num.chr, concordance. If false, the returned
 vector will contain these values.}

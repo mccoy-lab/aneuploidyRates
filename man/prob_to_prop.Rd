@@ -10,11 +10,11 @@ Convert the probabilities to proportion.}
 prob_to_prop(prob.meio, prob.mito, num.division = 8)
 }
 \arguments{
-\item{prob_meio}{the probability of having a meiotic error}
+\item{prob.meio}{the probability of having a meiotic error}
 
-\item{prob_mito}{the probability of having a mitotic error}
+\item{prob.mito}{the probability of having a mitotic error}
 
-\item{num_division}{the total number of divisions in this embryo}
+\item{num.division}{the total number of divisions in this embryo}
 }
 \value{
 proportion of totally affected (aneuploidy) cells within

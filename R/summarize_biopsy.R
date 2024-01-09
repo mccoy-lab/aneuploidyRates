@@ -10,6 +10,10 @@
 #' @param num.em the number of embryos to be created
 #' @param meio the probability of having a meiotic error
 #' @param mito the probability of having a meiotic error
+#' @param num.cell the number of cells in the embryo
+#' @param num.chr the number of chromosome pairs per cell
+#' @param dispersal the dispersion vector of the aneuploid cells (0-1)
+#' @param concordance the concordance between aneuploid cells for each chromosome (0-1).
 #' @param hide.default.param the boolean to exclude other parameters used in
 #' constructing the embryo: num.cell, num.chr, concordance. If false, the returned
 #' vector will contain these values.
@@ -43,8 +47,8 @@ summarize_biopsy <- function(num.em = 100,
   }
   if (num.em %% 1 != 0) {
     stop(paste0(
-      "The number of cell division: ",
-      num.division,
+      "The number of embryos: ",
+      num.em,
       "should be an integer"
     ))
   }
@@ -81,8 +85,8 @@ summarize_biopsy <- function(num.em = 100,
     # Create an embryo
     em <- create_embryo(
       prop.aneuploid = prop.aneu,
-      n.cell = num.cell,
-      n.chr = num.chr,
+      n.cells = num.cell,
+      n.chrs = num.chr,
       dispersal = dispersal,
       concordance = concordance
     )
