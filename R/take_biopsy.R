@@ -1,4 +1,6 @@
 #' This file takes the biopsy of an embryo object.
+if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
+if(!require(tessera)) devtools::install_github("bmskinner/tessera")
 library(tessera)
 
 

@@ -12,7 +12,18 @@
 
 #' The selection process will be done by EasyABC
 # install.packages("EasyABC")
+if(!require(EasyABC)) {
+  # EasyABC dependency
+  if(!require(locfit)) install.packages("locfit", repos = "http://cran.us.r-project.org")
+  if(!require(nnet)) install.packages("nnet", repos = "http://cran.us.r-project.org")
+  if(!require(lattice)) install.packages("lattice", repos = "http://cran.us.r-project.org")
+  if(!require(survival)) install.packages("survival", repos = "http://cran.us.r-project.org")
+  if(!require(Matrix)) install.packages("Matrix", repos = "http://cran.us.r-project.org")
+  if(!require(MASS)) install.packages("MASS", repos = "http://cran.us.r-project.org")
+  if(!require(quantreg)) install.packages("quantreg", repos = "http://cran.us.r-project.org")
 
+  install.packages("EasyABC", repos = "http://cran.us.r-project.org")
+}
 library(EasyABC)
 # source("R/summarize_biopsy.R")
 

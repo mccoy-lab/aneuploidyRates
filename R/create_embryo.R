@@ -2,10 +2,8 @@
 #' code used from line 9-511 are mainly referenced from the Tessera package,
 #' with more lines of comments, slight changes in line 332-343, and removal
 #' of the graphic
-#'
-#' (Maybe just use the original package? Then how do we write
-#' this file if there are no new functions?)
-library(tessera)
+
+# library(tessera)
 
 # Set up Embryo -----------------------------------------------------------
 
