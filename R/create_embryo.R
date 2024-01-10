@@ -67,13 +67,17 @@ setClass(
 #' @return an Embryo object
 #'
 #' @examples
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
+#' dispersal =  0.9)
 #'
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9, rng.seed = 42)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
+#' dispersal =  0.9, rng.seed = 42)
 #'
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2, dispersal =  0.9, concordance = 1)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2,
+#' dispersal =  0.9, concordance = 1)
 #'
-#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
+#' embryo <- create_embryo(n.cells = 200, n.chrs = 3,
+#' prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
 create_embryo <-
   function(n.cells = 200,
            n.chrs = 1,
@@ -225,13 +229,13 @@ create_embryo <-
     }
 
     # Test if any of the neighbouring cells have an aneuploidy
-    #' @param n the neighbor matrix for cells
-    #' @param ploidy the ploidy matrix for cells and chromosomes
-    #' @param index the cell to test
-    #' @param chromosome the chromosome to test
-    #' @param euploidy the number of chromosome to be considered an euploid
-    #'
-    #' @return Returns true if any of the closest cells are aneuploid
+    # @param n the neighbor matrix for cells
+    # @param ploidy the ploidy matrix for cells and chromosomes
+    # @param index the cell to test
+    # @param chromosome the chromosome to test
+    # @param euploidy the number of chromosome to be considered an euploid
+    #
+    # @return Returns true if any of the closest cells are aneuploid
     .has.adjacent.aneuploid <-
       function(n, ploidy, index, chromosome, euploidy) {
         adj.list <- n[[paste0("n", index)]]
@@ -462,13 +466,18 @@ create_embryo <-
 
 # Override functions --------------------------------------------------------
 
-# Add a method override for existing generic function length to get the number of cells
+#' Add a method override for existing generic function length to get the number
+#' of cells
+#'
+#' @param x an Embryo object
 setMethod("length", "Embryo", function(x) {
   length(x@x)
 })
 
 
-# Override show function for an Embryo object
+#' Override show function for an Embryo object
+#'
+#' @param object an Embryo object
 setMethod("show", "Embryo", function(object) {
   cat(
     "Embryo with ",

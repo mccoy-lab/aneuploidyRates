@@ -37,22 +37,12 @@ size can vary according to \code{embryo.size.sd}.}
 The actual embryo size will be sampled from a normal distribution with mean of \code{n.cells} and
 standard deviation \code{embryo.size.sd}.}
 
-\item{euploidy}{the number of chromosome to be considered an euploid}
+\item{euploidy}{the number of copies of a chromosome to consider euploid. For a diploid embryo this should be 2.}
 
 \item{rng.seed}{the seed for the rRandom Number Generation (RNG). Defaults to NULL. Use this to get the same embryo each time}
-
-\item{n}{the neighbor matrix for cells}
-
-\item{ploidy}{the ploidy matrix for cells and chromosomes}
-
-\item{index}{the cell to test}
-
-\item{chromosome}{the chromosome to test}
 }
 \value{
 an Embryo object
-
-Returns true if any of the closest cells are aneuploid
 }
 \description{
 Create an embryo with the given proportion of aneuploidies.
@@ -61,11 +51,15 @@ cells for each chromosome can be specificed; if fully concordant, a cell aneuplo
 for chr1 will also be aneuploid for chr2 and all the other chrs.
 }
 \examples{
-embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9)
+embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
+dispersal =  0.9)
 
-embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2, dispersal =  0.9, rng.seed = 42)
+embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
+dispersal =  0.9, rng.seed = 42)
 
-embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2, dispersal =  0.9, concordance = 1)
+embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2,
+dispersal =  0.9, concordance = 1)
 
-embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
+embryo <- create_embryo(n.cells = 200, n.chrs = 3,
+prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
 }

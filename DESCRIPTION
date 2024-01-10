@@ -8,7 +8,7 @@ Authors@R: c(
 Description: Simulate early embryo development under a range of 
 	meiotic and mitotic error rates. Compare resulting biopsies 
 	to clinically detected aneuploidy rates.
-License: `use_gpl3_license()`
+License: GPL (>= 3)
 URL: https://github.com/mccoy-lab/aneuploidyRates
 BugReports: https://github.com/mccoy-lab/aneuploidyRates/issues
 Roxygen: list(markdown = TRUE)
@@ -24,7 +24,6 @@ Remotes:
   bmskinner/tessera
 Suggests: 
     knitr,
-    BiocStyle,
     testthat (>= 3.0.0)
 Encoding: UTF-8
 Config/testthat/edition: 3
