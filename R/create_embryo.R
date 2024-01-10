@@ -1,9 +1,7 @@
 # This file creates an embryo object.
 # code used from line 9-511 are mainly referenced from the Tessera package,
 # with more lines of comments, slight changes in line 332-343, and removal
-# of the graphic
-
-# library(tessera)
+# of the graphing methods
 
 # Set up Embryo -----------------------------------------------------------
 
@@ -176,8 +174,9 @@ create_embryo <-
 
     # Make a sphere of evenly spaced points using the Fibonacci lattice
     indices <- seq(0, n.cells - 1, 1) + 0.5
+    # constrain to avoid rounding errors
     phi <-
-      acos(pmin(pmax(1 - 2 * indices / n.cells, -1.0), 1.0)) # constrain to avoid rounding errors
+      acos(pmin(pmax(1 - 2 * indices / n.cells,-1.0), 1.0))
     theta <- pi * (1 + sqrt(5)) * indices
 
     x <- cos(theta) * sin(phi)
@@ -191,14 +190,17 @@ create_embryo <-
     # Create distance matrix for each point
     # Set the .N_NEIGHBOURS closest points to be neighbours
     for (i in 1:nrow(d)) {
+      # distance between every other points and the current point
       dist <-
-        sqrt((d$x - x[i]) ** 2 + (d$y - y[i]) ** 2 + (d$z - z[i]) ** 2) # distance between every other points and the current point
+        sqrt((d$x - x[i]) ** 2 + (d$y - y[i]) ** 2 + (d$z - z[i]) ** 2)
+      # create a column to store the distances
       d[[paste0("d", i)]] <-
-        dist # create a column to store the distances
-      # A point is a neighbour if it is not this point, and it is in the list of closest points
+        dist
+      # A neighbor point is in the list of closest points:
+      # if the distance is smaller than the 7th on the list
       n[[paste0("n", i)]] <-
         dist > 0 &
-        dist <= max(head(sort(dist), n = .N_NEIGHBOURS + 1)) # if the distance is smaller than the 7th on the list
+        dist <= max(head(sort(dist), n = .N_NEIGHBOURS + 1))
     }
 
     # Set up ploidy data =======================================================
@@ -212,13 +214,13 @@ create_embryo <-
       ))
     colnames(ploidy) <- paste0("chr", 1:n.chrs)
 
-  # Set a cell to contain an aneuploid chromosome
-  #
-  # @param ploidy the embryo
-  # @param cell.index the cell to affect
-  # @param chromosome the chromosome to make aneuploid
-  #
-  # @return the modified ploidy table
+    # Set a cell to contain an aneuploid chromosome
+    #
+    # @param ploidy the embryo
+    # @param cell.index the cell to affect
+    # @param chromosome the chromosome to make aneuploid
+    #
+    # @return the modified ploidy table
     set.aneuploid <- function(ploidy, cell.index, chromosome) {
       if (chromosome < 1 | chromosome > n.chrs) {
         stop(paste0("Chromosome must be in range 1-", n.chrs))
@@ -286,7 +288,8 @@ create_embryo <-
     # @param chromosome the chromosome to set aneuploidies for
     # @param prop.aneuploid the proportion of aneuploid cells (0-1)
     # @param dispersion the dispersion of the aneuploid cells (0-1)
-    # @param concordance the concordance between aneuploid cells for each chromosome (0-1).
+    # @param concordance the concordance between aneuploid cells for each
+    # chromosome (0-1).
     #
     # @return the ploidy matrix with aneuploidies
     set.aneuploidies <-
@@ -309,9 +312,9 @@ create_embryo <-
 
         # set number of aneuploid cells ########################################
 
-        # When testing at a small probability, sometimes there is no aneuploid cells
+        # When testing at a small probability, sometimes there is < 1 aneuploidy
         if (n.cells * prop.aneuploid < 1) {
-          # So that for a small prop, sometimes it's 1
+          # So that for a small probability, sometimes n.aneuploid rounds to 1
           random <- runif(1)
           if (random < prop.aneuploid) {
             n.aneuploid <- 1
@@ -337,7 +340,7 @@ create_embryo <-
           # cat("Prev chr", prev.chr, "has", length(concordant.cells[concordant.cells==T]), "aneuploid cells\n")
           n.concordant <-
             length(concordant.cells[concordant.cells == T]) * concordance
-          # if there are more aneuploids in the prev chromosome, we can't match all
+          # if there are more aneuploidy in the prev chromosome, we can't match all
           n.concordant <- min(n.aneuploid, n.concordant)
           # cat("Expecting", n.concordant, "concordant cells with chr", prev.chr, "\n")
         }
@@ -355,17 +358,17 @@ create_embryo <-
           n.to.make <- n.seeds
 
           # Disperse seeds as much as possible initially
-          # We create a list of possible seed locations, and as each seed is assigned
-          # we remove it and its neighbours
-          # If there are enough seeds required, we will exhaust the possible locations
-          # and finish seeding in the next step
+          # We create a list of possible seed locations, and as each seed is
+          # assigned, we remove it and its neighbors.
+          # If there are enough seeds required, we will exhaust the possible
+          # locations and finish seeding in the next step.
           # cat("Creating", n.to.make, "seeds\n")
           possible.initial.seeds <-
             1:n.cells # vector of indexes we can sample
           while (n.to.make > 0 &
                  length(possible.initial.seeds) > 0) {
-            # Take the next seed from those available. NOTE: if the vector is length 1,
-            # sample will sample from 1:n, so we need to correct for this
+            # Take the next seed from those available. NOTE: if the vector is
+            # length 1, sample will sample from 1:n, so we need to correct for this
             seed <-
               ifelse(
                 length(possible.initial.seeds) == 1,
@@ -455,8 +458,8 @@ create_embryo <-
       z = d[, 3],
       aneu = prop.aneuploid,
       disp = dispersal,
-      dists = d[, -(1:3)],
-      neighbours = n[, -(1:3)],
+      dists = d[,-(1:3)],
+      neighbours = n[,-(1:3)],
       euploidy = euploidy,
       ploidy = ploidy
     )

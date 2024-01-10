@@ -41,3 +41,12 @@ and the three biopsy types shown as percentages.
 \description{
 A wrapper function for generating the biopsy results
 }
+\examples{
+summarize_biopsy(
+  meio = 0,
+  mito = 0.3,
+  dispersal = 0.5,
+  hide.default.param = TRUE
+)
+
+}

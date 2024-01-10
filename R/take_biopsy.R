@@ -1,7 +1,4 @@
 #' This file takes the biopsy of an embryo object.
-# if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
-# if(!require(tessera)) devtools::install_github("bmskinner/tessera")
-# library(tessera)
 
 
 #' Take a biopsy of the given embryo, return an int corresponding to the biopsy types
@@ -24,7 +21,8 @@ take_biopsy <- function(em, biop.size = 5) {
     ))
   }
 
-  biopsy.result <- tessera::takeBiopsy(embryo = em, biopsy.size = biop.size)
+  biopsy.result <-
+    tessera::takeBiopsy(embryo = em, biopsy.size = biop.size)
 
   # assign types based on results
   if (biopsy.result == 0) {

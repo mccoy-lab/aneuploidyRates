@@ -11,21 +11,6 @@
 # 18.6% (13,602) is mosaic, and 42.6% (31,185) is aneuploid.
 
 # The selection process will be done by EasyABC
-# install.packages("EasyABC")
-# if(!require(EasyABC)) {
-#   # EasyABC dependency
-#   if(!require(locfit)) install.packages("locfit", repos = "http://cran.us.r-project.org")
-#   if(!require(nnet)) install.packages("nnet", repos = "http://cran.us.r-project.org")
-#   if(!require(lattice)) install.packages("lattice", repos = "http://cran.us.r-project.org")
-#   if(!require(survival)) install.packages("survival", repos = "http://cran.us.r-project.org")
-#   if(!require(Matrix)) install.packages("Matrix", repos = "http://cran.us.r-project.org")
-#   if(!require(MASS)) install.packages("MASS", repos = "http://cran.us.r-project.org")
-#   if(!require(quantreg)) install.packages("quantreg", repos = "http://cran.us.r-project.org")
-#
-#   install.packages("EasyABC", repos = "http://cran.us.r-project.org")
-# }
-# library(EasyABC)
-# source("R/summarize_biopsy.R")
 
 #' Return a data frame of the selected error probabilities and dispersal
 #'
@@ -146,8 +131,8 @@ find_rates <- function(meio.range = list(0, 1),
       summary_stat_target = expected,
       # percentage of closest results to be selected
       tol = tolerance,
-      use_seed = TRUE,
-      n_cluster = 5,
+      # use_seed = TRUE,
+      # n_cluster = 5,
       progress_bar = TRUE
     )
 

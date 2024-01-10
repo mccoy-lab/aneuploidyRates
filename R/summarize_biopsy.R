@@ -1,10 +1,6 @@
 # This file returns a vector of a biopsy summary for a batch of embryos with the
 # same meiotic and mitotic error rates.
 
-# source("R/create_embryo.R")
-# source("R/prob_to_prop.R")
-# source("R/take_biopsy.R")
-
 
 #' A wrapper function for generating the biopsy results
 #' @param num.em the number of embryos to be created
@@ -21,6 +17,15 @@
 #' @return a vector with columns: "prop.aneu", "prob.meio", "prob.mito", "dispersal",
 #' and the three biopsy types shown as percentages.
 #' @export
+#'
+#' @examples
+#' summarize_biopsy(
+#'   meio = 0,
+#'   mito = 0.3,
+#'   dispersal = 0.5,
+#'   hide.default.param = TRUE
+#' )
+#'
 
 summarize_biopsy <- function(num.em = 100,
                              meio,
@@ -46,11 +51,9 @@ summarize_biopsy <- function(num.em = 100,
                 " must be at most 1"))
   }
   if (num.em %% 1 != 0) {
-    stop(paste0(
-      "The number of embryos: ",
-      num.em,
-      "should be an integer"
-    ))
+    stop(paste0("The number of embryos: ",
+                num.em,
+                "should be an integer"))
   }
   if (num.em < 0) {
     stop(paste0("The number of embryos: ",
@@ -111,23 +114,3 @@ summarize_biopsy <- function(num.em = 100,
   result[c(1, 5:7)] <- result[c(1, 5:7)] / num.em
   return(result)
 }
-
-# result <- summarize_biopsy(
-#   meio = 0,
-#   mito = 0.3,
-#   dispersal = 0.5,
-#   hide.default.param = TRUE
-# )
-# print(result[c(1, 5:7)] == list(1, 0, 0, 1))
-# print(result)
-# print(typeof(result))
-
-
-# system.time(
-#   df2 <- summarize_biopsy(
-#     meio = 0,
-#     mito = 0.3,
-#     dispersal = 0.5,
-#     hide.default.param = TRUE
-#   )
-# )
