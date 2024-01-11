@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize_biopsy.R
 \name{summarize_biopsy}
 \alias{summarize_biopsy}
-\title{A wrapper function for generating the biopsy results}
+\title{Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.}
 \usage{
 summarize_biopsy(
   num.em = 100,
@@ -39,7 +39,9 @@ a vector with columns: "prop.aneu", "prob.meio", "prob.mito", "dispersal",
 and the three biopsy types shown as percentages.
 }
 \description{
-A wrapper function for generating the biopsy results
+A wrapper function for generating the biopsy results, it counts the proportions
+of euploid, mosaic, and aneuploid biopsy results out of sampling a batch of
+embryos with the same error rates and dispersal.
 }
 \examples{
 summarize_biopsy(
@@ -47,6 +49,16 @@ summarize_biopsy(
   mito = 0.3,
   dispersal = 0.5,
   hide.default.param = TRUE
+)
+summarize_biopsy(
+  num.em = 200,
+  meio = 0.3,
+  mito = 0.02,
+  num.cell = 200,
+  num.chr = 1,
+  dispersal = 0,
+  concordance = 0,
+  hide.default.param = FALSE
 )
 
 }

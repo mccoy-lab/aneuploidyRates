@@ -36,5 +36,27 @@ a data frame of the corresponding embryo (prop.aneu), the selected
 error rate pair, its dispersal, and biopsy information.
 }
 \description{
-Return a data frame of the selected error probabilities and dispersal
+This function runs through a range of meiotic and mitotic probabilities and dispersal,
+and select the most fitting values that deduces the expected data. The selection
+process will be done by EasyABC.
+
+Data for comparison:
+From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
+we leveraged their summary statistics presented in Figure 1A and calculated
+a weighted average to determine percentage of aneuploidy, mosaicism, and euploidy
+biopsies across 5 clinics.
+
+A total of 73218 embryos are collected, of which 38.8\% (28,431) is euploid,
+18.6\% (13,602) is mosaic, and 42.6\% (31,185) is aneuploid.
+}
+\examples{
+find_rates(num.trials = 50)
+find_rates(
+  meio.range = list(0.3, 0.5),
+  mito.range = list(0.05, 0.15),
+  disp.range = list (0, 0.5),
+  expected = c(0.3, 0.1, 0.6),
+  tolerance = 0.1,
+  num.trials = 50,
+  hide.param = FALSE)
 }

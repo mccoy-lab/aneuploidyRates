@@ -1,8 +1,9 @@
-# This file returns a vector of a biopsy summary for a batch of embryos with the
-# same meiotic and mitotic error rates.
-
-
-#' A wrapper function for generating the biopsy results
+#' Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.
+#'
+#' A wrapper function for generating the biopsy results, it counts the proportions
+#' of euploid, mosaic, and aneuploid biopsy results out of sampling a batch of
+#' embryos with the same error rates and dispersal.
+#'
 #' @param num.em the number of embryos to be created
 #' @param meio the probability of having a meiotic error
 #' @param mito the probability of having a meiotic error
@@ -25,8 +26,17 @@
 #'   dispersal = 0.5,
 #'   hide.default.param = TRUE
 #' )
+#' summarize_biopsy(
+#'   num.em = 200,
+#'   meio = 0.3,
+#'   mito = 0.02,
+#'   num.cell = 200,
+#'   num.chr = 1,
+#'   dispersal = 0,
+#'   concordance = 0,
+#'   hide.default.param = FALSE
+#' )
 #'
-
 summarize_biopsy <- function(num.em = 100,
                              meio,
                              mito,

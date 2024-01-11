@@ -1,16 +1,21 @@
-#' This file converts the probabilities of being affected
-#' by meiotic and mitotic errors to proportions of
-#' aneuploid cells within an embryo.
-
-
-#' Convert the probabilities to proportion.
+#' Convert the error rates to proportion of aneuploidy cells within an embryo.
+#'
+#' Affect the cell with meiotic aneuploidy based on error rate. If the cell is
+#' affected, return the proportion of aneuploidy as 1. Else, simulate cell division
+#' with random mitotic errors based on the probability and calculate the number of
+#' aneuploid cells by the end of the simulation. Return the proportion.
+#'
 #' @param prob.meio the probability of having a meiotic error
 #' @param prob.mito the probability of having a mitotic error
 #' @param num.division the total number of divisions in this embryo
+#'
 #' @return proportion of totally affected (aneuploidy) cells within
 #' this embryo.
-#'
 #' @export
+#'
+#' @examples
+#' prob_to_prop(0, 0.5)
+#' prob_to_prop(0.2, 0.03, num.division = 6)
 prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
   # Error messages
   if (prob.meio < 0 | prob.mito < 0) {
@@ -60,16 +65,17 @@ prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
 
 
 #' Simulate cell division and count the number of affected (aneuploid) cells.
-#' Recursive.
-#' The derived cells of an aneuploid cell will all be aneuploids. Therefore,
-#' we can tally the number of affected cells mathematically.
+#'
+#' Since the derived cells of an aneuploid cell will all be aneuploids, the
+#' function recursively tallies the number of affected cells after a certain
+#' number of cell divisions.
 #'
 #' @param cells.affected current total number of affected cells
 #' @param n.division number of divisions simulated
 #' @param prob.affected the likelihood of a cell to be an aneuploid.
 #' @param currently.affected True if the current cell is an aneuploid and False otherwise
-#' @return total number of affected cells in this simulation
 #'
+#' @return total number of affected cells in this simulation
 mito_aneu_cells <- function(cells.affected = 0,
                             n.division = 8,
                             prob.affected = 0.5,

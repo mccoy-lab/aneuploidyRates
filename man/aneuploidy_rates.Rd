@@ -2,8 +2,7 @@
 % Please edit documentation in R/aneuploidyRates-package.R
 \docType{package}
 \name{aneuploidy_rates}
-\alias{aneuploidyRates}
-\alias{aneuploidyRates-package}
+\alias{aneuploidy_rates}
 \title{aneuploidy_rates: A package for computing the meiotic and mitotic error rates
 of human embryos.}
 \description{
@@ -18,21 +17,4 @@ summarize_biopsy uses create_embryo, prob_to_prop, and take_biopsy.
 find_rates uses summarize_biopsy.
 }
 
-\seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/mccoy-lab/aneuploidyRates}
-  \item Report bugs at \url{https://github.com/mccoy-lab/aneuploidyRates/issues}
-}
-
-}
-\author{
-\strong{Maintainer}: Angela Yang \email{qyang40@jhu.edu}
-
-Authors:
-\itemize{
-  \item Sara Carioscia \email{saracarioscia@gmail.com}
-}
-
-}
 \keyword{internal}

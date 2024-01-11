@@ -2,10 +2,7 @@
 % Please edit documentation in R/prob_to_prop.R
 \name{mito_aneu_cells}
 \alias{mito_aneu_cells}
-\title{Simulate cell division and count the number of affected (aneuploid) cells.
-Recursive.
-The derived cells of an aneuploid cell will all be aneuploids. Therefore,
-we can tally the number of affected cells mathematically.}
+\title{Simulate cell division and count the number of affected (aneuploid) cells.}
 \usage{
 mito_aneu_cells(
   cells.affected = 0,
@@ -27,8 +24,7 @@ mito_aneu_cells(
 total number of affected cells in this simulation
 }
 \description{
-Simulate cell division and count the number of affected (aneuploid) cells.
-Recursive.
-The derived cells of an aneuploid cell will all be aneuploids. Therefore,
-we can tally the number of affected cells mathematically.
+Since the derived cells of an aneuploid cell will all be aneuploids, the
+function recursively tallies the number of affected cells after a certain
+number of cell divisions.
 }

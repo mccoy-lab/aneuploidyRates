@@ -2,10 +2,7 @@
 % Please edit documentation in R/create_embryo.R
 \name{create_embryo}
 \alias{create_embryo}
-\title{Create an embryo with the given proportion of aneuploidies.
-Aneuploid cells are either adjacent or dispersed. The concordance of aneuploid
-cells for each chromosome can be specificed; if fully concordant, a cell aneuploid
-for chr1 will also be aneuploid for chr2 and all the other chrs.}
+\title{Create an embryo with the given proportion of aneuploidies.}
 \usage{
 create_embryo(
   n.cells = 200,
@@ -13,8 +10,6 @@ create_embryo(
   prop.aneuploid = 0.2,
   dispersal = 0,
   concordance = 0,
-  embryo.size.fixed = T,
-  embryo.size.sd = 5,
   euploidy = 2,
   rng.seed = NULL
 )
@@ -30,13 +25,6 @@ create_embryo(
 
 \item{concordance}{the concordance between aneuploid cells for each chromosome (0-1).}
 
-\item{embryo.size.fixed}{if true, the embryo is exactly the size in \code{n.cells}. If false, the embryo
-size can vary according to \code{embryo.size.sd}.}
-
-\item{embryo.size.sd}{the standard deviation of cell number if \code{embryo.size.fixed} is false.
-The actual embryo size will be sampled from a normal distribution with mean of \code{n.cells} and
-standard deviation \code{embryo.size.sd}.}
-
 \item{euploidy}{the number of copies of a chromosome to consider euploid. For a diploid embryo this should be 2.}
 
 \item{rng.seed}{the seed for the rRandom Number Generation (RNG). Defaults to NULL. Use this to get the same embryo each time}
@@ -46,9 +34,6 @@ an Embryo object
 }
 \description{
 Create an embryo with the given proportion of aneuploidies.
-Aneuploid cells are either adjacent or dispersed. The concordance of aneuploid
-cells for each chromosome can be specificed; if fully concordant, a cell aneuploid
-for chr1 will also be aneuploid for chr2 and all the other chrs.
 }
 \examples{
 embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
@@ -60,6 +45,6 @@ dispersal =  0.9, rng.seed = 42)
 embryo <- create_embryo(n.cells = 200, n.chrs = 3,  prop.aneuploid = 0.2,
 dispersal =  0.9, concordance = 1)
 
-embryo <- create_embryo(n.cells = 200, n.chrs = 3,
+embryo <- create_embryo(n.cells = 250, n.chrs = 3,
 prop.aneuploid = c(0.2, 0.1, 0.4), dispersal =  0.9)
 }

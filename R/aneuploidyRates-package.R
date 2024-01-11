@@ -14,7 +14,7 @@
 #' @docType package
 #' @name aneuploidy_rates
 #' @keywords internal
-"_PACKAGE"
+
 
 ## usethis namespace: start
 #' @import tessera
@@ -24,4 +24,3 @@
 #' @importFrom utils head
 ## usethis namespace: end
 NULL
-
