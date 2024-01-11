@@ -1,8 +1,8 @@
 #' This file runs the aneuploidyRates package and writes the generated data to a csv file
 #'
-source("R/find_rates.R")
-
-find_rates(num.trials = 100, tolerance = 0.05)
+# source("R/find_rates.R")
+# library(aneuploidyRates)
+# find_rates(num.trials = 100, tolerance = 0.05)
 # find_rates(num.trials = 50)
 
 # Performance check

@@ -2,10 +2,7 @@
 % Please edit documentation in R/take_biopsy.R
 \name{take_biopsy}
 \alias{take_biopsy}
-\title{Take a biopsy of the given embryo, return an int corresponding to the biopsy types
-2 = aneuploid
-1 = mosaic
-0 = euploid}
+\title{Takes a biopsy of an embryo object}
 \usage{
 take_biopsy(em, biop.size = 5)
 }
@@ -18,8 +15,16 @@ take_biopsy(em, biop.size = 5)
 an integer representing the biopsy type
 }
 \description{
-Take a biopsy of the given embryo, return an int corresponding to the biopsy types
+Return an int corresponding to the biopsy types:
 2 = aneuploid
 1 = mosaic
 0 = euploid
+}
+\examples{
+take_biopsy(tessera::Embryo(
+n.cells = 100,
+n.chrs = 1,
+prop.aneuploid = 0.5,
+dispersal = 0), biop.size =5)
+
 }

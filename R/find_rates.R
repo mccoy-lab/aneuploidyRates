@@ -1,6 +1,10 @@
-#' This file runs through a range of meiotic and mitotic probabilities and dispersal,
-#' and select the most fitting values that deduces the expected data.
-
+#' Return a data frame of the selected error probabilities and dispersal
+#'
+#' @description
+#' This function runs through a range of meiotic and mitotic probabilities and dispersal,
+#' and select the most fitting values that deduces the expected data. The selection
+#' process will be done by EasyABC.
+#'
 #' Data for comparison:
 #' From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
 #' we leveraged their summary statistics presented in Figure 1A and calculated
@@ -9,29 +13,32 @@
 #'
 #' A total of 73218 embryos are collected, of which 38.8% (28,431) is euploid,
 #' 18.6% (13,602) is mosaic, and 42.6% (31,185) is aneuploid.
-
-#' The selection process will be done by EasyABC
-# install.packages("EasyABC")
-
-library(EasyABC)
-source("R/summarize_biopsy.R")
-
-#' Return a data frame of the selected error probabilities and dispersal
 #'
-#'@param meio.range a double for the uniform distribution range to generate a meiotic error rate
-#'@param mito.range a double for the uniform distribution range to generate a mitotic error rate
-#'@param disp.range a double for the uniform distribution range to generate the extent of dispersal
-#'@param expected   a list of ratios derived from published data, used for selecting
+#'
+#' @param meio.range a double for the uniform distribution range to generate a meiotic error rate
+#' @param mito.range a double for the uniform distribution range to generate a mitotic error rate
+#' @param disp.range a double for the uniform distribution range to generate the extent of dispersal
+#' @param expected   a list of ratios derived from published data, used for selecting
 #'the fitting error rates and dispersal
-#'@param tolerance  the percent of simulations to be kept near the expected values
-#'@param num.trials the number of trials to run the simulation. Each trial
-#'@param hide.param a boolean to show/hide the constant default parameters: num.cells,
+#' @param tolerance  the percent of simulations to be kept near the expected values
+#' @param num.trials the number of trials to run the simulation. Each trial
+#' @param hide.param a boolean to show/hide the constant default parameters: num.cells,
 #'num.chr, concordance
 #'
-#'
-#'@return a data frame of the corresponding embryo (prop.aneu), the selected
+#' @return a data frame of the corresponding embryo (prop.aneu), the selected
 #'error rate pair, its dispersal, and biopsy information.
+#' @export
 #'
+#' @examples
+#' find_rates(num.trials = 50)
+#' find_rates(
+#'   meio.range = list(0.3, 0.5),
+#'   mito.range = list(0.05, 0.15),
+#'   disp.range = list (0, 0.5),
+#'   expected = c(0.3, 0.1, 0.6),
+#'   tolerance = 0.1,
+#'   num.trials = 50,
+#'   hide.param = FALSE)
 find_rates <- function(meio.range = list(0, 1),
                        mito.range = list(0, 1),
                        disp.range = list(0, 1),
@@ -92,11 +99,16 @@ find_rates <- function(meio.range = list(0, 1),
                 sum up to 1"
     ))
   }
+  if(num.trials*tolerance <= 1.5){
+    stop(paste0(
+      "The number of selected parameters allowed should be more than 1"
+    ))
+  }
 
   # Set up matrix for later output
   remaining.data <- matrix(ncol = 7)
   if (!hide.param) {
-    remaining.data <- cbind(remaining.data, matrix(ncol = 3))
+    remaining.data <- matrix(ncol = 10)
   }
 
   # Set the model for biopsy summary
@@ -123,7 +135,7 @@ find_rates <- function(meio.range = list(0, 1),
 
   # Feed into ABC_rejection
   rates_sim <-
-    ABC_rejection(
+    EasyABC::ABC_rejection(
       # previously set biopsy model, returns a list of biopsy type percentages
       model = rates_model,
       # previously set distributions for error rates and dispersal inputs
@@ -133,7 +145,10 @@ find_rates <- function(meio.range = list(0, 1),
       # expected values, used for selecting results
       summary_stat_target = expected,
       # percentage of closest results to be selected
-      tol = tolerance
+      tol = tolerance,
+      # use_seed = TRUE,
+      # n_cluster = 5,
+      progress_bar = TRUE
     )
 
   # Set up return format: from the saved data, select the rows with ABC_rej's

@@ -2,27 +2,28 @@
 % Please edit documentation in R/prob_to_prop.R
 \name{prob_to_prop}
 \alias{prob_to_prop}
-\title{This file converts the probabilities of being affected
-by meiotic and mitotic errors to proportions of
-aneuploid cells within an embryo.
-Convert the probabilities to proportion.}
+\title{Convert the error rates to proportion of aneuploidy cells within an embryo.}
 \usage{
 prob_to_prop(prob.meio, prob.mito, num.division = 8)
 }
 \arguments{
-\item{prob_meio}{the probability of having a meiotic error}
+\item{prob.meio}{the probability of having a meiotic error}
 
-\item{prob_mito}{the probability of having a mitotic error}
+\item{prob.mito}{the probability of having a mitotic error}
 
-\item{num_division}{the total number of divisions in this embryo}
+\item{num.division}{the total number of divisions in this embryo}
 }
 \value{
 proportion of totally affected (aneuploidy) cells within
 this embryo.
 }
 \description{
-This file converts the probabilities of being affected
-by meiotic and mitotic errors to proportions of
-aneuploid cells within an embryo.
-Convert the probabilities to proportion.
+Affect the cell with meiotic aneuploidy based on error rate. If the cell is
+affected, return the proportion of aneuploidy as 1. Else, simulate cell division
+with random mitotic errors based on the probability and calculate the number of
+aneuploid cells by the end of the simulation. Return the proportion.
+}
+\examples{
+prob_to_prop(0, 0.5)
+prob_to_prop(0.2, 0.03, num.division = 6)
 }

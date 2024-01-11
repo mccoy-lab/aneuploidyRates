@@ -1,4 +1,6 @@
-em = Embryo()
+# library(tessera)
+
+em = tessera::Embryo()
 test_that("Error message works",{
   expect_error(take_biopsy(1))
   expect_error(take_biopsy(em, biop.size = 1000))

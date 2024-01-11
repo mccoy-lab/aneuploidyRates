@@ -1,23 +1,42 @@
-# This file returns a vector of a biopsy summary for a batch of embryos with the
-# same meiotic and mitotic error rates.
-
-source("R/create_embryo.R")
-source("R/prob_to_prop.R")
-source("R/take_biopsy.R")
-
-
-#' A wrapper function for generating the biopsy results
+#' Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.
+#'
+#' A wrapper function for generating the biopsy results, it counts the proportions
+#' of euploid, mosaic, and aneuploid biopsy results out of sampling a batch of
+#' embryos with the same error rates and dispersal.
+#'
 #' @param num.em the number of embryos to be created
 #' @param meio the probability of having a meiotic error
 #' @param mito the probability of having a meiotic error
+#' @param num.cell the number of cells in the embryo
+#' @param num.chr the number of chromosome pairs per cell
+#' @param dispersal the dispersion vector of the aneuploid cells (0-1)
+#' @param concordance the concordance between aneuploid cells for each chromosome (0-1).
 #' @param hide.default.param the boolean to exclude other parameters used in
 #' constructing the embryo: num.cell, num.chr, concordance. If false, the returned
 #' vector will contain these values.
 #'
 #' @return a vector with columns: "prop.aneu", "prob.meio", "prob.mito", "dispersal",
 #' and the three biopsy types shown as percentages.
+#' @export
 #'
-
+#' @examples
+#' summarize_biopsy(
+#'   meio = 0,
+#'   mito = 0.3,
+#'   dispersal = 0.5,
+#'   hide.default.param = TRUE
+#' )
+#' summarize_biopsy(
+#'   num.em = 200,
+#'   meio = 0.3,
+#'   mito = 0.02,
+#'   num.cell = 200,
+#'   num.chr = 1,
+#'   dispersal = 0,
+#'   concordance = 0,
+#'   hide.default.param = FALSE
+#' )
+#'
 summarize_biopsy <- function(num.em = 100,
                              meio,
                              mito,
@@ -42,11 +61,9 @@ summarize_biopsy <- function(num.em = 100,
                 " must be at most 1"))
   }
   if (num.em %% 1 != 0) {
-    stop(paste0(
-      "The number of cell division: ",
-      num.division,
-      "should be an integer"
-    ))
+    stop(paste0("The number of embryos: ",
+                num.em,
+                "should be an integer"))
   }
   if (num.em < 0) {
     stop(paste0("The number of embryos: ",
@@ -81,8 +98,8 @@ summarize_biopsy <- function(num.em = 100,
     # Create an embryo
     em <- create_embryo(
       prop.aneuploid = prop.aneu,
-      n.cell = num.cell,
-      n.chr = num.chr,
+      n.cells = num.cell,
+      n.chrs = num.chr,
       dispersal = dispersal,
       concordance = concordance
     )
@@ -107,23 +124,3 @@ summarize_biopsy <- function(num.em = 100,
   result[c(1, 5:7)] <- result[c(1, 5:7)] / num.em
   return(result)
 }
-
-# result <- summarize_biopsy(
-#   meio = 0,
-#   mito = 0.3,
-#   dispersal = 0.5,
-#   hide.default.param = TRUE
-# )
-# print(result[c(1, 5:7)] == list(1, 0, 0, 1))
-# print(result)
-# print(typeof(result))
-
-
-# system.time(
-#   df2 <- summarize_biopsy(
-#     meio = 0,
-#     mito = 0.3,
-#     dispersal = 0.5,
-#     hide.default.param = TRUE
-#   )
-# )
