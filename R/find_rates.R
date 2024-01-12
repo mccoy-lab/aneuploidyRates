@@ -148,7 +148,7 @@ find_rates <- function(meio.range = list(0, 1),
       tol = tolerance,
       # use_seed = TRUE,
       # n_cluster = 5,
-      progress_bar = TRUE
+      # progress_bar = TRUE
     )
 
   # Set up return format: from the saved data, select the rows with ABC_rej's

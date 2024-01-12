@@ -2,7 +2,7 @@
 #
 # source("R/find_rates.R")
 if(!require(aneuploidyRates)){
-  if(!require(devtools)) install.packages("devtools")
+  if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
   library(devtools)
   install_github("mccoy-lab/aneuploidyRates")
 }
