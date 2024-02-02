@@ -1,11 +1,11 @@
 #! /bin/bash
 #SBATCH --job-name="aneuploidy_rates_run"
-#SBATCH --partition=defq
+#SBATCH --partition=parallel
 #SBATCH --time 00-08:30:00
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
-#SBATCH --array=1-100%10
+#SBATCH --array=1-10%10
 #SBATCH --account=rmccoy22
 
 
