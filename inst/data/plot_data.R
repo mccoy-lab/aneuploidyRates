@@ -1,6 +1,7 @@
 # This file loads the generated data of meiotic and mitotic rates and plots them
 # using different visualization methods.
-if(!require(ggplot2)) install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+if (!require(ggplot2))
+  install.packages("ggplot2", repos = "http://cran.us.r-project.org")
 library(ggplot2)
 # if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
 library(readr)
@@ -33,17 +34,6 @@ for (i in 2:100) {
   my_data <- rbind(my_data, temp)
 }
 
-
-# Draw scatterplots
-ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito)) + geom_point()
-ggplot(data = my_data,
-       aes(
-         x = my_data$prob.meio,
-         y = my_data$prob.mito,
-         color = my_data$dispersal
-       )) + geom_point()
-
-
 # Combine two tables
 # Locate the folder to investigate
 date <- "2024-01-12"
@@ -73,7 +63,173 @@ for (i in 2:100) {
 }
 
 
+# -------------Graphing-------------------------
+theme_set(theme_bw())
+
+# Draw Histograms
+h <-
+  ggplot(data = my_data, aes(x = my_data$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+h + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(my_data$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  annotate(
+    geom = "text",
+    x = mean(my_data$prob.meio) - 0.25,
+    y = 250,
+    fontface = "bold",
+    label = paste("Average: ", round(mean(my_data$prob.meio), 2))
+  ) + scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+# Mitotic
+hm <-
+  ggplot(data = my_data, aes(x = my_data$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+hm + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(my_data$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  annotate(
+    geom = "text",
+    x = mean(my_data$prob.mito) +0.05,
+    y = 400,
+    fontface = "bold",
+    label = paste("Average: ", round(mean(my_data$prob.mito), 2))
+  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+# Prop.aneu
+ha <-
+  ggplot(data = my_data, aes(x = my_data$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+ha + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Proprotion of Aneuploidy",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(my_data$prop.aneu)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  annotate(
+    geom = "text",
+    x = 0.35,
+    y = 140,
+    fontface = "bold",
+    label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
+  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+
+
 # Draw scatterplots
+g <-
+  ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
+g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
+                                        y = "Probability of Mitotic Errors") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+
+# Scatterplots with dispersal
+d <- ggplot(data = my_data,
+            aes(
+              x = my_data$prob.meio,
+              y = my_data$prob.mito,
+              color = my_data$dispersal
+            ))
+
+d + geom_point() + labs(x = "Probability of Meiotic Errors",
+                        y = "Probability of Mitotic Errors",
+                        color = "Dispersal") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
+    legend.position = c(.87, .8),
+    legend.background = element_rect(fill = "transparent"),
+    panel.grid = element_blank()
+  ) +
+  guides(color = guide_colorsteps())  + scale_color_viridis_c() +   geom_rug() +
+  annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.25)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.75)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.25)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.75)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  )
+
+
+# Distribution of Dispersal
+p <- ggplot(data = my_data,
+            aes(
+              x = my_data$prob.mito,
+              y = my_data$dispersal,
+              color = my_data$dispersal
+            )) + labs(x = "Probability of Mitotic Errors",
+                      y = "Dispersal",
+                      color = "Dispersal")
+p + geom_violin(fill = "gray80",
+                linewidth = 1,
+                alpha = .5)
+
+
+
+#
+# # Draw scatterplots
 ggplot(data = new_data, aes(x = new_data$prob.meio, y = new_data$prob.mito)) + geom_point()
 ggplot(data = new_data,
        aes(
@@ -81,9 +237,9 @@ ggplot(data = new_data,
          y = new_data$prob.mito,
          color = new_data$dispersal
        )) + geom_point()
-
-
-result <- rbind(new_data,my_data)
+#
+#
+result <- rbind(new_data, my_data)
 # Draw scatterplots
 ggplot(data = result, aes(x = result$prob.meio, y = result$prob.mito)) + geom_point()
 ggplot(data = result,
