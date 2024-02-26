@@ -8,7 +8,7 @@ library(readr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-01-04"
+date <- "2024-02-08"
 
 # Set column names
 my_data_cols <-
@@ -36,7 +36,7 @@ for (i in 2:100) {
 
 # Combine two tables
 # Locate the folder to investigate
-date <- "2024-01-12"
+date <- "2024-02-12"
 
 # Set column names
 new_data_cols <-
@@ -62,7 +62,7 @@ for (i in 2:100) {
   new_data <- rbind(new_data, temp)
 }
 
-
+my_data <- rbind(new_data, my_data)
 # -------------Graphing-------------------------
 theme_set(theme_bw())
 
@@ -88,7 +88,7 @@ h + geom_histogram(
   annotate(
     geom = "text",
     x = mean(my_data$prob.meio) - 0.25,
-    y = 250,
+    y = 1200,
     fontface = "bold",
     label = paste("Average: ", round(mean(my_data$prob.meio), 2))
   ) + scale_y_continuous(expand = c(0,0)) + theme_classic()
@@ -115,7 +115,7 @@ hm + geom_histogram(
   annotate(
     geom = "text",
     x = mean(my_data$prob.mito) +0.05,
-    y = 400,
+    y = 2000,
     fontface = "bold",
     label = paste("Average: ", round(mean(my_data$prob.mito), 2))
   )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
@@ -142,7 +142,7 @@ ha + geom_histogram(
   annotate(
     geom = "text",
     x = 0.35,
-    y = 140,
+    y = 700,
     fontface = "bold",
     label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
   )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
@@ -157,6 +157,39 @@ g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )+
+  annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.25)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.75)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.25)),
+    xend = quantile(my_data$prob.meio, probs = c(.25)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$prob.meio, probs = c(.75)),
+    xend = quantile(my_data$prob.meio, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
   )
 
 # Scatterplots with dispersal
@@ -216,7 +249,7 @@ d + geom_point() + labs(x = "Probability of Meiotic Errors",
 # Distribution of Dispersal
 p <- ggplot(data = my_data,
             aes(
-              x = my_data$prob.mito,
+              x = my_data$prob.meio,
               y = my_data$dispersal,
               color = my_data$dispersal
             )) + labs(x = "Probability of Mitotic Errors",
@@ -227,27 +260,6 @@ p + geom_violin(fill = "gray80",
                 alpha = .5)
 
 
-
-#
-# # Draw scatterplots
-ggplot(data = new_data, aes(x = new_data$prob.meio, y = new_data$prob.mito)) + geom_point()
-ggplot(data = new_data,
-       aes(
-         x = new_data$prob.meio,
-         y = new_data$prob.mito,
-         color = new_data$dispersal
-       )) + geom_point()
-#
-#
-result <- rbind(new_data, my_data)
-# Draw scatterplots
-ggplot(data = result, aes(x = result$prob.meio, y = result$prob.mito)) + geom_point()
-ggplot(data = result,
-       aes(
-         x = result$prob.meio,
-         y = result$prob.mito,
-         color = result$dispersal
-       )) + geom_point()
 
 
 # summary for 01-04 and 01-12 combined:
