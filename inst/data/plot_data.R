@@ -3,12 +3,13 @@
 if (!require(ggplot2))
   install.packages("ggplot2", repos = "http://cran.us.r-project.org")
 library(ggplot2)
+library(GGally)
 # if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
 library(readr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-02-08"
+date <- "2024-01-04"
 
 # Set column names
 my_data_cols <-
@@ -63,10 +64,11 @@ for (i in 2:100) {
 }
 
 my_data <- rbind(new_data, my_data)
+
 # -------------Graphing-------------------------
 theme_set(theme_bw())
 
-# Draw Histograms
+#### Draw Histograms ####
 h <-
   ggplot(data = my_data, aes(x = my_data$prob.meio))  +
   theme(
@@ -114,11 +116,20 @@ hm + geom_histogram(
   ) +
   annotate(
     geom = "text",
-    x = mean(my_data$prob.mito) +0.05,
+    x = mean(my_data$prob.mito) +0.1,
     y = 2000,
     fontface = "bold",
     label = paste("Average: ", round(mean(my_data$prob.mito), 2))
   )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+# Two together
+
+
+hist(my_data$prob.mito, col='lightblue', xlab='Probability of Errors')
+hist(my_data$prob.meio, col='lightgreen', add=TRUE)
+
+#add legend
+legend('topright', c('mitotic errors', 'meiotic errors'), fill=c('lightblue', 'lightgreen'))
 
 # Prop.aneu
 ha <-
@@ -149,7 +160,7 @@ ha + geom_histogram(
 
 
 
-# Draw scatterplots
+#### Draw scatterplots ####
 g <-
   ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
 g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
@@ -190,7 +201,19 @@ g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
     yend = quantile(my_data$prob.mito, probs = c(.75)),
     color = "red",
     linewidth = 1
-  )
+  ) +
+  geom_hline(
+    aes(yintercept = mean(my_data$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  geom_vline(
+    aes(xintercept = mean(my_data$prob.meio),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ))
 
 # Scatterplots with dispersal
 d <- ggplot(data = my_data,
@@ -246,7 +269,7 @@ d + geom_point() + labs(x = "Probability of Meiotic Errors",
   )
 
 
-# Distribution of Dispersal
+#### Distribution of Dispersal ####
 p <- ggplot(data = my_data,
             aes(
               x = my_data$prob.meio,
@@ -259,7 +282,23 @@ p + geom_violin(fill = "gray80",
                 linewidth = 1,
                 alpha = .5)
 
+#### Correlation ####
+pair <- ggpairs(my_data[,4:6]) + theme_minimal()
+pair
 
+library("ggcorrplot")
+# Compute a correlation matrix
+corr <- round(cor(my_data[,4:6]), 1)
+# Visualize
+ggcorrplot(corr, p.mat = cor_pmat(my_data[,4:6]),
+           hc.order = TRUE, type = "lower",
+           color = c("#FC4E07", "white", "#00AFBB"),
+           outline.col = "white", lab = TRUE)
+
+#### Boxplot ####
+ggplot(my_data, aes(y = my_data[,4:6])) +
+  geom_boxplot(fill = "indianred", orientation = "y") +
+  labs(x = "Values", y = "Variables")
 
 
 # summary for 01-04 and 01-12 combined:
@@ -277,3 +316,19 @@ p + geom_violin(fill = "gray80",
 # Mean   :0.4435
 # 3rd Qu.:0.5200
 # Max.   :0.6900
+
+# summary for 5000 data with dispersal and 0.01 tolerance
+# ...1          embryo       prop.aneu        prob.meio          prob.mito           dispersal            euploid
+# Min.   :   1   Min.   : 1.0   Min.   :0.2271   Min.   :0.001703   Min.   :1.479e-05   Min.   :0.0000493   Min.   :0.0000
+# 1st Qu.:1251   1st Qu.: 3.0   1st Qu.:0.4517   1st Qu.:0.356319   1st Qu.:1.076e-02   1st Qu.:0.1546677   1st Qu.:0.2400
+# Median :2500   Median : 5.5   Median :0.5350   Median :0.435587   Median :1.897e-02   Median :0.3770824   Median :0.3300
+# Mean   :2500   Mean   : 5.5   Mean   :0.5315   Mean   :0.432737   Mean   :2.536e-02   Mean   :0.4180395   Mean   :0.3366
+# 3rd Qu.:3750   3rd Qu.: 8.0   3rd Qu.:0.6090   3rd Qu.:0.513566   3rd Qu.:3.059e-02   3rd Qu.:0.6638928   3rd Qu.:0.4300
+# Max.   :5000   Max.   :10.0   Max.   :0.8603   Max.   :0.761285   Max.   :2.187e-01   Max.   :0.9998474   Max.   :0.6700
+# mosaic         aneuploid
+# Min.   :0.0000   Min.   :0.1700
+# 1st Qu.:0.1400   1st Qu.:0.3800
+# Median :0.2200   Median :0.4500
+# Mean   :0.2185   Mean   :0.4449
+# 3rd Qu.:0.2900   3rd Qu.:0.5200
+# Max.   :0.6100   Max.   :0.6900
