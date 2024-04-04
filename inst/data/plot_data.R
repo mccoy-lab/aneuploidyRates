@@ -9,7 +9,7 @@ library(readr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-01-04"
+date <- "2024-03-28"
 
 # Set column names
 my_data_cols <-
@@ -272,12 +272,30 @@ d + geom_point() + labs(x = "Probability of Meiotic Errors",
 #### Distribution of Dispersal ####
 p <- ggplot(data = my_data,
             aes(
-              x = my_data$prob.meio,
-              y = my_data$dispersal,
-              color = my_data$dispersal
+              x =  my_data$dispersal,
             )) + labs(x = "Probability of Mitotic Errors",
                       y = "Dispersal",
                       color = "Dispersal")
+p + geom_histogram(
+  binwidth = 0.15,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Dispersal",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(my_data$dispersal)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  annotate(
+    geom = "text",
+    x = 0.35,
+    y = 400,
+    fontface = "bold",
+    label = paste("Average: ", round(mean(my_data$dispersal), 2))
+  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+
 p + geom_violin(fill = "gray80",
                 linewidth = 1,
                 alpha = .5)
