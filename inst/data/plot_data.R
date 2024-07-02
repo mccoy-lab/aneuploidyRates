@@ -3,13 +3,15 @@
 if (!require(ggplot2))
   install.packages("ggplot2", repos = "http://cran.us.r-project.org")
 library(ggplot2)
-library(GGally)
+# if (!require(GGally))
+#   install.packages("ggplot2", repos = "http://cran.us.r-project.org")
+# library(GGally)
 # if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
 library(readr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-03-28"
+date <- "2024-02-02"
 
 # Set column names
 my_data_cols <-
@@ -26,7 +28,7 @@ my_data <-
 colnames(my_data) <- my_data_cols[1,]
 
 # Read all the rest of the data
-for (i in 2:100) {
+for (i in 2:10) {
   temp <-
     read_table(paste0("inst/data/", date, "/", i, ".txt"),
                skip = 1,
@@ -159,7 +161,6 @@ ha + geom_histogram(
   )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
 
 
-
 #### Draw scatterplots ####
 g <-
   ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
@@ -210,7 +211,7 @@ g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
   ) +
   geom_vline(
     aes(xintercept = mean(my_data$prob.meio),
-    color = "red",
+    color = "blue",
     linewidth = 1.25,
     linetype = "dashed"
   ))
@@ -296,28 +297,12 @@ p + geom_histogram(
     label = paste("Average: ", round(mean(my_data$dispersal), 2))
   )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
 
-p + geom_violin(fill = "gray80",
-                linewidth = 1,
-                alpha = .5)
 
-#### Correlation ####
-pair <- ggpairs(my_data[,4:6]) + theme_minimal()
-pair
+#### Statistics ####
 
-library("ggcorrplot")
-# Compute a correlation matrix
-corr <- round(cor(my_data[,4:6]), 1)
-# Visualize
-ggcorrplot(corr, p.mat = cor_pmat(my_data[,4:6]),
-           hc.order = TRUE, type = "lower",
-           color = c("#FC4E07", "white", "#00AFBB"),
-           outline.col = "white", lab = TRUE)
-
-#### Boxplot ####
-ggplot(my_data, aes(y = my_data[,4:6])) +
-  geom_boxplot(fill = "indianred", orientation = "y") +
-  labs(x = "Values", y = "Variables")
-
+### Correlation ###
+print(cor(my_data$prob.meio, my_data$prob.mito))
+print(cor(my_data[, c('prob.meio','prob.mito','dispersal')]))
 
 # summary for 01-04 and 01-12 combined:
 # embryo       prop.aneu        prob.meio         prob.mito           dispersal            euploid           mosaic
@@ -350,3 +335,13 @@ ggplot(my_data, aes(y = my_data[,4:6])) +
 # Mean   :0.2185   Mean   :0.4449
 # 3rd Qu.:0.2900   3rd Qu.:0.5200
 # Max.   :0.6100   Max.   :0.6900
+
+
+### Correct Biopsy ###
+# sum(my_data$mosaic)*100/500000
+# 0.218514
+# sum(my_data$euploid)*100/500000
+# 0.336616
+# sum(my_data$aneuploid)*100/500000
+# 0.44487
+# 168308 euploid, 109257 mosaic, 222435 aneuploid (should all be mosaic)
