@@ -6,12 +6,14 @@ library(ggplot2)
 # if (!require(GGally))
 #   install.packages("ggplot2", repos = "http://cran.us.r-project.org")
 # library(GGally)
-# if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
+if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.org")
 library(readr)
+if(!require(gridExtra)) install.packages("gridExtra", repos = "http://cran.us.r-project.org")
+library(gridExtra)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-02-02"
+date <- "2024-07-02"
 
 # Set column names
 my_data_cols <-
@@ -77,7 +79,7 @@ h <-
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
   )
-h + geom_histogram(
+h <- h + geom_histogram(
   binwidth = 0.1,
   color = "#000000",
   fill = "lightblue"
@@ -89,13 +91,14 @@ h + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  annotate(
-    geom = "text",
-    x = mean(my_data$prob.meio) - 0.25,
-    y = 1200,
-    fontface = "bold",
-    label = paste("Average: ", round(mean(my_data$prob.meio), 2))
-  ) + scale_y_continuous(expand = c(0,0)) + theme_classic()
+  # annotate(
+  #   geom = "text",
+  #   x = mean(my_data$prob.meio) - 0.25,
+  #   y = 1200,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$prob.meio), 2))
+  # ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
 
 # Mitotic
 hm <-
@@ -104,7 +107,7 @@ hm <-
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
   )
-hm + geom_histogram(
+hm <- hm + geom_histogram(
   binwidth = 0.025,
   color = "#000000",
   fill = "lightblue",
@@ -116,22 +119,23 @@ hm + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  annotate(
-    geom = "text",
-    x = mean(my_data$prob.mito) +0.1,
-    y = 2000,
-    fontface = "bold",
-    label = paste("Average: ", round(mean(my_data$prob.mito), 2))
-  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+  # annotate(
+  #   geom = "text",
+  #   x = mean(my_data$prob.mito) +0.1,
+  #   y = 2000,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$prob.mito), 2))
+  # )   +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
 
 # Two together
 
-
-hist(my_data$prob.mito, col='lightblue', xlab='Probability of Errors')
-hist(my_data$prob.meio, col='lightgreen', add=TRUE)
-
-#add legend
-legend('topright', c('mitotic errors', 'meiotic errors'), fill=c('lightblue', 'lightgreen'))
+#
+# hist(my_data$prob.mito, col='lightblue', xlab='Probability of Errors')
+# hist(my_data$prob.meio, col='lightgreen', add=TRUE)
+#
+# #add legend
+# legend('topright', c('mitotic errors', 'meiotic errors'), fill=c('lightblue', 'lightgreen'))
 
 # Prop.aneu
 ha <-
@@ -140,7 +144,7 @@ ha <-
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
   )
-ha + geom_histogram(
+ha <- ha + geom_histogram(
   binwidth = 0.05,
   color = "#000000",
   fill = "lightblue",
@@ -152,19 +156,55 @@ ha + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  annotate(
-    geom = "text",
-    x = 0.35,
-    y = 700,
-    fontface = "bold",
-    label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
-  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+  # annotate(
+  #   geom = "text",
+  #   x = 0.35,
+  #   y = 700,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
+  # )   +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+
+
+#### Distribution of Dispersal ####
+p <- ggplot(data = my_data,
+            aes(
+              x =  my_data$dispersal,
+            )) + labs(x = "Probability of Mitotic Errors",
+                      y = "Dispersal",
+                      color = "Dispersal")
+p <- p + geom_histogram(
+  binwidth = 0.15,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Dispersal",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(my_data$dispersal)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  # annotate(
+  #   geom = "text",
+  #   x = 0.35,
+  #   y = 400,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$dispersal), 2))
+  # )   +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+
+
+# Arrange the panel
+grid.arrange(h, hm,ha, p)
 
 
 #### Draw scatterplots ####
 g <-
   ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
-g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
+g <- g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
                                         y = "Probability of Mitotic Errors") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
@@ -205,16 +245,16 @@ g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Errors",
   ) +
   geom_hline(
     aes(yintercept = mean(my_data$prob.mito)),
-    color = "red",
+    color = "blue",
     linewidth = 1.25,
     linetype = "dashed"
   ) +
   geom_vline(
-    aes(xintercept = mean(my_data$prob.meio),
+    xintercept = mean(my_data$prob.meio),
     color = "blue",
     linewidth = 1.25,
     linetype = "dashed"
-  ))
+  )
 
 # Scatterplots with dispersal
 d <- ggplot(data = my_data,
@@ -224,7 +264,7 @@ d <- ggplot(data = my_data,
               color = my_data$dispersal
             ))
 
-d + geom_point() + labs(x = "Probability of Meiotic Errors",
+d <- d + geom_point() + labs(x = "Probability of Meiotic Errors",
                         y = "Probability of Mitotic Errors",
                         color = "Dispersal") +
   theme(
@@ -270,32 +310,64 @@ d + geom_point() + labs(x = "Probability of Meiotic Errors",
   )
 
 
-#### Distribution of Dispersal ####
-p <- ggplot(data = my_data,
-            aes(
-              x =  my_data$dispersal,
-            )) + labs(x = "Probability of Mitotic Errors",
-                      y = "Dispersal",
-                      color = "Dispersal")
-p + geom_histogram(
-  binwidth = 0.15,
-  color = "#000000",
-  fill = "lightblue",
-) + labs(x = "Dispersal",
-         y = "Count") +
-  geom_vline(
-    aes(xintercept = mean(my_data$dispersal)),
+# mitotic error vs dispersal
+md <-
+  ggplot(data = my_data, aes(x = my_data$dispersal, y = my_data$prob.mito))
+md <- md + geom_point(color = "magenta") + labs(x = "Dispersal",
+                                             y = "Probability of Mitotic Errors") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )+
+  annotate(
+    geom = "segment",
+    x = quantile(my_data$dispersal, probs = c(.25)),
+    xend = quantile(my_data$dispersal, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.25)),
     color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$dispersal, probs = c(.25)),
+    xend = quantile(my_data$dispersal, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.75)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$dispersal, probs = c(.25)),
+    xend = quantile(my_data$dispersal, probs = c(.25)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) + annotate(
+    geom = "segment",
+    x = quantile(my_data$dispersal, probs = c(.75)),
+    xend = quantile(my_data$dispersal, probs = c(.75)),
+    y = quantile(my_data$prob.mito, probs = c(.25)),
+    yend = quantile(my_data$prob.mito, probs = c(.75)),
+    color = "red",
+    linewidth = 1
+  ) +
+  geom_hline(
+    aes(yintercept = mean(my_data$prob.mito)),
+    color = "blue",
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  annotate(
-    geom = "text",
-    x = 0.35,
-    y = 400,
-    fontface = "bold",
-    label = paste("Average: ", round(mean(my_data$dispersal), 2))
-  )   + scale_y_continuous(expand = c(0,0)) + theme_classic()
+  geom_vline(
+    xintercept = mean(my_data$dispersal),
+    color = "blue",
+    linewidth = 1.25,
+    linetype = "dashed"
+  )
+
+
+# Arrange panel
+grid.arrange(d, g)
 
 
 #### Statistics ####
@@ -335,6 +407,28 @@ print(cor(my_data[, c('prob.meio','prob.mito','dispersal')]))
 # Mean   :0.2185   Mean   :0.4449
 # 3rd Qu.:0.2900   3rd Qu.:0.5200
 # Max.   :0.6100   Max.   :0.6900
+
+# summary for 100 data in the smaller range (1st and 3rd quantiles)
+# embryo       prop.aneu        prob.meio        prob.mito         dispersal
+# Min.   : 1.0   Min.   :0.4532   Min.   :0.3603   Min.   :0.01111   Min.   :0.02039
+# 1st Qu.: 3.0   1st Qu.:0.4839   1st Qu.:0.3956   1st Qu.:0.01319   1st Qu.:0.16341
+# Median : 5.5   Median :0.4949   Median :0.4193   Median :0.01610   Median :0.31908
+# Mean   : 5.5   Mean   :0.4967   Mean   :0.4256   Mean   :0.01665   Mean   :0.36232
+# 3rd Qu.: 8.0   3rd Qu.:0.5086   3rd Qu.:0.4562   3rd Qu.:0.01923   3rd Qu.:0.51746
+# Max.   :10.0   Max.   :0.5328   Max.   :0.5021   Max.   :0.02796   Max.   :0.98738
+# euploid           mosaic        aneuploid
+# Min.   :0.3700   Min.   :0.170   Min.   :0.4100
+# 1st Qu.:0.3800   1st Qu.:0.180   1st Qu.:0.4200
+# Median :0.3900   Median :0.185   Median :0.4300
+# Mean   :0.3883   Mean   :0.185   Mean   :0.4267
+# 3rd Qu.:0.4000   3rd Qu.:0.190   3rd Qu.:0.4300
+# Max.   :0.4000   Max.   :0.200   Max.   :0.4400
+# correlation
+# prob.meio  prob.mito  dispersal
+# prob.meio  1.0000000 -0.2358313  0.1928092
+# prob.mito -0.2358313  1.0000000 -0.6025071
+# dispersal  0.1928092 -0.6025071  1.0000000
+
 
 
 ### Correct Biopsy ###
