@@ -10,6 +10,9 @@ if(!require(readr)) install.packages("readr", repos = "http://cran.us.r-project.
 library(readr)
 if(!require(gridExtra)) install.packages("gridExtra", repos = "http://cran.us.r-project.org")
 library(gridExtra)
+if (!require(ggcorrplot))
+  install.packages("ggcorrplot", repos = "http://cran.us.r-project.org")
+library(ggcorrplot)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
@@ -374,7 +377,14 @@ grid.arrange(d, g)
 
 ### Correlation ###
 print(cor(my_data$prob.meio, my_data$prob.mito))
-print(cor(my_data[, c('prob.meio','prob.mito','dispersal')]))
+
+corm = cor(my_data[, c('prob.meio','prob.mito','dispersal')])
+print(corm)
+
+pmat = cor_pmat(my_data[, c('prob.meio','prob.mito','dispersal')])
+print(pmat)
+
+ggcorrplot(corm, type = "lower", lab = TRUE, p.mat = pmat, insig = "blank")
 
 # summary for 01-04 and 01-12 combined:
 # embryo       prop.aneu        prob.meio         prob.mito           dispersal            euploid           mosaic
@@ -423,11 +433,19 @@ print(cor(my_data[, c('prob.meio','prob.mito','dispersal')]))
 # Mean   :0.3883   Mean   :0.185   Mean   :0.4267
 # 3rd Qu.:0.4000   3rd Qu.:0.190   3rd Qu.:0.4300
 # Max.   :0.4000   Max.   :0.200   Max.   :0.4400
+
+
 # correlation
 # prob.meio  prob.mito  dispersal
 # prob.meio  1.0000000 -0.2358313  0.1928092
 # prob.mito -0.2358313  1.0000000 -0.6025071
 # dispersal  0.1928092 -0.6025071  1.0000000
+
+# correlation p-values
+# prob.meio    prob.mito    dispersal
+# prob.meio 0.000000e+00 4.991992e-77 9.478728e-05
+# prob.mito 4.991992e-77 0.000000e+00 1.438761e-57
+# dispersal 9.478728e-05 1.438761e-57 0.000000e+00
 
 
 
