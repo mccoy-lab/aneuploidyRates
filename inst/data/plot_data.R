@@ -16,7 +16,7 @@ library(ggcorrplot)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-07-02"
+date <- "2024-04-04"
 
 # Set column names
 my_data_cols <-
@@ -33,7 +33,7 @@ my_data <-
 colnames(my_data) <- my_data_cols[1,]
 
 # Read all the rest of the data
-for (i in 2:10) {
+for (i in 2:100) {
   temp <-
     read_table(paste0("inst/data/", date, "/", i, ".txt"),
                skip = 1,
@@ -418,21 +418,21 @@ ggcorrplot(corm, type = "lower", lab = TRUE, p.mat = pmat, insig = "blank")
 # 3rd Qu.:0.2900   3rd Qu.:0.5200
 # Max.   :0.6100   Max.   :0.6900
 
-# summary for 100 data in the smaller range (1st and 3rd quantiles)
+# summary for 1000 data in the smaller range (1st and 3rd quantiles), 4-4
 # embryo       prop.aneu        prob.meio        prob.mito         dispersal
-# Min.   : 1.0   Min.   :0.4532   Min.   :0.3603   Min.   :0.01111   Min.   :0.02039
-# 1st Qu.: 3.0   1st Qu.:0.4839   1st Qu.:0.3956   1st Qu.:0.01319   1st Qu.:0.16341
-# Median : 5.5   Median :0.4949   Median :0.4193   Median :0.01610   Median :0.31908
-# Mean   : 5.5   Mean   :0.4967   Mean   :0.4256   Mean   :0.01665   Mean   :0.36232
-# 3rd Qu.: 8.0   3rd Qu.:0.5086   3rd Qu.:0.4562   3rd Qu.:0.01923   3rd Qu.:0.51746
-# Max.   :10.0   Max.   :0.5328   Max.   :0.5021   Max.   :0.02796   Max.   :0.98738
-# euploid           mosaic        aneuploid
-# Min.   :0.3700   Min.   :0.170   Min.   :0.4100
-# 1st Qu.:0.3800   1st Qu.:0.180   1st Qu.:0.4200
-# Median :0.3900   Median :0.185   Median :0.4300
-# Mean   :0.3883   Mean   :0.185   Mean   :0.4267
-# 3rd Qu.:0.4000   3rd Qu.:0.190   3rd Qu.:0.4300
-# Max.   :0.4000   Max.   :0.200   Max.   :0.4400
+# Min.   : 1.0   Min.   :0.4532   Min.   :0.3601   Min.   :0.01102   Min.   :0.0003697
+# 1st Qu.: 3.0   1st Qu.:0.4825   1st Qu.:0.3974   1st Qu.:0.01355   1st Qu.:0.1355719
+# Median : 5.5   Median :0.4931   Median :0.4276   Median :0.01625   Median :0.3185236
+# Mean   : 5.5   Mean   :0.4955   Mean   :0.4283   Mean   :0.01735   Mean   :0.3658146
+# 3rd Qu.: 8.0   3rd Qu.:0.5071   3rd Qu.:0.4572   3rd Qu.:0.02033   3rd Qu.:0.5518917
+# Max.   :10.0   Max.   :0.5600   Max.   :0.5099   Max.   :0.03100   Max.   :0.9993082
+# euploid           mosaic         aneuploid
+# Min.   :0.3700   Min.   :0.1700   Min.   :0.4100
+# 1st Qu.:0.3800   1st Qu.:0.1800   1st Qu.:0.4200
+# Median :0.3900   Median :0.1900   Median :0.4300
+# Mean   :0.3874   Mean   :0.1867   Mean   :0.4258
+# 3rd Qu.:0.3900   3rd Qu.:0.1900   3rd Qu.:0.4300
+# Max.   :0.4000   Max.   :0.2000   Max.   :0.4400
 
 
 # correlation
