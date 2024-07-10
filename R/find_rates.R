@@ -120,10 +120,10 @@ find_rates <- function(meio.range = list(0, 1),
       hide.default.param = hide.param
     )
 
-    # Saves all datat (used for displaying prop.aneu and other default params later)
+    # Saves all data (used for displaying prop.aneu and other default params later)
     remaining.data <<- rbind(remaining.data, biopsy)
     # Returns only the biopsy types
-    return(biopsy[5:7])
+    return(biopsy[1,5:7])
   }
 
   # Choose the distribution to draw inputs. Assume uniform distributions.
@@ -191,3 +191,5 @@ find_rates <- function(meio.range = list(0, 1),
 
   return(data.frame(result))
 }
+
+find_rates(num.trials = 10, tolerance = 1)
