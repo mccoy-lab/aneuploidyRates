@@ -114,16 +114,16 @@ find_rates <- function(meio.range = list(0, 1),
   # Set the model for biopsy summary
   rates_model <- function(probs) {
     biopsy <- summarize_biopsy(
-      meio = round(probs[[1]], 3),
-      mito = round(probs[[2]], 3),
-      dispersal = round(probs[[3]], 3),
+      meio = probs[[1]],
+      mito = probs[[2]],
+      dispersal = probs[[3]],
       hide.default.param = hide.param
     )
 
-    # Saves all datat (used for displaying prop.aneu and other default params later)
+    # Saves all data (used for displaying prop.aneu and other default params later)
     remaining.data <<- rbind(remaining.data, biopsy)
     # Returns only the biopsy types
-    return(biopsy[5:7])
+    return(biopsy[1,5:7])
   }
 
   # Choose the distribution to draw inputs. Assume uniform distributions.

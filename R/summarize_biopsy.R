@@ -81,10 +81,22 @@ summarize_biopsy <- function(num.em = 100,
   #   mosaic,
   #   aneuploid
   # )
-  result <- c(0, meio, mito, dispersal, 0, 0, 0)
+  # c(0, meio, mito, dispersal, 0, 0, 0)
+  result <- matrix(nrow = num.em, ncol = 7)
+  euploid <- 0
+  mosaic <- 0
+  aneuploid <- 0
+
+  result[,2] <- meio
+  result[,3] <- mito
+  result[,4] <- dispersal
+
   if (!hide.default.param) {
     # Keep the other parameters used for constructing the embryo
-    result <- c(result, num.cell, num.chr, concordance)
+    result <- cbind(result, matrix(nrow = num.em, ncol = 3))
+    result[,8] <- num.cell
+    result[,9] <- num.chr
+    result[,10] <- concordance
   }
 
   # Generate embryos and collect biopsy results
@@ -93,7 +105,7 @@ summarize_biopsy <- function(num.em = 100,
     # conversion simulation)
     prop.aneu <- prob_to_prop(prob.meio = meio, prob.mito = mito)
     # Sum up all prop.aneus (will take the average later)
-    result[1] <- result[1] + prop.aneu
+    result[i, 1] <- prop.aneu
 
     # Create an embryo
     em <- create_embryo(
@@ -109,18 +121,20 @@ summarize_biopsy <- function(num.em = 100,
 
     # Add its type to categories in result
     if (type == 0) {
-      result[5] <- result[5] + 1
+      euploid <- euploid + 1
 
     } else if (type == 1) {
-      result[6] <- result[6] + 1
+      mosaic <- mosaic + 1
 
     } else{
-      result[7] <- result[7] + 1
+      aneuploid <- aneuploid + 1
 
     }
   }
 
   # Calculate the average prop.aneu and convert the types to percentages
-  result[c(1, 5:7)] <- result[c(1, 5:7)] / num.em
+  result[,5] <- euploid / num.em
+  result[,6] <- mosaic / num.em
+  result[,7] <- aneuploid / num.em
   return(result)
 }
