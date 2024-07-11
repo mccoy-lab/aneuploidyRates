@@ -114,9 +114,9 @@ find_rates <- function(meio.range = list(0, 1),
   # Set the model for biopsy summary
   rates_model <- function(probs) {
     biopsy <- summarize_biopsy(
-      meio = round(probs[[1]], 3),
-      mito = round(probs[[2]], 3),
-      dispersal = round(probs[[3]], 3),
+      meio = probs[[1]],
+      mito = probs[[2]],
+      dispersal = probs[[3]],
       hide.default.param = hide.param
     )
 
@@ -191,5 +191,3 @@ find_rates <- function(meio.range = list(0, 1),
 
   return(data.frame(result))
 }
-
-find_rates(num.trials = 10, tolerance = 1)
