@@ -457,3 +457,357 @@ ggcorrplot(corm, type = "lower", lab = TRUE, p.mat = pmat, insig = "blank")
 # sum(my_data$aneuploid)*100/500000
 # 0.44487
 # 168308 euploid, 109257 mosaic, 222435 aneuploid (should all be mosaic)
+
+
+#------For Paper-------
+
+#### Figure 2 ####
+# import dispersal_ranges.csv
+
+# dispersal = 0
+# Locate the folder to investigate
+date <- "2024-07-09"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+disp_0 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(disp_0) <- my_data_cols[1,]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1,]
+  disp_0 <- rbind(disp_0, temp)
+}
+
+disp_0_meiotic <-
+  ggplot(data = disp_0, aes(x = disp_0$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0_meiotic <- disp_0_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_0_mitotic <-
+  ggplot(data = disp_0, aes(x = disp_0$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0_mitotic <- disp_0_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+# dispersal = 0
+disp_0_meiotic <-
+  ggplot(data = disp_0, aes(x = disp_0$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0_meiotic <- disp_0_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_0_mitotic <-
+  ggplot(data = disp_0, aes(x = disp_0$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0_mitotic <- disp_0_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+
+# dispersal = 0.5
+# Locate the folder to investigate
+date <- "2024-07-07"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+disp_0.5 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(disp_0.5) <- my_data_cols[1,]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1,]
+  disp_0.5 <- rbind(disp_0.5, temp)
+}
+
+disp_0.5_meiotic <-
+  ggplot(data = disp_0.5, aes(x = disp_0.5$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0.5_meiotic <- disp_0.5_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0.5$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_0.5_mitotic <-
+  ggplot(data = disp_0.5, aes(x = disp_0.5$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0.5_mitotic <- disp_0.5_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0.5$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_0.5_meiotic <-
+  ggplot(data = disp_0.5, aes(x = disp_0.5$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0.5_meiotic <- disp_0.5_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0.5$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_0.5_mitotic <-
+  ggplot(data = disp_0.5, aes(x = disp_0.5$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_0.5_mitotic <- disp_0.5_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_0.5$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+# dispersal = 1
+# Locate the folder to investigate
+date <- "2024-07-06"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+disp_1 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(disp_1) <- my_data_cols[1,]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1,]
+  disp_1 <- rbind(disp_1, temp)
+}
+
+disp_1_meiotic <-
+  ggplot(data = disp_1, aes(x = disp_1$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_1_meiotic <- disp_1_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_1$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_1_mitotic <-
+  ggplot(data = disp_1, aes(x = disp_1$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_1_mitotic <- disp_1_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_1$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_1_meiotic <-
+  ggplot(data = disp_1, aes(x = disp_1$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_1_meiotic <- disp_1_meiotic + geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_1$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+disp_1_mitotic <-
+  ggplot(data = disp_1, aes(x = disp_1$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+disp_1_mitotic <- disp_1_mitotic + geom_histogram(
+  binwidth = 0.025,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Probability of Mitotic Errors",
+         y = "Count") +
+  geom_vline(
+    aes(xintercept = mean(disp_1$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0,0)) + theme_classic()
+
+
+# Arrange the panel
+
+grid.arrange(disp_0_meiotic, disp_0_mitotic, disp_0.5_meiotic, disp_0.5_mitotic,
+             disp_1_meiotic, disp_1_mitotic)
+
+
+# Boxplot arrangement
+library(readr)
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+p1 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.meio, fill=dispersal)) +
+  geom_boxplot() +
+  facet_wrap(~dispersal) + labs(y = "Probability of Meiotic Errors")
+# one box per variety
+p2 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.mito, fill=dispersal)) +
+  geom_boxplot() +
+  facet_wrap(~dispersal) + labs(y = "Probability of Mitotic Errors")
+
+grid.arrange(p1, p2)
+
+
