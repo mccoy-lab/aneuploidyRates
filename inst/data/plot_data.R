@@ -435,6 +435,55 @@ ggcorrplot(corm, type = "lower", lab = TRUE, p.mat = pmat, insig = "blank")
 # Max.   :0.4000   Max.   :0.2000   Max.   :0.4400
 
 
+# summary for 1000 data with 0 dispersal
+# embryo       prop.aneu        prob.meio         prob.mito          dispersal    euploid
+# Min.   : 1.0   Min.   :0.3527   Min.   :0.01037   Min.   :0.002648   Min.   :0   Min.   :0.0400
+# 1st Qu.: 3.0   1st Qu.:0.4941   1st Qu.:0.32986   1st Qu.:0.024217   1st Qu.:0   1st Qu.:0.3000
+# Median : 5.5   Median :0.5489   Median :0.38702   Median :0.035792   Median :0   Median :0.3600
+# Mean   : 5.5   Mean   :0.5496   Mean   :0.38469   Mean   :0.039464   Mean   :0   Mean   :0.3574
+# 3rd Qu.: 8.0   3rd Qu.:0.6035   3rd Qu.:0.44500   3rd Qu.:0.049736   3rd Qu.:0   3rd Qu.:0.4200
+# Max.   :10.0   Max.   :0.7830   Max.   :0.67352   Max.   :0.170349   Max.   :0   Max.   :0.5600
+# mosaic         aneuploid
+# Min.   :0.0400   Min.   :0.2800
+# 1st Qu.:0.1600   1st Qu.:0.4000
+# Median :0.2100   Median :0.4300
+# Mean   :0.2068   Mean   :0.4358
+# 3rd Qu.:0.2500   3rd Qu.:0.4800
+# Max.   :0.5400   Max.   :0.5900
+
+# summary for 1000 data for dispersal 0.5
+# embryo       prop.aneu        prob.meio         prob.mito           dispersal
+# Min.   : 1.0   Min.   :0.2732   Min.   :0.04993   Min.   :0.0000711   Min.   :0.5
+# 1st Qu.: 3.0   1st Qu.:0.4410   1st Qu.:0.36405   1st Qu.:0.0093711   1st Qu.:0.5
+# Median : 5.5   Median :0.5278   Median :0.44853   Median :0.0170284   Median :0.5
+# Mean   : 5.5   Mean   :0.5242   Mean   :0.44492   Mean   :0.0206510   Mean   :0.5
+# 3rd Qu.: 8.0   3rd Qu.:0.6051   3rd Qu.:0.52790   3rd Qu.:0.0260281   3rd Qu.:0.5
+# Max.   :10.0   Max.   :0.8406   Max.   :0.73187   Max.   :0.1991658   Max.   :0.5
+# euploid           mosaic         aneuploid
+# Min.   :0.0000   Min.   :0.0000   Min.   :0.2200
+# 1st Qu.:0.2400   1st Qu.:0.1300   1st Qu.:0.3700
+# Median :0.3300   Median :0.2100   Median :0.4500
+# Mean   :0.3383   Mean   :0.2133   Mean   :0.4484
+# 3rd Qu.:0.4400   3rd Qu.:0.2900   3rd Qu.:0.5300
+# Max.   :0.6700   Max.   :0.5800   Max.   :0.7400
+
+
+# summary for 1000 data points with dispersal 1
+# embryo       prop.aneu        prob.meio          prob.mito           dispersal    euploid
+# Min.   : 1.0   Min.   :0.2048   Min.   :0.003131   Min.   :5.961e-05   Min.   :1   Min.   :0.0000
+# 1st Qu.: 3.0   1st Qu.:0.4270   1st Qu.:0.356467   1st Qu.:8.188e-03   1st Qu.:1   1st Qu.:0.2000
+# Median : 5.5   Median :0.5180   Median :0.448093   Median :1.470e-02   Median :1   Median :0.3100
+# Mean   : 5.5   Mean   :0.5181   Mean   :0.446774   Mean   :1.896e-02   Mean   :1   Mean   :0.3195
+# 3rd Qu.: 8.0   3rd Qu.:0.6098   3rd Qu.:0.543985   3rd Qu.:2.263e-02   3rd Qu.:1   3rd Qu.:0.4300
+# Max.   :10.0   Max.   :0.8368   Max.   :0.740339   Max.   :1.987e-01   Max.   :1   Max.   :0.7000
+# mosaic         aneuploid
+# Min.   :0.0000   Min.   :0.1400
+# 1st Qu.:0.1400   1st Qu.:0.3700
+# Median :0.2300   Median :0.4500
+# Mean   :0.2297   Mean   :0.4508
+# 3rd Qu.:0.3100   3rd Qu.:0.5400
+# Max.   :0.6000   Max.   :0.7200
+
 # correlation
 # prob.meio  prob.mito  dispersal
 # prob.meio  1.0000000 -0.2358313  0.1928092
@@ -800,13 +849,18 @@ grid.arrange(disp_0_meiotic, disp_0_mitotic, disp_0.5_meiotic, disp_0.5_mitotic,
 # Boxplot arrangement
 library(readr)
 dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
-p1 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.meio, fill=dispersal)) +
+theme_set(theme_bw())
+p1 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.meio)) +
   geom_boxplot() +
-  facet_wrap(~dispersal) + labs(y = "Probability of Meiotic Errors")
+  facet_wrap(~dispersal) + labs(y = "Probability of Meiotic Errors")+
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 # one box per variety
-p2 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.mito, fill=dispersal)) +
+p2 <- ggplot(dispersal_ranges, aes(y=dispersal_ranges$prob.mito)) +
   geom_boxplot() +
-  facet_wrap(~dispersal) + labs(y = "Probability of Mitotic Errors")
+  facet_wrap(~dispersal) + labs(y = "Probability of Mitotic Errors", x="Dispersal")+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 grid.arrange(p1, p2)
 
