@@ -15,6 +15,15 @@ library(gridExtra)
 if (!require(ggcorrplot))
   install.packages("ggcorrplot", repos = "http://cran.us.r-project.org")
 library(ggcorrplot)
+if (!require(tidyr))
+  install.packages("tidyr", repos = "http://cran.us.r-project.org")
+library(tidyr)
+if (!require(viridis))
+  install.packages("viridis", repos = "http://cran.us.r-project.org")
+library(viridis)
+if (!require(dplyr))
+  install.packages("dplyr", repos = "http://cran.us.r-project.org")
+library(dplyr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
@@ -503,9 +512,9 @@ ggcorrplot(
 # 168308 euploid, 109257 mosaic, 222435 aneuploid (should all be mosaic)
 
 
-#------For Paper-------
+#------For Paper-----------------------------------------------------
 
-#### Figure 2 ####
+#### Figure 2 #############################################################
 # import dispersal_ranges.csv
 
 # dispersal = 0
@@ -745,9 +754,9 @@ p2 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.mito)) +
 grid.arrange(p1, p2)
 
 
-#### Figure 3 ####
+#### Figure 3 ##################################################
 
-# Read data
+##### Read data
 # dispersal = 0
 # Locate the folder to investigate
 date <- "2024-07-20"
@@ -786,13 +795,77 @@ prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
   binwidth = 0.05,
   color = "#000000",
   fill = "lightblue",
-) + labs(x = "Proprotion of Aneuploidy", y = "Number of Embryos") +
-  geom_vline(
-    aes(xintercept = mean(prop_disp_0$prop.aneu)),
-    color = "red",
-    linewidth = 1.25,
-    linetype = "dashed"
-  ) +
+) + labs(x = element_blank(), y = "Number of Embryos") +
+  # geom_vline(
+  #   aes(xintercept = mean(prop_disp_0$prop.aneu)),
+  #   color = "red",
+  #   linewidth = 1.25,
+  #   linetype = "dashed"
+  # ) +
+  # annotate(
+  #   geom = "text",
+  #   x = 0.35,
+  #   y = 700,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
+  # )   +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
+
+# Classification
+
+# Create the data for the chart
+barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu < 0.2),
+                    sum((prop_disp_0$prop.aneu >= 0.2) &
+                          (prop_disp_0$prop.aneu < 0.8)),
+                    sum(prop_disp_0$prop.aneu >= 0.8))
+# 28742, 32352, 38906
+
+
+# dispersal = 0.5
+# Locate the folder to investigate
+date <- "2024-07-25"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+prop_disp_0.5 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(prop_disp_0.5) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  prop_disp_0.5 <- rbind(prop_disp_0.5, temp)
+}
+
+prop_aneu_disp_0.5 <-
+  ggplot(data = prop_disp_0.5, aes(x = prop_disp_0.5$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+prop_aneu_disp_0.5 <- prop_aneu_disp_0.5 + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = element_blank(), y = "Number of Embryos") +
+  # geom_vline(
+  #   aes(xintercept = mean(prop_disp_0.5$prop.aneu)),
+  #   color = "red",
+  #   linewidth = 1.25,
+  #   linetype = "dashed"
+  # ) +
   # annotate(
   #   geom = "text",
   #   x = 0.35,
@@ -805,29 +878,189 @@ prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
 # Classification
 
 # Create the data for the chart
-A <- c(sum(prop_disp_0$prop.aneu < 0.2),
-       sum((prop_disp_0$prop.aneu >= 0.2) &
-             (prop_disp_0$prop.aneu < 0.8)),
-       sum(prop_disp_0$prop.aneu >= 0.8))
-# 28742, 32352, 38906
-B <- c("Euploid", "Mosaic", "Aneuploid")
+barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu < 0.2),
+                      sum((prop_disp_0.5$prop.aneu >= 0.2) &
+                            (prop_disp_0.5$prop.aneu < 0.8)
+                      ),
+                      sum(prop_disp_0.5$prop.aneu >= 0.8))
+# 42945, 11874, 45181
 
-# Plot the bar chart with text features
+# dispersal = 0
+# Locate the folder to investigate
+date <- "2024-07-26"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+prop_disp_1 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(prop_disp_1) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  prop_disp_1 <- rbind(prop_disp_1, temp)
+}
+
+prop_aneu_disp_1 <-
+  ggplot(data = prop_disp_1, aes(x = prop_disp_1$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+prop_aneu_disp_1 <- prop_aneu_disp_1 + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
+  # geom_vline(
+  #   aes(xintercept = mean(prop_disp_0$prop.aneu)),
+  #   color = "red",
+  #   linewidth = 1.25,
+  #   linetype = "dashed"
+  # ) +
+  # annotate(
+  #   geom = "text",
+  #   x = 0.35,
+  #   y = 700,
+  #   fontface = "bold",
+  #   label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
+  # )   +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
+
+# Classification
+
+# Create the data for the chart
+barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu < 0.2),
+                    sum((prop_disp_1$prop.aneu >= 0.2) &
+                          (prop_disp_1$prop.aneu < 0.8)),
+                    sum(prop_disp_1$prop.aneu >= 0.8))
+# 38906, 45181, 45279
+
+
+###### histograms
+grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1)
+
+####### barplot
+biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
+colnames(biopsy_data) <- c("0", "0.5", "1")
+rownames(biopsy_data) <- c("Euploid", "Mosaic", "Aneuploid")
+
+# stacked
 barplot(
-  A,
-  names.arg = B,
-  xlab = "Embryo Type",
+  as.matrix(biopsy_data),
+  main = "Type of Embryos",
+  col = c("lightgrey", "steelblue", "navy"),
+  legend.text = rownames(data),
+  xlab = "Dispersal Level",
   ylab = "Number of Embryos",
-  col = "steelblue"
+  args.legend = list(x = "top")
+)
+# side-by-side
+barplot(
+  as.matrix(biopsy_data),
+  main = "Type of Embryos",
+  beside = TRUE,
+  col = c("lightgrey", "steelblue", "navy"),
+  legend.text = rownames(data),
+  xlab = "Dispersal Level",
+  ylab = "Number of Embryos",
+  args.legend = list(x = "top")
 )
 
-# Add data labels on top of each bar
-# text(
-#   x = barplot(A, names.arg = B, col = "steelblue", ylim = c(0, max(A) * 1.2)),
-#   y = A + 1, labels = A, pos = 3, cex = 1.2, col = "black"
-# )
 
-#### Table 1 ####
+###### ggplot barplot
+
+# Convert row names to a column
+biopsy_data$Condition <- rownames(biopsy_data)
+
+# Reshape the data to long format
+biopsy_long <- gather(biopsy_data, key = "Category", value = "Value", -Condition)
+
+# Create the bar chart
+# side-by-side
+ggplot(biopsy_long, aes(
+  x = Category,
+  y = Value,
+  fill = factor(Condition, levels = rownames(biopsy_data))
+)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Type of Embryos with Selected Error Rate Pairs",
+       x = "Dispersal Level",
+       y = "Number of Embryos",
+       fill = "Biopsy Type") +
+  geom_text(
+    aes(label = Value),
+    vjust = 1.6,
+    color = "white",
+    position = position_dodge(0.9),
+    size = 3.5
+  ) +
+  scale_fill_viridis(discrete = T) +
+  theme_minimal()
+
+# stacked
+
+biopsy_long <- biopsy_long %>%
+  group_by(Category) %>%
+  mutate(label_ypos = cumsum(Value) - 0.5 * Value)
+
+# Create the stacked bar chart with labels
+ggplot(biopsy_long, aes(
+  x = Category,
+  y = Value,
+  fill = factor(Condition, levels = rownames(biopsy_data))
+)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Type of Embryos with Selected Error Rate Pairs",
+       x = "Dispersal Level",
+       y = "Number of Embryos",
+       fill = "Biopsy Type") +
+  geom_text(aes(y = label_ypos, label = Value),
+            color = "white",
+            size = 5) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal()
+
+# percentages
+
+# Calculate the percentage values
+biopsy_long <- biopsy_long %>%
+  group_by(Category) %>%
+  mutate(Percent = Value / sum(Value) * 100,
+         Midpoint = cumsum(Percent) - 0.5 * Percent)
+
+# Create the percent stacked bar chart
+ggplot(biopsy_long, aes(
+  x = Category,
+  y = Percent,
+  fill = factor(Condition, levels = rownames(biopsy_data))
+)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Type of Embryos with Selected Error Rate Pairs",
+       x = "Dispersal Level",
+       y = "Percentage of Embryos",
+       fill = "Biopsy Type") +
+  geom_text(aes(y = Midpoint, label = sprintf("%.1f%%", Percent)),
+            color = "white",
+            size = 5) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_minimal()
+
+
+
+#### Table 1 #########################################################
 # using dispersal data from above
 # dispersal = 0
 # Locate the folder to investigate
@@ -914,6 +1147,6 @@ for (i in 2:100) {
 }
 
 library(vtable)
-st(disp_0[,c('prob.meio','prob.mito','euploid', 'mosaic','aneuploid')])
-st(disp_0.5[,c('prob.meio','prob.mito','euploid', 'mosaic','aneuploid')])
-st(disp_1[,c('prob.meio','prob.mito','euploid', 'mosaic','aneuploid')])
+st(disp_0[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
+st(disp_0.5[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
+st(disp_1[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
