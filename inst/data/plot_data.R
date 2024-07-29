@@ -1029,8 +1029,7 @@ barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu < 0.2),
 
 
 ###### histograms
-grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1,
-             top = "Proportion of Aneuploidy Distribution Across Different Dispersal Levels")
+grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1, top = "Proportion of Aneuploidy Distribution Across Different Dispersal Levels")
 
 ####### barplot
 biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
@@ -1244,7 +1243,7 @@ disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
 disp_1 <- subset(dispersal_ranges, dispersal == 1)
 
 scat_disp_0 <- ggplot(data = disp_0, aes(x = disp_0$prob.meio, y = disp_0$prob.mito)) +
- geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
@@ -1252,7 +1251,7 @@ scat_disp_0 <- ggplot(data = disp_0, aes(x = disp_0$prob.meio, y = disp_0$prob.m
   theme_classic()
 
 scat_disp_0.5 <- ggplot(data = disp_0.5, aes(x = disp_0.5$prob.meio, y = disp_0.5$prob.mito)) +
- geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
@@ -1260,7 +1259,7 @@ scat_disp_0.5 <- ggplot(data = disp_0.5, aes(x = disp_0.5$prob.meio, y = disp_0.
   theme_classic()
 
 scat_disp_1 <- ggplot(data = disp_1, aes(x = disp_1$prob.meio, y = disp_1$prob.mito)) +
-geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
@@ -1271,17 +1270,42 @@ geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "
 grid.arrange(scat_disp_0, scat_disp_0.5, scat_disp_1)
 
 ##### With the correlation coefficients and p-values
-ggscat_disp_0 <- ggscatter(disp_0, x = "prob.meio", y = "prob.mito", color = "black",
-          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
-ggscat_disp_0.5 <- ggscatter(disp_0.5, x = "prob.meio", y = "prob.mito",
-          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
-ggscat_disp_1 <- ggscatter(disp_1, x = "prob.meio", y = "prob.mito",
-          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
+ggscat_disp_0 <- ggscatter(
+  disp_0,
+  x = "prob.meio",
+  y = "prob.mito",
+  color = "black",
+  add = "reg.line",
+  conf.int = TRUE,
+  cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+  cor.coef = TRUE,
+  cor.method = "pearson",
+  xlab = "Probability of Meiotic Error",
+  ylab = "Probability of Mitotic Error"
+)
+ggscat_disp_0.5 <- ggscatter(
+  disp_0.5,
+  x = "prob.meio",
+  y = "prob.mito",
+  add = "reg.line",
+  conf.int = TRUE,
+  cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+  cor.coef = TRUE,
+  cor.method = "pearson",
+  xlab = "Probability of Meiotic Error",
+  ylab = "Probability of Mitotic Error"
+)
+ggscat_disp_1 <- ggscatter(
+  disp_1,
+  x = "prob.meio",
+  y = "prob.mito",
+  add = "reg.line",
+  conf.int = TRUE,
+  cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+  cor.coef = TRUE,
+  cor.method = "pearson",
+  xlab = "Probability of Meiotic Error",
+  ylab = "Probability of Mitotic Error"
+)
 
 grid.arrange(ggscat_disp_0, ggscat_disp_0.5, ggscat_disp_1)
