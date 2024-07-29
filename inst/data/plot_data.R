@@ -209,56 +209,57 @@ grid.arrange(h, hm, ha, p)
 #### Draw scatterplots ####
 g <-
   ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
-g <- g + geom_point(color = "sienna") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+g <- g + geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
   ) +
-  annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.25)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.75)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.25)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.75)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) +
-  geom_hline(
-    aes(yintercept = mean(my_data$prob.mito)),
-    color = "blue",
-    linewidth = 1.25,
-    linetype = "dashed"
-  ) +
-  geom_vline(
-    xintercept = mean(my_data$prob.meio),
-    color = "blue",
-    linewidth = 1.25,
-    linetype = "dashed"
-  )
+  # annotate(
+  #   geom = "segment",
+  #   x = quantile(my_data$prob.meio, probs = c(.25)),
+  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
+  #   y = quantile(my_data$prob.mito, probs = c(.25)),
+  #   yend = quantile(my_data$prob.mito, probs = c(.25)),
+  #   color = "red",
+  #   linewidth = 1
+  # ) + annotate(
+  #   geom = "segment",
+  #   x = quantile(my_data$prob.meio, probs = c(.25)),
+  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
+  #   y = quantile(my_data$prob.mito, probs = c(.75)),
+  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
+  #   color = "red",
+  #   linewidth = 1
+  # ) + annotate(
+  #   geom = "segment",
+  #   x = quantile(my_data$prob.meio, probs = c(.25)),
+  #   xend = quantile(my_data$prob.meio, probs = c(.25)),
+  #   y = quantile(my_data$prob.mito, probs = c(.25)),
+  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
+  #   color = "red",
+  #   linewidth = 1
+  # ) + annotate(
+  #   geom = "segment",
+  #   x = quantile(my_data$prob.meio, probs = c(.75)),
+  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
+  #   y = quantile(my_data$prob.mito, probs = c(.25)),
+  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
+  #   color = "red",
+  #   linewidth = 1
+  # ) +
+  # geom_hline(
+  #   aes(yintercept = mean(my_data$prob.mito)),
+  #   color = "blue",
+  #   linewidth = 1.25,
+  #   linetype = "dashed"
+  # ) +
+  # geom_vline(
+  #   xintercept = mean(my_data$prob.meio),
+  #   color = "blue",
+  #   linewidth = 1.25,
+  #   linetype = "dashed"
+  # ) +
+  theme_classic()
 
 # Scatterplots with dispersal
 d <- ggplot(data = my_data,
@@ -511,6 +512,64 @@ ggcorrplot(
 # 0.44487
 # 168308 euploid, 109257 mosaic, 222435 aneuploid (should all be mosaic)
 
+
+### Normality
+# import dispersal_ranges
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+
+disp_0 <- subset(dispersal_ranges, dispersal == 0)
+disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
+disp_1 <- subset(dispersal_ranges, dispersal == 1)
+
+# Shapiro-Wilk Normality Test
+shapiro.test(disp_0$prob.meio)
+# W = 0.99155, p-value = 1.719e-05
+shapiro.test(disp_0$prob.mito)
+# W = 0.87031, p-value < 2.2e-16
+shapiro.test(disp_0.5$prob.meio)
+# W = 0.99538, p-value = 0.004047
+shapiro.test(disp_0.5$prob.mito)
+# W = 0.59542, p-value < 2.2e-16
+shapiro.test(disp_1$prob.meio)
+# W = 0.99137, p-value = 1.365e-05
+shapiro.test(disp_1$prob.mito)
+# W = 0.51354, p-value < 2.2e-16
+
+#### None of the distributions are normal
+
+# Difference in distribution test
+wilcox.test(disp_0$prob.meio, disp_0.5$prob.meio)
+# W = 343200, p-value < 2.2e-16, these two distributions are significantly different
+wilcox.test(disp_0$prob.mito, disp_0.5$prob.mito)
+# W = 811481, p-value < 2.2e-16
+wilcox.test(disp_0$prob.meio, disp_1$prob.meio)
+# W = 349101, p-value < 2.2e-16
+wilcox.test(disp_0$prob.mito, disp_1$prob.mito)
+# W = 844531, p-value < 2.2e-16
+wilcox.test(disp_1$prob.meio, disp_0.5$prob.meio)
+# W = 507520, p-value = 0.5604, these two distributions are not significantly different!
+wilcox.test(disp_1$prob.mito, disp_0.5$prob.mito)
+# W = 444843, p-value = 1.943e-05
+
+# Is the dist of mitotic at 0 shifted rightwards (greater)?
+wilcox.test(disp_0$prob.mito, disp_0.5$prob.mito, alternative = "greater")
+# W = 811481, p-value < 2.2e-16, it is greater
+
+# Is the dist of meiotic at 0 shifted leftwards (less)?
+wilcox.test(disp_0$prob.meio, disp_0.5$prob.meio, alternative = "less")
+# W = 343200, p-value < 2.2e-16, it is less
+
+wilcox.test(disp_0.5$prob.mito, disp_1$prob.mito, alternative = "greater")
+# W = 555157, p-value = 9.715e-06, 0.5 is greater than 1
+
+
+# For biopsy proportions
+A = c(38906, 32352, 28742)
+B = c(45181, 11874, 42945)
+C = c(45279, 9420, 45301)
+wilcox.test(A, B)
+wilcox.test(B, C)
+wilcox.test(A, C)
 
 #------For Paper-----------------------------------------------------
 
@@ -950,7 +1009,8 @@ barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu < 0.2),
 
 
 ###### histograms
-grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1)
+grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1,
+             top = "Proportion of Aneuploidy Distribution Across Different Dispersal Levels")
 
 ####### barplot
 biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
@@ -1008,7 +1068,8 @@ ggplot(biopsy_long, aes(
     size = 3.5
   ) +
   scale_fill_viridis(discrete = T) +
-  theme_minimal()
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic()
 
 # stacked
 
@@ -1020,7 +1081,7 @@ biopsy_long <- biopsy_long %>%
 ggplot(biopsy_long, aes(
   x = Category,
   y = Value,
-  fill = factor(Condition, levels = rownames(biopsy_data))
+  fill = factor(Condition, levels = c("Aneuploid", "Mosaic", "Euploid"))
 )) +
   geom_bar(stat = "identity") +
   labs(title = "Type of Embryos with Selected Error Rate Pairs",
@@ -1031,7 +1092,8 @@ ggplot(biopsy_long, aes(
             color = "white",
             size = 5) +
   scale_fill_viridis(discrete = TRUE) +
-  theme_minimal()
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic()
 
 # percentages
 
@@ -1045,7 +1107,7 @@ biopsy_long <- biopsy_long %>%
 ggplot(biopsy_long, aes(
   x = Category,
   y = Percent,
-  fill = factor(Condition, levels = rownames(biopsy_data))
+  fill = factor(Condition, levels = c("Aneuploid", "Mosaic", "Euploid"))
 )) +
   geom_bar(stat = "identity") +
   labs(title = "Type of Embryos with Selected Error Rate Pairs",
@@ -1056,7 +1118,8 @@ ggplot(biopsy_long, aes(
             color = "white",
             size = 5) +
   scale_fill_viridis(discrete = TRUE) +
-  theme_minimal()
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic()
 
 
 
