@@ -24,6 +24,9 @@ library(viridis)
 if (!require(dplyr))
   install.packages("dplyr", repos = "http://cran.us.r-project.org")
 library(dplyr)
+if (!require(ggpubr))
+  install.packages("ggpubr", repos = "http://cran.us.r-project.org")
+library(ggpubr)
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
@@ -391,6 +394,18 @@ ggcorrplot(
   insig = "blank"
 )
 
+cor.test(disp_0$prob.meio, disp_0$prob.mito)
+# 95 percent confidence interval:
+#   -0.4804412 -0.3794460
+# sample estimates:
+#   cor
+# -0.4312938
+
+print(cor(disp_0.5$prob.meio, disp_0.5$prob.mito))
+# -0.1430319
+print(cor(disp_1$prob.meio, disp_1$prob.mito))
+# -0.1744691
+
 # summary for 01-04 and 01-12 combined:
 # embryo       prop.aneu        prob.meio         prob.mito           dispersal            euploid           mosaic
 # Min.   : 1.0   Min.   :0.2271   Min.   :0.01166   Min.   :3.343e-05   Min.   :0.0005205   Min.   :0.0000   Min.   :0.0000
@@ -535,6 +550,10 @@ shapiro.test(disp_1$prob.meio)
 shapiro.test(disp_1$prob.mito)
 # W = 0.51354, p-value < 2.2e-16
 
+# graphing:
+ggqqplot(disp_0$prob.meio, ylab = "prob.meio")
+ggqqplot(disp_0$prob.mito, ylab = "prob.mito")
+
 #### None of the distributions are normal
 
 # Difference in distribution test
@@ -570,6 +589,7 @@ C = c(45279, 9420, 45301)
 wilcox.test(A, B)
 wilcox.test(B, C)
 wilcox.test(A, C)
+# W = 3, p = 0.7
 
 #------For Paper-----------------------------------------------------
 
@@ -1213,3 +1233,55 @@ library(vtable)
 st(disp_0[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
 st(disp_0.5[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
 st(disp_1[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
+
+
+#### Figure 4 ###################################
+# import dispersal_ranges
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+
+disp_0 <- subset(dispersal_ranges, dispersal == 0)
+disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
+disp_1 <- subset(dispersal_ranges, dispersal == 1)
+
+scat_disp_0 <- ggplot(data = disp_0, aes(x = disp_0$prob.meio, y = disp_0$prob.mito)) +
+ geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  ) +
+  theme_classic()
+
+scat_disp_0.5 <- ggplot(data = disp_0.5, aes(x = disp_0.5$prob.meio, y = disp_0.5$prob.mito)) +
+ geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  ) +
+  theme_classic()
+
+scat_disp_1 <- ggplot(data = disp_1, aes(x = disp_1$prob.meio, y = disp_1$prob.mito)) +
+geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  ) +
+  theme_classic()
+
+
+grid.arrange(scat_disp_0, scat_disp_0.5, scat_disp_1)
+
+##### With the correlation coefficients and p-values
+ggscat_disp_0 <- ggscatter(disp_0, x = "prob.meio", y = "prob.mito", color = "black",
+          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
+ggscat_disp_0.5 <- ggscatter(disp_0.5, x = "prob.meio", y = "prob.mito",
+          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
+ggscat_disp_1 <- ggscatter(disp_1, x = "prob.meio", y = "prob.mito",
+          add = "reg.line", conf.int = TRUE, cor.coeff.args = list(label.x.npc = "middle", label.y.npc = "top"),
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Probability of Meiotic Error", ylab = "Probability of Mitotic Error")
+
+grid.arrange(ggscat_disp_0, ggscat_disp_0.5, ggscat_disp_1)
