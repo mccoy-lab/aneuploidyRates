@@ -1,4 +1,4 @@
-# This file runs the aneuploidyRates package and writes the generated data to a csv file
+# This file runs the aneuploidyRates package
 #
 # source("R/find_rates.R")
 if(!require(aneuploidyRates)){
@@ -9,10 +9,3 @@ if(!require(aneuploidyRates)){
 library(aneuploidyRates)
 find_rates(num.trials = 1000, disp.range = list(1,1), tolerance = 0.01)
 # find_rates(num.trials = 30, tolerance = 1)
-
-# Performance check
-# system.time(
-#   df <- find_rates(num.trials = 50)
-# )
-# print(typeof(df))
-# print(df)

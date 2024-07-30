@@ -1,4 +1,4 @@
-#' Takes a biopsy of an embryo object
+#' Takes a biopsy of an embryo object.
 #'
 #' @description
 #' Return an int corresponding to the biopsy types:
