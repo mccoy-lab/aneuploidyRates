@@ -2,7 +2,7 @@
 % Please edit documentation in R/take_biopsy.R
 \name{take_biopsy}
 \alias{take_biopsy}
-\title{Takes a biopsy of an embryo object}
+\title{Takes a biopsy of an embryo object.}
 \usage{
 take_biopsy(em, biop.size = 5)
 }

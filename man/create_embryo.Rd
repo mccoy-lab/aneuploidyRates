@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_embryo.R
 \name{create_embryo}
 \alias{create_embryo}
-\title{Create an embryo with the given proportion of aneuploidies.}
+\title{Create an embryo with the given proportion of aneuploidy cells.}
 \usage{
 create_embryo(
   n.cells = 200,
@@ -25,15 +25,17 @@ create_embryo(
 
 \item{concordance}{the concordance between aneuploid cells for each chromosome (0-1).}
 
-\item{euploidy}{the number of copies of a chromosome to consider euploid. For a diploid embryo this should be 2.}
+\item{euploidy}{the number of copies of a chromosome to consider euploid.
+For a diploid embryo this should be 2.}
 
-\item{rng.seed}{the seed for the rRandom Number Generation (RNG). Defaults to NULL. Use this to get the same embryo each time}
+\item{rng.seed}{the seed for the Random Number Generation (RNG). Defaults to NULL.
+Use this to obtain the same embryo each time}
 }
 \value{
 an Embryo object
 }
 \description{
-Create an embryo with the given proportion of aneuploidies.
+Create an embryo with the given proportion of aneuploidy cells.
 }
 \examples{
 embryo <- create_embryo(n.cells = 200, n.chrs = 1,  prop.aneuploid = 0.2,
