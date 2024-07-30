@@ -1,5 +1,5 @@
 test_that("Output is the correct form",{
-  expect_type(find_rates(), "list")
+  expect_type(find_rates(num.trials = 40), "list")
 })
 
 test_that("Error messages work",{

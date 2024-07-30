@@ -1,7 +1,7 @@
 #' Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.
 #'
 #' A wrapper function for generating the biopsy results, it counts the proportions
-#' of euploid, mosaic, and aneuploid biopsy results out of sampling a batch of
+#' of euploid, mosaic, and aneuploid biopsy results from sampling a batch of
 #' embryos with the same error rates and dispersal.
 #'
 #' @param num.em the number of embryos to be created
@@ -72,16 +72,6 @@ summarize_biopsy <- function(num.em = 100,
   }
 
   # Set up result file, filing in the inputs
-  # result <- c(
-  #   prop.aneu,
-  #   prob.meio,
-  #   prob.mito,
-  #   dispersal,
-  #   euploid,
-  #   mosaic,
-  #   aneuploid
-  # )
-  # c(0, meio, mito, dispersal, 0, 0, 0)
   result <- matrix(nrow = num.em, ncol = 7)
   euploid <- 0
   mosaic <- 0

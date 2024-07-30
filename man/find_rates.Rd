@@ -41,16 +41,16 @@ and select the most fitting values that deduces the expected data. The selection
 process will be done by EasyABC.
 
 Data for comparison:
-From Viotti et al. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041),
-we leveraged their summary statistics presented in Figure 1A and calculated
-a weighted average to determine percentage of aneuploidy, mosaicism, and euploidy
+Viotti et al,. 2021 (https://doi.org/10.1016/j.fertnstert.2020.11.041).
+We leveraged their summary statistics presented in Figure 1A and calculated
+a weighted average to determine percentage of euploid, mosaic, and aneuploid
 biopsies across 5 clinics.
 
-A total of 73218 embryos are collected, of which 38.8\% (28,431) is euploid,
-18.6\% (13,602) is mosaic, and 42.6\% (31,185) is aneuploid.
+A total of 73218 embryos are collected, of which 38.8\% (28,431) are euploid,
+18.6\% (13,602) are mosaic, and 42.6\% (31,185) are aneuploid.
 }
 \examples{
-find_rates(num.trials = 50)
+find_rates(num.trials = 40)
 find_rates(
   meio.range = list(0.3, 0.5),
   mito.range = list(0.05, 0.15),

@@ -40,7 +40,7 @@ and the three biopsy types shown as percentages.
 }
 \description{
 A wrapper function for generating the biopsy results, it counts the proportions
-of euploid, mosaic, and aneuploid biopsy results out of sampling a batch of
+of euploid, mosaic, and aneuploid biopsy results from sampling a batch of
 embryos with the same error rates and dispersal.
 }
 \examples{
