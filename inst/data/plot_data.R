@@ -811,6 +811,72 @@ grid.arrange(
 )
 
 
+# Panel Grid
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+disp_meiotic <-
+  ggplot(data = dispersal_ranges, aes(x = dispersal_ranges$prob.meio))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )+ geom_histogram(
+  binwidth = 0.1,
+  color = "#000000",
+  fill = "lightblue"
+) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
+  geom_vline(
+    aes(xintercept = mean(dispersal_ranges$prob.meio)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 450)) + theme_classic() +
+  facet_grid(rows = vars(dispersal))
+
+disp_mitotic <-
+  ggplot(data = dispersal_ranges, aes(x = dispersal_ranges$prob.mito))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )+ geom_histogram(
+    binwidth = 0.025,
+    color = "#000000",
+    fill = "lightblue",
+  ) + labs(x = "Probability of Mitotic Error", y = "Number of Embryos") +
+  geom_vline(
+    aes(xintercept = mean(dispersal_ranges$prob.mito)),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) + theme_classic()+
+  facet_grid(rows = vars(dispersal))
+
+# Arrange the panel
+
+grid.arrange(
+    disp_meiotic,
+    disp_mitotic, ncol= 2
+)
+
+# Together
+library(reshape2)
+data_melt <- melt(dispersal_ranges, id.vars = c("embryo", "prop.aneu", "dispersal", "euploid", "mosaic", "aneuploid"),
+                  measure.vars = c("prob.meio", "prob.mito"))
+
+# Plot the histograms
+ggplot(data_melt, aes(x = value)) +
+  geom_histogram(data = subset(data_melt, variable == "prob.meio"), binwidth = 0.05, fill = "steelblue", color = "black") +
+  geom_histogram(data = subset(data_melt, variable == "prob.mito"), binwidth = 0.02, fill = "steelblue", color = "black") +
+  facet_grid(dispersal ~ variable, scales = "free") +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 450))+
+  labs(x = "Error Rates", y = "Frequency") +
+  theme_classic() +
+  theme(strip.text.y = element_text(angle = 0)) +
+  ggtitle("Distribution of Error Rates at Different Dispersal Levels") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+
 # Boxplot arrangement
 library(readr)
 dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
