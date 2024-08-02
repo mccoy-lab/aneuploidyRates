@@ -117,6 +117,7 @@ find_rates <- function(meio.range = list(0, 1),
       meio = probs[[1]],
       mito = probs[[2]],
       dispersal = probs[[3]],
+      num.cell = 256,
       hide.default.param = hide.param
     )
 
