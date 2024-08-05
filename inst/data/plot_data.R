@@ -27,6 +27,22 @@ library(dplyr)
 if (!require(ggpubr))
   install.packages("ggpubr", repos = "http://cran.us.r-project.org")
 library(ggpubr)
+if (!require("RColorBrewer")) {
+  install.packages("RColorBrewer")
+  library(RColorBrewer)
+}
+if (!require("gt")) {
+  install.packages("gt")
+  library(gt)
+}
+if (!require("vtable")) {
+  install.packages("vtable")
+  library(vtable)
+}
+if (!require("kableExtra")) {
+  install.packages("kableExtra")
+  library(kableExtra)
+}
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
@@ -918,7 +934,7 @@ dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
 theme_set(theme_bw())
 p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
   geom_boxplot() +
-  facet_wrap( ~ dispersal) + labs(y = "Probability of Meiotic Error") +
+  facet_wrap(~ dispersal) + labs(y = "Probability of Meiotic Error") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -927,8 +943,8 @@ p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
 # one box per variety
 p2 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.mito)) +
   geom_boxplot() +
-  facet_wrap( ~ dispersal) + labs(y = "Probability of Mitotic Error", x =
-                                    "Dispersal") +
+  facet_wrap(~ dispersal) + labs(y = "Probability of Mitotic Error", x =
+                                   "Dispersal") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
 grid.arrange(p1, p2)
@@ -981,7 +997,7 @@ prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
 # Classification
 
 # Create the data for the chart
-barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <=0),
+barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <= 0),
                     sum((prop_disp_0$prop.aneu > 0) &
                           (prop_disp_0$prop.aneu < 1)),
                     sum(prop_disp_0$prop.aneu >= 1))
@@ -1035,8 +1051,7 @@ prop_aneu_disp_0.5 <- prop_aneu_disp_0.5 + geom_histogram(
 # Create the data for the chart
 barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu <= 0),
                       sum((prop_disp_0.5$prop.aneu > 0) &
-                            (prop_disp_0.5$prop.aneu < 1)
-                      ),
+                            (prop_disp_0.5$prop.aneu < 1)),
                       sum(prop_disp_0.5$prop.aneu >= 1))
 # 42945, 11874, 45181
 # True composition: 1765, 53665, 44570
@@ -1101,33 +1116,33 @@ grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1, top = "Prop
 dispersal_ranges <- rbind.data.frame(prop_disp_0, prop_disp_0.5, prop_disp_1)
 
 # Normal
-ggplot(dispersal_ranges, aes(x=prop.aneu)) +
-  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))),
-             scales = "fixed") +
-  geom_histogram(data=dispersal_ranges,
-                 binwidth = 0.025,
-                 boundary = 0,
-                 fill = "lightblue",
-                 color = "black"
-  )+
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
+ggplot(dispersal_ranges, aes(x = prop.aneu)) +
+  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))), scales = "fixed") +
+  geom_histogram(
+    data = dispersal_ranges,
+    binwidth = 0.025,
+    boundary = 0,
+    fill = "lightblue",
+    color = "black"
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
   labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
   theme_bw()
 
 
 # By cell
-ggplot(dispersal_ranges, aes(x=prop.aneu)) +
-  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))),
-             scales = "fixed") +
-  geom_histogram(data=dispersal_ranges,
-                 binwidth = 1/256,
-                 boundary = 0,
-                 fill = "red",
-                 color = "black"
-                 )+
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
+ggplot(dispersal_ranges, aes(x = prop.aneu)) +
+  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))), scales = "fixed") +
+  geom_histogram(
+    data = dispersal_ranges,
+    binwidth = 1 / 256,
+    boundary = 0,
+    fill = "red",
+    color = "black"
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
   labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
   theme_bw()
 
@@ -1201,7 +1216,10 @@ biopsy_long <- biopsy_long %>%
 ggplot(biopsy_long, aes(
   x = Category,
   y = Value,
-  fill = factor(Condition, levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid"))
+  fill = factor(
+    Condition,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+  )
 )) +
   geom_bar(stat = "identity") +
   labs(title = "Type of Embryos with Selected Error Rate Pairs",
@@ -1227,13 +1245,14 @@ biopsy_long <- biopsy_long %>%
 ggplot(biopsy_long, aes(
   x = Category,
   y = Percent,
-  fill = factor(Condition, levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid"))
+  fill = factor(
+    Condition,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+  )
 )) +
   geom_bar(stat = "identity") +
   labs(# title = "Type of Embryos with Selected Error Rate Pairs",
-       x = "Dispersal Level",
-       y = "Percentage of Embryos",
-       fill = "Biopsy Type") +
+    x = "Dispersal Level", y = "Percentage of Embryos", fill = "Biopsy Type") +
   geom_text(aes(y = Midpoint, label = sprintf("%.1f%%", Percent)),
             color = "white",
             size = 5) +
@@ -1245,17 +1264,18 @@ ggplot(biopsy_long, aes(
 ggplot(biopsy_long, aes(
   y = Category,
   x = Percent,
-  fill = factor(Condition, levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid"))
+  fill = factor(
+    Condition,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+  )
 )) +
   geom_bar(stat = "identity") +
   labs(# title = "Type of Embryos with Selected Error Rate Pairs",
-    y = "Dispersal Level",
-    x = "Percentage of Embryos",
-    fill = "Embryo Type") +
-  geom_text(aes(x = Midpoint+6, label = sprintf("%.1f%%", Percent)),
+    y = "Dispersal Level", x = "Percentage of Embryos", fill = "Embryo Type") +
+  geom_text(aes(x = Midpoint + 6, label = sprintf("%.1f%%", Percent)),
             color = "red",
             size = 4) +
-  scale_fill_viridis(discrete = TRUE) +
+  scale_fill_brewer(palette = "Set3") +
   scale_x_continuous(expand = c(0, 0)) +
   theme_classic()
 
@@ -1346,11 +1366,30 @@ for (i in 2:100) {
   disp_1 <- rbind(disp_1, temp)
 }
 
-library(vtable)
-st(disp_0[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
-st(disp_0.5[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
-st(disp_1[, c('prob.meio', 'prob.mito', 'euploid', 'mosaic', 'aneuploid')])
 
+stats_0 <- st(disp_0[, c('prob.meio', 'prob.mito')], out = "return")
+stats_0 <- t(stats_0)
+stats_0.5 <- st(disp_0.5[, c('prob.meio', 'prob.mito')], out = "return")
+stats_0.5 <- t(stats_0.5)
+stats_1 <- st(disp_1[, c('prob.meio', 'prob.mito')], out = "return")
+stats_1 <- t(stats_1)
+stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
+stats_sum <- rbind(c("Dispersal 0", "", "Dispersal 0.5", "", "Dispersal 1", ""),
+                   stats_sum)
+kbl(stats_sum) %>%
+  kable_material(c("striped", "hover"))
+
+stats_0 <- st(disp_0[, c('euploid', 'mosaic', 'aneuploid')], out = "return")
+stats_0 <- t(stats_0)
+stats_0.5 <- st(disp_0.5[, c('euploid', 'mosaic', 'aneuploid')], out = "return")
+stats_0.5 <- t(stats_0.5)
+stats_1 <- st(disp_1[, c('euploid', 'mosaic', 'aneuploid')], out = "return")
+stats_1 <- t(stats_1)
+stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
+stats_sum <- rbind(c("Dispersal 0", "", "", "Dispersal 0.5", "", "", "Dispersal 1", "", ""),
+                   stats_sum)
+kbl(stats_sum) %>%
+  kable_material(c("striped", "hover"))
 
 #### Figure 4 ###################################
 # import dispersal_ranges
