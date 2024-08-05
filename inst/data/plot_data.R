@@ -233,51 +233,6 @@ g <- g + geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Erro
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
   ) +
-  # annotate(
-  #   geom = "segment",
-  #   x = quantile(my_data$prob.meio, probs = c(.25)),
-  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
-  #   y = quantile(my_data$prob.mito, probs = c(.25)),
-  #   yend = quantile(my_data$prob.mito, probs = c(.25)),
-  #   color = "red",
-  #   linewidth = 1
-  # ) + annotate(
-  #   geom = "segment",
-  #   x = quantile(my_data$prob.meio, probs = c(.25)),
-  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
-  #   y = quantile(my_data$prob.mito, probs = c(.75)),
-  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
-  #   color = "red",
-  #   linewidth = 1
-  # ) + annotate(
-  #   geom = "segment",
-  #   x = quantile(my_data$prob.meio, probs = c(.25)),
-  #   xend = quantile(my_data$prob.meio, probs = c(.25)),
-  #   y = quantile(my_data$prob.mito, probs = c(.25)),
-  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
-  #   color = "red",
-  #   linewidth = 1
-  # ) + annotate(
-  #   geom = "segment",
-  #   x = quantile(my_data$prob.meio, probs = c(.75)),
-  #   xend = quantile(my_data$prob.meio, probs = c(.75)),
-  #   y = quantile(my_data$prob.mito, probs = c(.25)),
-  #   yend = quantile(my_data$prob.mito, probs = c(.75)),
-  #   color = "red",
-  #   linewidth = 1
-  # ) +
-  # geom_hline(
-  #   aes(yintercept = mean(my_data$prob.mito)),
-  #   color = "blue",
-  #   linewidth = 1.25,
-  #   linetype = "dashed"
-  # ) +
-  # geom_vline(
-  #   xintercept = mean(my_data$prob.meio),
-  #   color = "blue",
-  #   linewidth = 1.25,
-  #   linetype = "dashed"
-  # ) +
   theme_classic()
 
 # Scatterplots with dispersal
@@ -296,40 +251,7 @@ d <- d + geom_point() + labs(x = "Probability of Meiotic Error", y = "Probabilit
     legend.background = element_rect(fill = "transparent"),
     panel.grid = element_blank()
   ) +
-  guides(color = guide_colorsteps())  + scale_color_viridis_c() +   geom_rug() +
-  annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.25)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.75)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.25)),
-    xend = quantile(my_data$prob.meio, probs = c(.25)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$prob.meio, probs = c(.75)),
-    xend = quantile(my_data$prob.meio, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  )
+  guides(color = guide_colorsteps())  + scale_color_viridis_c() +   geom_rug()
 
 
 # mitotic error vs dispersal
@@ -389,6 +311,29 @@ md <- md + geom_point(color = "magenta") + labs(x = "Dispersal", y = "Probabilit
 
 # Arrange panel
 grid.arrange(d, g)
+
+
+# Scatter plot with Euclidean distances
+my_data <- my_data %>% mutate(euclidean = sqrt((euploid - 0.388)^2 + (mosaic - 0.188) ^ 2 +
+                                                 (aneuploid - 0.426)^2))
+ggplot(data = my_data,
+            aes(
+              x = prob.meio,
+              y = prob.mito,
+              color = euclidean,
+              shape = factor(dispersal)
+            ))+ geom_point(size = 2.5) +
+  labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error",
+       color = "Distance", shape = "Dispersal") +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
+    legend.position = c(.87, .8),
+    legend.background = element_rect(fill = "transparent"),
+    panel.grid = element_blank()
+  ) +
+  guides(color = guide_colorsteps())  + scale_color_viridis_c() + geom_rug() +
+  theme_bw()
 
 
 #### Statistics ####
