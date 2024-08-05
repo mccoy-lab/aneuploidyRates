@@ -818,11 +818,11 @@ disp_meiotic <-
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  )+ geom_histogram(
-  binwidth = 0.1,
-  color = "#000000",
-  fill = "lightblue"
-) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
+  ) + geom_histogram(
+    binwidth = 0.1,
+    color = "#000000",
+    fill = "lightblue"
+  ) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
   geom_vline(
     aes(xintercept = mean(dispersal_ranges$prob.meio)),
     color = "red",
@@ -837,7 +837,7 @@ disp_mitotic <-
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  )+ geom_histogram(
+  ) + geom_histogram(
     binwidth = 0.025,
     color = "#000000",
     fill = "lightblue",
@@ -848,33 +848,68 @@ disp_mitotic <-
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  scale_y_continuous(expand = c(0, 0)) + theme_classic()+
+  scale_y_continuous(expand = c(0, 0)) + theme_classic() +
   facet_grid(rows = vars(dispersal))
 
 # Arrange the panel
 
-grid.arrange(
-    disp_meiotic,
-    disp_mitotic, ncol= 2
-)
+grid.arrange(disp_meiotic, disp_mitotic, ncol = 2)
 
 # Together
 library(reshape2)
-data_melt <- melt(dispersal_ranges, id.vars = c("embryo", "prop.aneu", "dispersal", "euploid", "mosaic", "aneuploid"),
-                  measure.vars = c("prob.meio", "prob.mito"))
+data_melt <- melt(
+  dispersal_ranges,
+  id.vars = c(
+    "embryo",
+    "prop.aneu",
+    "dispersal",
+    "euploid",
+    "mosaic",
+    "aneuploid"
+  ),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+variable_labels <- c(prob.meio = "Probability of Meiotic Error", prob.mito = "Probability of Mitotic Error")
+
+max_values <- data_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(max_value = max(value, na.rm = TRUE))
 
 # Plot the histograms
 ggplot(data_melt, aes(x = value)) +
-  geom_histogram(data = subset(data_melt, variable == "prob.meio"), binwidth = 0.05, fill = "steelblue", color = "black") +
-  geom_histogram(data = subset(data_melt, variable == "prob.mito"), binwidth = 0.02, fill = "steelblue", color = "black") +
-  facet_grid(dispersal ~ variable, scales = "free") +
-  scale_y_continuous(expand = c(0, 0), limits = c(NA, 450))+
-  labs(x = "Error Rates", y = "Frequency") +
-  theme_classic() +
-  theme(strip.text.y = element_text(angle = 0)) +
-  ggtitle("Distribution of Error Rates at Different Dispersal Levels") +
-  theme(plot.title = element_text(hjust = 0.5))
-
+  facet_grid(
+    dispersal ~ variable,
+    scales = "free_x",
+    axes = "all",
+    axis.labels = "all_y",
+    labeller = labeller(variable = variable_labels)
+  ) +
+  geom_histogram(
+    data = subset(data_melt, variable == "prob.meio"),
+    binwidth = 0.1,
+    boundary = 0,
+    fill = "steelblue",
+    color = "black"
+  ) +
+  geom_histogram(
+    data = subset(data_melt, variable == "prob.mito"),
+    binwidth = 0.025,
+    boundary = 0,
+    fill = "steelblue",
+    color = "black"
+  ) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Error Rates", y = "Number of Embryos") +
+  geom_vline(
+    data = max_values,
+    aes(xintercept = max_value),
+    color = "red",
+    linewidth = 1.25,
+    linetype = "dashed"
+  ) +
+  theme_bw()
 
 
 # Boxplot arrangement
@@ -883,7 +918,7 @@ dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
 theme_set(theme_bw())
 p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
   geom_boxplot() +
-  facet_wrap(~ dispersal) + labs(y = "Probability of Meiotic Error") +
+  facet_wrap( ~ dispersal) + labs(y = "Probability of Meiotic Error") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -892,8 +927,8 @@ p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
 # one box per variety
 p2 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.mito)) +
   geom_boxplot() +
-  facet_wrap(~ dispersal) + labs(y = "Probability of Mitotic Error", x =
-                                   "Dispersal") +
+  facet_wrap( ~ dispersal) + labs(y = "Probability of Mitotic Error", x =
+                                    "Dispersal") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
 grid.arrange(p1, p2)
