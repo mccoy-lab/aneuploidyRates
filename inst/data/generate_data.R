@@ -7,7 +7,7 @@ if(!require(aneuploidyRates)){
   install_github("mccoy-lab/aneuploidyRates")
 }
 library(aneuploidyRates)
-find_rates(num.trials = 1000, disp.range = list(1,1), tolerance = 0.01)
+find_rates(num.trials = 100, disp.range = list(0,0), tolerance = 0.05)
 # find_rates(num.trials = 30, tolerance = 1)
 
 # Performance check
