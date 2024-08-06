@@ -917,168 +917,168 @@ grid.arrange(p1, p2)
 
 #### Figure 3 ##################################################
 
-# ##### Read data
-# # dispersal = 0
-# # Locate the folder to investigate
-# date <- "2024-08-02"
-#
-# # Set column names
-# my_data_cols <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              n_max  = 1,
-#              col_names = FALSE)
-# my_data_cols <- cbind('embryo', my_data_cols)
-#
-# # Read the first txt file
-# prop_disp_0 <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              skip = 1,
-#              col_names = FALSE)
-# colnames(prop_disp_0) <- my_data_cols[1, ]
-#
-# # Read all the rest of the data
-# for (i in 2:100) {
-#   temp <-
-#     read_table(paste0("inst/data/", date, "/", i, ".txt"),
-#                skip = 1,
-#                col_names = FALSE)
-#   colnames(temp) <- my_data_cols[1, ]
-#   prop_disp_0 <- rbind(prop_disp_0, temp)
-# }
-#
-# prop_aneu_disp_0 <-
-#   ggplot(data = prop_disp_0, aes(x = prop_disp_0$prop.aneu))  +
-#   theme(
-#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-#   )
-# prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
-#   binwidth = 0.05,
-#   color = "#000000",
-#   fill = "lightblue",
-# ) + labs(x = element_blank(), y = "Number of Embryos") +
-#   scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
-#
-# # Classification
-#
-# # Create the data for the chart
-# barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <= 0),
-#                     sum((prop_disp_0$prop.aneu > 0) &
-#                           (prop_disp_0$prop.aneu < 1)),
-#                     sum(prop_disp_0$prop.aneu >= 1))
-# # 28742, 32352, 38906
-# # True composition: 170, 61914, 37914
-#
-#
-# # dispersal = 0.5
-# # Locate the folder to investigate
-# date <- "2024-08-04"
-#
-# # Set column names
-# my_data_cols <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              n_max  = 1,
-#              col_names = FALSE)
-# my_data_cols <- cbind('embryo', my_data_cols)
-#
-# # Read the first txt file
-# prop_disp_0.5 <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              skip = 1,
-#              col_names = FALSE)
-# colnames(prop_disp_0.5) <- my_data_cols[1, ]
-#
-# # Read all the rest of the data
-# for (i in 2:100) {
-#   temp <-
-#     read_table(paste0("inst/data/", date, "/", i, ".txt"),
-#                skip = 1,
-#                col_names = FALSE)
-#   colnames(temp) <- my_data_cols[1, ]
-#   prop_disp_0.5 <- rbind(prop_disp_0.5, temp)
-# }
-#
-# prop_aneu_disp_0.5 <-
-#   ggplot(data = prop_disp_0.5, aes(x = prop_disp_0.5$prop.aneu))  +
-#   theme(
-#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-#   )
-# prop_aneu_disp_0.5 <- prop_aneu_disp_0.5 + geom_histogram(
-#   binwidth = 0.05,
-#   color = "#000000",
-#   fill = "lightblue",
-# ) + labs(x = element_blank(), y = "Number of Embryos") +
-#   scale_y_continuous(expand = c(0, 0)) + theme_classic()
-#
-# # Classification
-#
-# # Create the data for the chart
-# barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu <= 0),
-#                       sum((prop_disp_0.5$prop.aneu > 0) &
-#                             (prop_disp_0.5$prop.aneu < 1)),
-#                       sum(prop_disp_0.5$prop.aneu >= 1))
-# # 42945, 11874, 45181
-# # True composition: 1765, 53665, 44570
-#
-# # dispersal = 1
-# # Locate the folder to investigate
-# date <- "2024-08-05"
-#
-# # Set column names
-# my_data_cols <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              n_max  = 1,
-#              col_names = FALSE)
-# my_data_cols <- cbind('embryo', my_data_cols)
-#
-# # Read the first txt file
-# prop_disp_1 <-
-#   read_table(paste0("inst/data/", date, "/1.txt"),
-#              skip = 1,
-#              col_names = FALSE)
-# colnames(prop_disp_1) <- my_data_cols[1, ]
-#
-# # Read all the rest of the data
-# for (i in 2:100) {
-#   temp <-
-#     read_table(paste0("inst/data/", date, "/", i, ".txt"),
-#                skip = 1,
-#                col_names = FALSE)
-#   colnames(temp) <- my_data_cols[1, ]
-#   prop_disp_1 <- rbind(prop_disp_1, temp)
-# }
-#
-# prop_aneu_disp_1 <-
-#   ggplot(data = prop_disp_1, aes(x = prop_disp_1$prop.aneu))  +
-#   theme(
-#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-#   )
-# prop_aneu_disp_1 <- prop_aneu_disp_1 + geom_histogram(
-#   binwidth = 0.05,
-#   color = "#000000",
-#   fill = "lightblue",
-# ) + labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
-#   scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
-#
-# # Classification
-#
-# # Create the data for the chart
-# barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu <= 0),
-#                     sum((prop_disp_1$prop.aneu > 0) &
-#                           (prop_disp_1$prop.aneu < 1)),
-#                     sum(prop_disp_1$prop.aneu >= 1))
-# # 38906, 45181, 45279
-# # True composition: 2744, 52448, 44808
-#
-#
+##### Read data
+# dispersal = 0
+# Locate the folder to investigate
+date <- "2024-08-02"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+prop_disp_0 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(prop_disp_0) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  prop_disp_0 <- rbind(prop_disp_0, temp)
+}
+
+prop_aneu_disp_0 <-
+  ggplot(data = prop_disp_0, aes(x = prop_disp_0$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = element_blank(), y = "Number of Embryos") +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
+
+# Classification
+
+# Create the data for the chart
+barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <= 0),
+                    sum((prop_disp_0$prop.aneu > 0) &
+                          (prop_disp_0$prop.aneu < 1)),
+                    sum(prop_disp_0$prop.aneu >= 1))
+# 28742, 32352, 38906
+# True composition: 170, 61914, 37914
+
+
+# dispersal = 0.5
+# Locate the folder to investigate
+date <- "2024-08-04"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+prop_disp_0.5 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(prop_disp_0.5) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  prop_disp_0.5 <- rbind(prop_disp_0.5, temp)
+}
+
+prop_aneu_disp_0.5 <-
+  ggplot(data = prop_disp_0.5, aes(x = prop_disp_0.5$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+prop_aneu_disp_0.5 <- prop_aneu_disp_0.5 + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = element_blank(), y = "Number of Embryos") +
+  scale_y_continuous(expand = c(0, 0)) + theme_classic()
+
+# Classification
+
+# Create the data for the chart
+barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu <= 0),
+                      sum((prop_disp_0.5$prop.aneu > 0) &
+                            (prop_disp_0.5$prop.aneu < 1)),
+                      sum(prop_disp_0.5$prop.aneu >= 1))
+# 42945, 11874, 45181
+# True composition: 1765, 53665, 44570
+
+# dispersal = 1
+# Locate the folder to investigate
+date <- "2024-08-05"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+prop_disp_1 <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(prop_disp_1) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:100) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  prop_disp_1 <- rbind(prop_disp_1, temp)
+}
+
+prop_aneu_disp_1 <-
+  ggplot(data = prop_disp_1, aes(x = prop_disp_1$prop.aneu))  +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+  )
+prop_aneu_disp_1 <- prop_aneu_disp_1 + geom_histogram(
+  binwidth = 0.05,
+  color = "#000000",
+  fill = "lightblue",
+) + labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
+  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
+
+# Classification
+
+# Create the data for the chart
+barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu <= 0),
+                    sum((prop_disp_1$prop.aneu > 0) &
+                          (prop_disp_1$prop.aneu < 1)),
+                    sum(prop_disp_1$prop.aneu >= 1))
+# 38906, 45181, 45279
+# True composition: 2744, 52448, 44808
+
+
 # ###### histograms
 # grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1, top = "Proportion of Aneuploidy Distribution Across Different Dispersal Levels")
 #
 
 ## In Same Panel
-dispersal_ranges <- read_csv("inst/data/dispersal_full.csv")
+dispersal_ranges <- rbind.data.frame(prop_disp_0, prop_disp_0.5, prop_disp_1)
 
 # Normal histogram
 ggplot(dispersal_ranges, aes(x = prop.aneu)) +
@@ -1113,6 +1113,10 @@ ggplot(dispersal_ranges, aes(x = prop.aneu)) +
 
 
 ###### ggplot barplot
+# Summarize each type
+biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
+colnames(biopsy_data) <- c("0", "0.5", "1")
+rownames(biopsy_data) <- c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid")
 
 # Convert row names to a column
 biopsy_data$Condition <- rownames(biopsy_data)
