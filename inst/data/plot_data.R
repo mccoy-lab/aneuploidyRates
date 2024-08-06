@@ -102,6 +102,8 @@ for (i in 2:100) {
 
 my_data <- rbind(new_data, my_data)
 
+
+
 # -------------Graphing-------------------------
 theme_set(theme_bw())
 
@@ -559,7 +561,7 @@ wilcox.test(A, C)
 
 # dispersal = 0
 # Locate the folder to investigate
-date <- "2024-07-09"
+date <- "2024-08-02"
 
 # Set column names
 my_data_cols <-
@@ -627,7 +629,7 @@ disp_0_mitotic <- disp_0_mitotic + geom_histogram(
 
 # dispersal = 0.5
 # Locate the folder to investigate
-date <- "2024-07-07"
+date <- "2024-08-04"
 
 # Set column names
 my_data_cols <-
@@ -693,7 +695,7 @@ disp_0.5_mitotic <- disp_0.5_mitotic + geom_histogram(
 
 # dispersal = 1
 # Locate the folder to investigate
-date <- "2024-07-06"
+date <- "2024-08-05"
 
 # Set column names
 my_data_cols <-
@@ -773,9 +775,12 @@ grid.arrange(
 
 
 # Panel Grid
-dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+dispersal_ranges <- read_csv("inst/data/dispersal_full.csv")
+dispersal_ranges[,1:3] <- NULL
+dispersal_ranges <- unique(dispersal_ranges)
+
 disp_meiotic <-
-  ggplot(data = dispersal_ranges, aes(x = dispersal_ranges$prob.meio))  +
+  ggplot(data = dispersal_ranges, aes(x = prob.meio))  +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
@@ -785,7 +790,7 @@ disp_meiotic <-
     fill = "lightblue"
   ) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
   geom_vline(
-    aes(xintercept = mean(dispersal_ranges$prob.meio)),
+    aes(xintercept = mean(prob.meio)),
     color = "red",
     linewidth = 1.25,
     linetype = "dashed"
@@ -794,7 +799,7 @@ disp_meiotic <-
   facet_grid(rows = vars(dispersal))
 
 disp_mitotic <-
-  ggplot(data = dispersal_ranges, aes(x = dispersal_ranges$prob.mito))  +
+  ggplot(data = dispersal_ranges, aes(x = prob.mito))  +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
@@ -804,7 +809,7 @@ disp_mitotic <-
     fill = "lightblue",
   ) + labs(x = "Probability of Mitotic Error", y = "Number of Embryos") +
   geom_vline(
-    aes(xintercept = mean(dispersal_ranges$prob.mito)),
+    aes(xintercept = mean(prob.mito)),
     color = "red",
     linewidth = 1.25,
     linetype = "dashed"
@@ -821,8 +826,6 @@ library(reshape2)
 data_melt <- melt(
   dispersal_ranges,
   id.vars = c(
-    "embryo",
-    "prop.aneu",
     "dispersal",
     "euploid",
     "mosaic",
@@ -900,7 +903,7 @@ grid.arrange(p1, p2)
 ##### Read data
 # dispersal = 0
 # Locate the folder to investigate
-date <- "2024-07-20"
+date <- "2024-08-02"
 
 # Set column names
 my_data_cols <-
@@ -952,7 +955,7 @@ barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <= 0),
 
 # dispersal = 0.5
 # Locate the folder to investigate
-date <- "2024-07-25"
+date <- "2024-08-04"
 
 # Set column names
 my_data_cols <-
@@ -1003,7 +1006,7 @@ barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu <= 0),
 
 # dispersal = 1
 # Locate the folder to investigate
-date <- "2024-07-26"
+date <- "2024-08-05"
 
 # Set column names
 my_data_cols <-
@@ -1229,7 +1232,7 @@ ggplot(biopsy_long, aes(
 # using dispersal data from above
 # dispersal = 0
 # Locate the folder to investigate
-date <- "2024-07-09"
+date <- "2024-08-02"
 
 # Set column names
 my_data_cols <-
@@ -1255,9 +1258,12 @@ for (i in 2:100) {
   disp_0 <- rbind(disp_0, temp)
 }
 
+disp_0[,1:2] <- NULL
+disp_0 <- unique(disp_0)
+
 # dispersal = 0.5
 # Locate the folder to investigate
-date <- "2024-07-07"
+date <- "2024-08-04"
 
 # Set column names
 my_data_cols <-
@@ -1282,10 +1288,12 @@ for (i in 2:100) {
   colnames(temp) <- my_data_cols[1, ]
   disp_0.5 <- rbind(disp_0.5, temp)
 }
+disp_0.5[,1:2] <- NULL
+disp_0.5 <- unique(disp_0.5)
 
 # dispersal = 1
 # Locate the folder to investigate
-date <- "2024-07-06"
+date <- "2024-08-05"
 
 # Set column names
 my_data_cols <-
@@ -1310,7 +1318,8 @@ for (i in 2:100) {
   colnames(temp) <- my_data_cols[1, ]
   disp_1 <- rbind(disp_1, temp)
 }
-
+disp_1[,1:2] <- NULL
+disp_1 <- unique(disp_1)
 
 stats_0 <- st(disp_0[, c('prob.meio', 'prob.mito')], out = "return")
 stats_0 <- t(stats_0)
@@ -1321,8 +1330,7 @@ stats_1 <- t(stats_1)
 stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
 stats_sum <- rbind(c("Dispersal 0", "", "Dispersal 0.5", "", "Dispersal 1", ""),
                    stats_sum)
-kbl(stats_sum) %>%
-  kable_material(c("striped", "hover"))
+kbl(stats_sum, format = "markdown")
 
 stats_0 <- st(disp_0[, c('euploid', 'mosaic', 'aneuploid')], out = "return")
 stats_0 <- t(stats_0)
@@ -1333,8 +1341,7 @@ stats_1 <- t(stats_1)
 stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
 stats_sum <- rbind(c("Dispersal 0", "", "", "Dispersal 0.5", "", "", "Dispersal 1", "", ""),
                    stats_sum)
-kbl(stats_sum) %>%
-  kable_material(c("striped", "hover"))
+kbl(stats_sum, format = "markdown")
 
 #### Figure 4 ###################################
 # import dispersal_ranges
