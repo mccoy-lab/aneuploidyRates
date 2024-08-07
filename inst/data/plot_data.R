@@ -10,11 +10,13 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
-# 08-02, 08-04, 08-05 -- 256 cells, 1,000 combinations each (3,000 total), 100,000
-# proportions of aneuploidy each (300,000 total). 0, 0.5, 1 dispersal
+# 08-06 -- 10,000 combinations (0.1 tolerance) at 0 dispersal, 30,000 total.
 
-# 07-30 -- 200 cells, 100 combinations each, 10,000 proportions each. 0 dispersal.
-# Small sample check
+# 08-02, 08-04, 08-05 -- 256 cells, 1,000 combinations (0.01 tolerance) each (3,000 total),
+# 100,000 proportions of aneuploidy each (300,000 total). 0, 0.5, 1 dispersal.
+
+# 07-30 -- 200 cells, 100 combinations each (0.01 tolerance), 10,000 proportions
+# each. 0 dispersal. Small sample check
 
 # 07-20, 07-25, 07-26 -- 200 cells, 1,000 combinations each (3,000 total), 100,000
 # proportions of aneuploidy each (300,000 total). 0, 0.5, 1 dispersal
@@ -69,7 +71,7 @@ if (!require("kableExtra")) {
 
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
-date <- "2024-07-02"
+date <- "2024-08-06"
 
 # Set column names
 my_data_cols <-
@@ -97,7 +99,7 @@ for (i in 2:100) {
 
 # Combine two tables
 # Locate the folder to investigate
-date <- "2024-07-02"
+date <- "2024-08-06"
 
 # Set column names
 new_data_cols <-
@@ -148,13 +150,6 @@ h <- h + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  # annotate(
-  #   geom = "text",
-  #   x = mean(my_data$prob.meio) - 0.25,
-  #   y = 1200,
-  #   fontface = "bold",
-  #   label = paste("Average: ", round(mean(my_data$prob.meio), 2))
-  # ) +
   scale_y_continuous(expand = c(0, 0)) + theme_classic()
 
 # Mitotic
@@ -175,23 +170,7 @@ hm <- hm + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  # annotate(
-  #   geom = "text",
-  #   x = mean(my_data$prob.mito) +0.1,
-  #   y = 2000,
-  #   fontface = "bold",
-  #   label = paste("Average: ", round(mean(my_data$prob.mito), 2))
-  # )   +
   scale_y_continuous(expand = c(0, 0)) + theme_classic()
-
-# Two together
-
-#
-# hist(my_data$prob.mito, col='lightblue', xlab='Probability of Errors')
-# hist(my_data$prob.meio, col='lightgreen', add=TRUE)
-#
-# #add legend
-# legend('topright', c('mitotic errors', 'meiotic errors'), fill=c('lightblue', 'lightgreen'))
 
 # Prop.aneu
 ha <-
@@ -211,13 +190,6 @@ ha <- ha + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  # annotate(
-  #   geom = "text",
-  #   x = 0.35,
-  #   y = 700,
-  #   fontface = "bold",
-  #   label = paste("Average: ", round(mean(my_data$prop.aneu), 2))
-  # )   +
   scale_y_continuous(expand = c(0, 0)) + theme_classic()
 
 
@@ -235,13 +207,6 @@ p <- p + geom_histogram(
     linewidth = 1.25,
     linetype = "dashed"
   ) +
-  # annotate(
-  #   geom = "text",
-  #   x = 0.35,
-  #   y = 400,
-  #   fontface = "bold",
-  #   label = paste("Average: ", round(mean(my_data$dispersal), 2))
-  # )   +
   scale_y_continuous(expand = c(0, 0)) + theme_classic()
 
 
@@ -251,8 +216,11 @@ grid.arrange(h, hm, ha, p)
 
 
 #### Draw scatterplots ####
+# my_data[,1:2] <- NULL
+# my_data <- unique(my_data)
+
 g <-
-  ggplot(data = my_data, aes(x = my_data$prob.meio, y = my_data$prob.mito))
+  ggplot(data = my_data, aes(x = prob.meio, y = prob.mito))
 g <- g + geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error") +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
@@ -261,12 +229,7 @@ g <- g + geom_point(color = "steelblue") + labs(x = "Probability of Meiotic Erro
   theme_classic()
 
 # Scatterplots with dispersal
-d <- ggplot(data = my_data,
-            aes(
-              x = my_data$prob.meio,
-              y = my_data$prob.mito,
-              color = my_data$dispersal
-            ))
+d <- ggplot(data = my_data, aes(x = prob.meio, y = prob.mito, color = dispersal))
 
 d <- d + geom_point() + labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error", color = "Dispersal") +
   theme(
@@ -280,58 +243,58 @@ d <- d + geom_point() + labs(x = "Probability of Meiotic Error", y = "Probabilit
 
 
 # mitotic error vs dispersal
-md <-
-  ggplot(data = my_data, aes(x = my_data$dispersal, y = my_data$prob.mito))
-md <- md + geom_point(color = "magenta") + labs(x = "Dispersal", y = "Probability of Mitotic Error") +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  ) +
-  annotate(
-    geom = "segment",
-    x = quantile(my_data$dispersal, probs = c(.25)),
-    xend = quantile(my_data$dispersal, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.25)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$dispersal, probs = c(.25)),
-    xend = quantile(my_data$dispersal, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.75)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$dispersal, probs = c(.25)),
-    xend = quantile(my_data$dispersal, probs = c(.25)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) + annotate(
-    geom = "segment",
-    x = quantile(my_data$dispersal, probs = c(.75)),
-    xend = quantile(my_data$dispersal, probs = c(.75)),
-    y = quantile(my_data$prob.mito, probs = c(.25)),
-    yend = quantile(my_data$prob.mito, probs = c(.75)),
-    color = "red",
-    linewidth = 1
-  ) +
-  geom_hline(
-    aes(yintercept = mean(my_data$prob.mito)),
-    color = "blue",
-    linewidth = 1.25,
-    linetype = "dashed"
-  ) +
-  geom_vline(
-    xintercept = mean(my_data$dispersal),
-    color = "blue",
-    linewidth = 1.25,
-    linetype = "dashed"
-  )
+# md <-
+#   ggplot(data = my_data, aes(x = dispersal, y = prob.mito))
+# md <- md + geom_point(color = "magenta") + labs(x = "Dispersal", y = "Probability of Mitotic Error") +
+#   theme(
+#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+#   ) +
+#   annotate(
+#     geom = "segment",
+#     x = quantile(dispersal, probs = c(.25)),
+#     xend = quantile(dispersal, probs = c(.75)),
+#     y = quantile(prob.mito, probs = c(.25)),
+#     yend = quantile(prob.mito, probs = c(.25)),
+#     color = "red",
+#     linewidth = 1
+#   ) + annotate(
+#     geom = "segment",
+#     x = quantile(dispersal, probs = c(.25)),
+#     xend = quantile(dispersal, probs = c(.75)),
+#     y = quantile(prob.mito, probs = c(.75)),
+#     yend = quantile(prob.mito, probs = c(.75)),
+#     color = "red",
+#     linewidth = 1
+#   ) + annotate(
+#     geom = "segment",
+#     x = quantile(my_data$dispersal, probs = c(.25)),
+#     xend = quantile(my_data$dispersal, probs = c(.25)),
+#     y = quantile(my_data$prob.mito, probs = c(.25)),
+#     yend = quantile(my_data$prob.mito, probs = c(.75)),
+#     color = "red",
+#     linewidth = 1
+#   ) + annotate(
+#     geom = "segment",
+#     x = quantile(my_data$dispersal, probs = c(.75)),
+#     xend = quantile(my_data$dispersal, probs = c(.75)),
+#     y = quantile(my_data$prob.mito, probs = c(.25)),
+#     yend = quantile(my_data$prob.mito, probs = c(.75)),
+#     color = "red",
+#     linewidth = 1
+#   ) +
+#   geom_hline(
+#     aes(yintercept = mean(my_data$prob.mito)),
+#     color = "blue",
+#     linewidth = 1.25,
+#     linetype = "dashed"
+#   ) +
+#   geom_vline(
+#     xintercept = mean(my_data$dispersal),
+#     color = "blue",
+#     linewidth = 1.25,
+#     linetype = "dashed"
+#   )
 
 
 # Arrange panel
@@ -339,17 +302,21 @@ grid.arrange(d, g)
 
 
 # Scatter plot with Euclidean distances
-my_data <- my_data %>% mutate(euclidean = sqrt((euploid - 0.388)^2 + (mosaic - 0.188) ^ 2 +
-                                                 (aneuploid - 0.426)^2))
+my_data <- my_data %>% mutate(euclidean = sqrt((euploid - 0.388) ^ 2 + (mosaic - 0.188) ^ 2 +
+                                                 (aneuploid - 0.426) ^ 2))
 ggplot(data = my_data,
-            aes(
-              x = prob.meio,
-              y = prob.mito,
-              color = euclidean,
-              shape = factor(dispersal)
-            ))+ geom_point(size = 2.5) +
-  labs(x = "Probability of Meiotic Error", y = "Probability of Mitotic Error",
-       color = "Distance", shape = "Dispersal") +
+       aes(
+         x = prob.meio,
+         y = prob.mito,
+         color = euclidean,
+         shape = factor(dispersal)
+       )) + geom_point(size = 2) +
+  labs(
+    x = "Probability of Meiotic Error",
+    y = "Probability of Mitotic Error",
+    color = "Distance",
+    shape = "Dispersal"
+  ) +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
@@ -798,58 +765,53 @@ wilcox.test(A, C)
 # Panel Grid
 dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
 
-disp_meiotic <-
-  ggplot(data = dispersal_ranges, aes(x = prob.meio))  +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  ) + geom_histogram(
-    binwidth = 0.1,
-    color = "#000000",
-    fill = "lightblue"
-  ) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
-  geom_vline(
-    aes(xintercept = mean(prob.meio)),
-    color = "red",
-    linewidth = 1.25,
-    linetype = "dashed"
-  ) +
-  scale_y_continuous(expand = c(0, 0), limits = c(NA, 450)) + theme_classic() +
-  facet_grid(rows = vars(dispersal))
-
-disp_mitotic <-
-  ggplot(data = dispersal_ranges, aes(x = prob.mito))  +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  ) + geom_histogram(
-    binwidth = 0.025,
-    color = "#000000",
-    fill = "lightblue",
-  ) + labs(x = "Probability of Mitotic Error", y = "Number of Embryos") +
-  geom_vline(
-    aes(xintercept = mean(prob.mito)),
-    color = "red",
-    linewidth = 1.25,
-    linetype = "dashed"
-  ) +
-  scale_y_continuous(expand = c(0, 0)) + theme_classic() +
-  facet_grid(rows = vars(dispersal))
-
-# Arrange the panel
-
-grid.arrange(disp_meiotic, disp_mitotic, ncol = 2)
+# disp_meiotic <-
+#   ggplot(data = dispersal_ranges, aes(x = prob.meio))  +
+#   theme(
+#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+#   ) + geom_histogram(
+#     binwidth = 0.1,
+#     color = "#000000",
+#     fill = "lightblue"
+#   ) + labs(x = "Probability of Meiotic Error", y = "Number of Embryos") +
+#   geom_vline(
+#     aes(xintercept = mean(prob.meio)),
+#     color = "red",
+#     linewidth = 1.25,
+#     linetype = "dashed"
+#   ) +
+#   scale_y_continuous(expand = c(0, 0), limits = c(NA, 450)) + theme_classic() +
+#   facet_grid(rows = vars(dispersal))
+#
+# disp_mitotic <-
+#   ggplot(data = dispersal_ranges, aes(x = prob.mito))  +
+#   theme(
+#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
+#   ) + geom_histogram(
+#     binwidth = 0.025,
+#     color = "#000000",
+#     fill = "lightblue",
+#   ) + labs(x = "Probability of Mitotic Error", y = "Number of Embryos") +
+#   geom_vline(
+#     aes(xintercept = mean(prob.mito)),
+#     color = "red",
+#     linewidth = 1.25,
+#     linetype = "dashed"
+#   ) +
+#   scale_y_continuous(expand = c(0, 0)) + theme_classic() +
+#   facet_grid(rows = vars(dispersal))
+#
+# # Arrange the panel
+#
+# grid.arrange(disp_meiotic, disp_mitotic, ncol = 2)
 
 # Together
 library(reshape2)
 data_melt <- melt(
   dispersal_ranges,
-  id.vars = c(
-    "dispersal",
-    "euploid",
-    "mosaic",
-    "aneuploid"
-  ),
+  id.vars = c("dispersal", "euploid", "mosaic", "aneuploid"),
   measure.vars = c("prob.meio", "prob.mito")
 )
 
@@ -858,6 +820,7 @@ variable_labels <- c(prob.meio = "Probability of Meiotic Error", prob.mito = "Pr
 max_values <- data_melt %>%
   group_by(dispersal, variable) %>%
   summarise(max_value = max(value, na.rm = TRUE))
+
 
 # Plot the histograms
 ggplot(data_melt, aes(x = value)) +
@@ -882,7 +845,15 @@ ggplot(data_melt, aes(x = value)) +
     fill = "steelblue",
     color = "black"
   ) +
-  scale_y_continuous(expand = c(0, 0)) +
+  scale_y_continuous(
+    expand = c(0, 0),
+    sec.axis = sec_axis(
+      ~ . ,
+      name = "Dispersal",
+      breaks = NULL,
+      labels = NULL
+    )
+  ) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Error Rates", y = "Number of Embryos") +
   geom_vline(
@@ -899,7 +870,7 @@ ggplot(data_melt, aes(x = value)) +
 theme_set(theme_bw())
 p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
   geom_boxplot() +
-  facet_wrap(~ dispersal) + labs(y = "Probability of Meiotic Error") +
+  facet_wrap( ~ dispersal) + labs(y = "Probability of Meiotic Error") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -908,8 +879,8 @@ p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
 # one box per variety
 p2 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.mito)) +
   geom_boxplot() +
-  facet_wrap(~ dispersal) + labs(y = "Probability of Mitotic Error", x =
-                                   "Dispersal") +
+  facet_wrap( ~ dispersal) + labs(y = "Probability of Mitotic Error", x =
+                                    "Dispersal") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
 grid.arrange(p1, p2)
@@ -1091,25 +1062,74 @@ ggplot(dispersal_ranges, aes(x = prop.aneu)) +
     color = "black"
   ) +
   scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0)) +
+  scale_y_continuous(
+    expand = c(0, 0),
+    sec.axis = sec_axis(
+      ~ . ,
+      name = "Dispersal",
+      breaks = NULL,
+      labels = NULL
+    )
+  ) +
   labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
   theme_bw()
 
 
 # By cell (bar at 0% represents the number of euploid embryos only)
+euploid_heights <- dispersal_ranges %>%
+  group_by(dispersal) %>%
+  summarise(euploid_height = (sum(prop.aneu == 0) / n()))
+
+total_count <- sum(dispersal_ranges$dispersal == 0)
+
 ggplot(dispersal_ranges, aes(x = prop.aneu)) +
   facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))), scales = "fixed") +
   geom_histogram(
     data = dispersal_ranges,
-    binwidth = 1 / 256,
+    aes(y = ..count.. / total_count),
+    binwidth = 1 / 257,
     boundary = 0,
     fill = "red",
     color = "black"
   ) +
   scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
-  theme_bw()
+  scale_y_continuous(
+    expand = c(0, 0),
+    sec.axis = sec_axis(
+      ~ . ,
+      name = "Dispersal",
+      breaks = NULL,
+      labels = NULL
+    ),
+    labels = scales::percent_format()
+  ) +
+  labs(x = "Proportion of Aneuploidy", y = "Percentage of Embryos") +
+  theme_bw() +
+  geom_segment(
+    data = euploid_heights,
+    aes(
+      x = 0.1,
+      xend = 0,
+      y = euploid_height + 0.25,
+      yend = euploid_height
+    ),
+    arrow = arrow(length = unit(0.3, 'cm')),
+    size = 0.5,
+    color = "red"
+  ) +
+  geom_text(
+    data = euploid_heights,
+    aes(
+      x = 0.1,
+      y = euploid_height + 0.25,
+      label = sprintf("%.1f%%", euploid_height * 100)
+    ),
+    vjust = -0.5,
+    hjust = -0.1,
+    fontface = 'bold',
+    size = 4.5,
+    show.legend = FALSE
+  )
 
 
 ###### ggplot barplot
@@ -1202,6 +1222,7 @@ ggplot(biopsy_long, aes(
   theme_classic()
 
 # Horizontal percentage bar chart
+# Viridis Color Palette
 ggplot(biopsy_long, aes(
   y = Category,
   x = Percent,
@@ -1213,9 +1234,36 @@ ggplot(biopsy_long, aes(
   geom_bar(stat = "identity") +
   labs(# title = "Type of Embryos with Selected Error Rate Pairs",
     y = "Dispersal Level", x = "Percentage of Embryos", fill = "Embryo Type") +
-  geom_text(aes(x = Midpoint + 6, label = sprintf("%.1f%%", Percent)),
-            color = "red",
-            size = 4) +
+  geom_label(
+    aes(x = Midpoint + 8, label = sprintf("%.1f%%", Percent)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  ) +
+  scale_fill_viridis(discrete = TRUE) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_classic()
+
+
+ggplot(biopsy_long, aes(
+  y = Category,
+  x = Percent,
+  fill = factor(
+    Condition,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+  )
+)) +
+  geom_bar(stat = "identity") +
+  labs(# title = "Type of Embryos with Selected Error Rate Pairs",
+    y = "Dispersal Level", x = "Percentage of Embryos", fill = "Embryo Type") +
+  geom_label(
+    aes(x = Midpoint + 8, label = sprintf("%.1f%%", Percent)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  ) +
   scale_fill_brewer(palette = "Set3") +
   scale_x_continuous(expand = c(0, 0)) +
   theme_classic()
@@ -1432,5 +1480,13 @@ ggscatter(
   cor.method = "pearson",
   xlab = "Probability of Meiotic Error",
   ylab = "Probability of Mitotic Error"
-) + facet_grid(dispersal~., scales = "free", axes = "all",
-               axis.labels = "all_y")
+) + facet_grid(dispersal ~ .,
+               scales = "free",
+               axes = "all",
+               axis.labels = "all_y") +
+  scale_y_continuous(sec.axis = sec_axis(
+    ~ . ,
+    name = "Dispersal",
+    breaks = NULL,
+    labels = NULL
+  ))
