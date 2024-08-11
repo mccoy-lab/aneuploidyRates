@@ -22,11 +22,13 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 rate <- strtoi(args[1]) - 1
+
 # set number of steps
 steps = 10
 incr = 0.186/10
-df <- as.data.frame(find_rates(num.trials = 1000, expected = c((0.388 + rate * (incr / 2)),
-                                           (0.186 - rate *incr),
-                                           (0.426 + rate *(incr/2))),
-           tolerance = 0.01))
+expected_values = c((0.388 + rate * (incr / 2)),
+                (0.186 - rate *incr),
+                (0.426 + rate *(incr/2)))
+df <- find_rates(num.trials = 1000, expected = expected_values,
+           tolerance = 0.01)
 df %>% mutate(misdiagnosed.rates = (1/steps * rate))
