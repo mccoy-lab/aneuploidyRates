@@ -31,4 +31,5 @@ expected_values = c((0.388 + rate * (incr / 2)),
                 (0.426 + rate *(incr/2)))
 df <- find_rates(num.trials = 1000, expected = expected_values,
            tolerance = 0.01)
-df %>% mutate(misdiagnosed.rates = (1/steps * rate))
+df <- df %>% mutate(misdiagnosed.rates = (1/steps * rate))
+write.csv(df, file = args[2])
