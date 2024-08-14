@@ -10,6 +10,9 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
+# 08-09, 08-09b, 08-10 -- Capalbo data, 1,000 combinations (0.01 tolerance) at 0, 0.5,
+# and 1 dispersal, 3,000 total.
+
 # 08-08, 08-08b -- Capalbo data, 10,000 combinations (0.1 tolerance) at 0, 0.5,
 # and 1 dispersal, 30,000 total.
 
@@ -1370,7 +1373,8 @@ ggplot(biopsy_long, aes(
 # disp_1[,1:2] <- NULL
 # disp_1 <- unique(disp_1)
 
-dispersal_ranges <- read_csv("inst/data/dispersal_ranges_0.1_tol.csv")
+# need to do a "git lfs checkout inst/data/dispersal_ranges_0.1_tol.csv"
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
 
 disp_0 <- subset(dispersal_ranges, dispersal == 0)
 disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
@@ -1400,7 +1404,7 @@ kbl(stats_sum, format = "markdown")
 
 #### Figure 4 ###################################
 # import dispersal_ranges
-dispersal_ranges <- read_csv("inst/data/dispersal_ranges_0.1_tol.csv")
+dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
 #
 # disp_0 <- subset(dispersal_ranges, dispersal == 0)
 # disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
@@ -1527,3 +1531,31 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   )) +
   guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
   theme_bw()
+
+#### Misdiagnosed Rates ##############
+date <- "2024-08-10c"
+
+# Set column names
+my_data_cols <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             n_max  = 1,
+             col_names = FALSE)
+my_data_cols <- cbind('embryo', my_data_cols)
+
+# Read the first txt file
+my_data <-
+  read_table(paste0("inst/data/", date, "/1.txt"),
+             skip = 1,
+             col_names = FALSE)
+colnames(my_data) <- my_data_cols[1, ]
+
+# Read all the rest of the data
+for (i in 2:11) {
+  temp <-
+    read_table(paste0("inst/data/", date, "/", i, ".txt"),
+               skip = 1,
+               col_names = FALSE)
+  colnames(temp) <- my_data_cols[1, ]
+  my_data <- rbind(my_data, temp)
+}
+
