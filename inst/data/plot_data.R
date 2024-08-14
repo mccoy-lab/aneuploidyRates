@@ -1533,29 +1533,37 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   theme_bw()
 
 #### Misdiagnosed Rates ##############
-date <- "2024-08-10c"
+date <- "2024-08-12c"
+data <- read.csv(paste0("inst/data/", date, "/data.csv"))
 
-# Set column names
-my_data_cols <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             n_max  = 1,
-             col_names = FALSE)
-my_data_cols <- cbind('embryo', my_data_cols)
+filtered_data <- data %>%
+  filter(prop.aneu > 0 & prop.aneu < 1)
+mosaic_data <- filtered_data %>%  group_by(misdiagnosed.rates) %>%
+  summarise(proportion = n()/ nrow(data[data$misdiagnosed.rates == 0, ]))
 
-# Read the first txt file
-my_data <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             skip = 1,
-             col_names = FALSE)
-colnames(my_data) <- my_data_cols[1, ]
-
-# Read all the rest of the data
-for (i in 2:11) {
-  temp <-
-    read_table(paste0("inst/data/", date, "/", i, ".txt"),
-               skip = 1,
-               col_names = FALSE)
-  colnames(temp) <- my_data_cols[1, ]
-  my_data <- rbind(my_data, temp)
-}
+ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
+  geom_point(size = 1) +
+  # facet_grid(dispersal ~ .,
+  #                                   scales = "free",
+  #                                   axes = "all",
+  #                                   axis.labels = "all_y") +
+  labs(
+    x = "Misdiagnosed Rate",
+    y = "Proportion of Mosaic Aneuploidy Embryos",
+  ) +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
+    legend.position = c(.87, .8),
+    legend.background = element_rect(fill = "transparent"),
+    panel.grid = element_blank()
+  ) +
+  # scale_y_continuous(sec.axis = sec_axis(
+  #   ~ . ,
+  #   name = "Dispersal",
+  #   breaks = NULL,
+  #   labels = NULL
+  # )) +
+  # guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
+  theme_bw()
 
