@@ -1,102 +1,19 @@
 # This file runs the aneuploidyRates package and writes the generated data to a csv file
 #
 # source("R/find_rates.R")
-# if(!require(aneuploidyRates)){
-#   if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
-#   library(devtools)
-#   install_github("mccoy-lab/aneuploidyRates")
-# }
-# library(aneuploidyRates)
+if(!require(aneuploidyRates)){
+  if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
+  library(devtools)
+  install_github("mccoy-lab/aneuploidyRates")
+}
+library(aneuploidyRates)
 
-
-#' Convert the error rates to proportion of aneuploidy cells within an embryo.
-#'
-#' Affect the cell with meiotic aneuploidy based on error rate. If the cell is
-#' affected, return the proportion of aneuploidy as 1. Else, simulate cell division
-#' with random mitotic errors based on the probability and calculate the number of
-#' aneuploid cells by the end of the simulation. Return the proportion.
-#'
-#' @param prob.meio the probability of having a meiotic error
-#' @param prob.mito the probability of having a mitotic error
-#' @param num.division the total number of divisions in this embryo
-#'
-#' @return proportion of totally affected (aneuploidy) cells within
-#' this embryo.
-#' @export
-#'
-#' @examples
-#' prob_to_prop(0, 0.5)
-#' prob_to_prop(0.2, 0.03, num.division = 6)
-
-#
-# find_rates <- function(meio.range = list(0, 1),
-#                        mito.range = list(0, 1),
-#                        disp.range = list(0, 1),
-#                        expected = c(0.388, 0.186, 0.426),
-#                        tolerance = 0.05,
-#                        num.trials = 100,
-#                        hide.param = TRUE) {
-#   # Error messages
-#   if (length(meio.range) != 2 |
-#       length(mito.range) != 2 | length(disp.range) != 2) {
-#     stop(paste0(
-#       "Must input a range (e.g. (0,1)) for the error and dispersal ranges"
-#     ))
-#   }
-#   if (meio.range[1] < 0 | mito.range[1] < 0 | disp.range[1] < 0) {
-#     stop(
-#       paste0(
-#         "The probabilities: ",
-#         meio.range[[1]],
-#         ", ",
-#         mito.range[[1]],
-#         ", and dispersal: ",
-#         disp.range[[1]],
-#         " must be at least 0"
-#       )
-#     )
-#   }
-#   if (meio.range[2] > 1 | mito.range[2] > 1 | disp.range[2] > 1) {
-#     stop(
-#       paste0(
-#         "The probabilities: ",
-#         meio.range[[2]],
-#         ", ",
-#         mito.range[[2]],
-#         ", and dispersal: ",
-#         disp.range[[2]],
-#         " must be at most 1"
-#       )
-#     )
-#   }
-#   if (num.trials %% 1 != 0) {
-#     stop(
-#       paste0(
-#         "The number of trials for the simulation: ",
-#         num.trials,
-#         "should be an integer"
-#       )
-#     )
-#   }
-#   if (tolerance <= 0 | tolerance > 1) {
-#     stop(paste0("The tolerance: ",
-#                 tolerance,
-#                 " should be in the range (0, 1]"))
-#   }
-#   if (sum(expected) != 1) {
-#     stop(paste0(
-#       "The expected percentages of all three embryo types should
-#                 sum up to 1"
-#     ))
-#   }
-#   if(num.trials*tolerance <= 1.5){
-#     stop(paste0(
-#       "The number of selected parameters allowed should be more than 1"
-#     ))
-#   }
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+library(dplyr)
 
 # Set the model for biopsy summary
 rates_model <- function(probs) {
+
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
     if (prob.meio < 0 | prob.mito < 0) {
@@ -242,7 +159,7 @@ rates_model <- function(probs) {
     }
   }
 
-  summarize_biopsy <- function(num.em = 100,
+  summarize_biopsy <- function(num.em = 1000,
                                meio,
                                mito,
                                num.cell = 200,
@@ -368,27 +285,21 @@ rates_model <- function(probs) {
 
   # Saves all data (used for displaying prop.aneu and other default params later)
   # remaining.data <<- rbind(remaining.data, biopsy)
-  write.csv(biopsy,paste0(probs[[2]], "_", probs[[3]], ".csv"))
+  write.csv(biopsy,paste0("temp/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
   # Returns only the biopsy types
   return(biopsy[1,5:7])
 }
 
 
-meio.range = list(0, 1)
-mito.range = list(0, 1)
-disp.range = list(0, 0)
-expected = c(0.388, 0.186, 0.426)
-num.trials = 30
-hide.param = TRUE
+  meio.range = list(0, 1)
+  mito.range = list(0, 1)
+  disp = list(0, 0)
+  expected = c(0.388, 0.186, 0.426)
+  num.trials = 2000
+  hide.param = TRUE
 
-  # Set up matrix for later output
-  remaining.data <- matrix(ncol = 7)
-  if (!hide.param) {
-    remaining.data <- matrix(ncol = 10)
-  }
-
-
-  print(remaining.data)
+  # Set up temp folder
+  dir.create("temp/")
 
   # Choose the distribution to draw inputs. Assume uniform distributions.
   rates_prior <- list(
@@ -411,14 +322,14 @@ hide.param = TRUE
       # proportion of particles kept at each step, default to 0.5
       alpha = 0.5,
       # stopping criterion, propotion of new particles accepted, default 0.05
-      p_acc_min = 0.99,
+      p_acc_min = 0.05,
       use_seed = TRUE,
-      n_cluster = 5,
+      n_cluster = 20,
       progress_bar = TRUE
     )
 
   print(rates_sim)
-  print(remaining.data)
+  # print(remaining.data)
 
   # Set up return format: from the saved data, select the rows with ABC_rej's
   # returned parameters
@@ -427,39 +338,23 @@ hide.param = TRUE
   #                  &
   #                    remaining.data[, 3] %in% rates_sim$param[, 2], ]
   # print(result)
-  result <- cbind(rates_sim$param[,1:2], 0,rates_sim$stats)
-  print(result)
+  result <- cbind(rates_sim$param[,1:2], 0, rates_sim$stats)
 
-  # Set row names (numbers)
-  # rownames(result) <- 1:nrow(result)
+  # keeping the weights
+  result<- cbind(result, rates_sim$weights)
 
-  # Set column names
-  # if (hide.param) {
-  #   colnames(result) <-
-  #     c(
-  #       "prop.aneu",
-  #       "prob.meio",
-  #       "prob.mito",
-  #       "dispersal",
-  #       "euploid",
-  #       "mosaic",
-  #       "aneuploid"
-  #     )
-  # } else{
-  #   colnames(result) <-
-  #     c(
-  #       "prop.aneu",
-  #       "prob.meio",
-  #       "prob.mito",
-  #       "dispersal",
-  #       "euploid",
-  #       "mosaic",
-  #       "aneuploid",
-  #       "num.cell",
-  #       "num.chr",
-  #       "concordance"
-  #     )
-  # }
+
+  # collect prop.aneu
+  result_prop_aneu <- c()
+  for(i in 1:nrow(result)){
+    filename <- paste0("temp/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
+    proportion <- read.csv(filename)
+    proportion <- proportion[,2:8]
+    #colnames(proportion) <- colnames(result_prop_aneu)
+    result_prop_aneu <- rbind(result_prop_aneu, proportion)
+  }
+
+
 
     colnames(result) <-
       c(
@@ -468,21 +363,28 @@ hide.param = TRUE
         "dispersal",
         "euploid",
         "mosaic",
+        "aneuploid",
+        "weights"
+      )
+
+    colnames(result_prop_aneu) <-
+      c(
+        "prop.aneu",
+        "prob.meio",
+        "prob.mito",
+        "dispersal",
+        "euploid",
+        "mosaic",
         "aneuploid"
       )
 
-  print(data.frame(result))
+  # print(result)
+  #
+  # print(result_prop_aneu)
 
+  # Write to file
+  args <- commandArgs(trailingOnly = TRUE)
+  write.csv(result_prop_aneu, file = args[1])
+  write.csv(result, file = args[2])
 
-
-
-
-# find_rates(num.trials = 30, expected = c(0.232, 0.187, 0.581), disp.range = list(0,0), tolerance = 0.8)
-# find_rates(num.trials = 30, tolerance = 1)
-
-# Performance check
-# system.time(
-#   df <- find_rates(num.trials = 50)
-# )
-# print(typeof(df))
-# print(df)
+  unlink("temp/*", recursive = TRUE)

@@ -1146,7 +1146,7 @@ ggplot(dispersal_ranges, aes(x = prop.aneu)) +
 ###### ggplot barplot
 # Summarize each type
 biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
-colnames(biopsy_data) <- c("0", "0.5", "1")
+colnames(biopsy_data) <- c("1", "0.5", "0")
 rownames(biopsy_data) <- c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid")
 
 # Convert row names to a column
