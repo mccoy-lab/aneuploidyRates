@@ -81,14 +81,18 @@ if (!require("kableExtra")) {
   install.packages("kableExtra")
   library(kableExtra)
 }
-if(!require(bayestestR)) {
+if (!require(bayestestR)) {
   install.packages("bayestestR")
 }
 library(bayestestR)
-if(!require(reshape2)) {
+if (!require(reshape2)) {
   install.packages("reshape2")
 }
 library(reshape2)
+if (!require(patchwork)) {
+  install.packages("patchwork")
+}
+library(patchwork)
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
 date <- "2024-08-06"
@@ -330,8 +334,10 @@ print(cor(disp_1$prob.meio, disp_1$prob.mito))
 
 #### Figure 2 #############################################################
 
-# Panel Grid
-dispersal_ranges <- read_csv("inst/data/dispersal_ranges_0.1_tol.csv")
+data1 <- read.csv("inst/data/2024-08-16c/data.csv")
+data2 <- read.csv("inst/data/2024-08-16d/data.csv")
+data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+dispersal_ranges <- rbind(data1, data2, data3)
 
 # Together
 library(reshape2)
@@ -397,7 +403,7 @@ ggplot(data_melt, aes(x = value)) +
 theme_set(theme_bw())
 p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
   geom_boxplot() +
-  facet_wrap( ~ dispersal) + labs(y = "Probability of Meiotic Error") +
+  facet_wrap(~ dispersal) + labs(y = "Probability of Meiotic Error") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -406,8 +412,8 @@ p1 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.meio)) +
 # one box per variety
 p2 <- ggplot(dispersal_ranges, aes(y = dispersal_ranges$prob.mito)) +
   geom_boxplot() +
-  facet_wrap( ~ dispersal) + labs(y = "Probability of Mitotic Error", x =
-                                    "Dispersal") +
+  facet_wrap(~ dispersal) + labs(y = "Probability of Mitotic Error", x =
+                                   "Dispersal") +
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
 grid.arrange(p1, p2)
@@ -416,6 +422,10 @@ grid.arrange(p1, p2)
 #### Figure 3 ##################################################
 
 # Read prop.aneu data to create dispersal_ranges
+data1 <- read.csv("inst/data/2024-08-16c/full_data.csv")
+data2 <- read.csv("inst/data/2024-08-16d/full_data.csv")
+data3 <- read.csv("inst/data/2024-08-16e/full_data.csv")
+dispersal_ranges <- rbind(data1, data2, data3)
 
 # By cell (bar at 0% represents the number of euploid embryos only)
 euploid_heights <- dispersal_ranges %>%
@@ -424,7 +434,7 @@ euploid_heights <- dispersal_ranges %>%
 
 total_count <- sum(dispersal_ranges$dispersal == 0)
 
-ggplot(dispersal_ranges, aes(x = prop.aneu)) +
+prop.hist <- ggplot(dispersal_ranges, aes(x = prop.aneu)) +
   facet_grid(rows = vars(factor(dispersal, levels = c("0", "0.5", "1"))), scales = "fixed") +
   geom_histogram(
     data = dispersal_ranges,
@@ -445,7 +455,7 @@ ggplot(dispersal_ranges, aes(x = prop.aneu)) +
     ),
     labels = scales::percent_format()
   ) +
-  labs(x = "Proportion of Aneuploidy", y = "Percentage of Embryos") +
+  labs(x = "Proportion of Aneuploidy", y = "Percentage of Embryos", tag = "A") +
   theme_bw() +
   geom_segment(
     data = euploid_heights,
@@ -491,46 +501,53 @@ embryo_types <- biopsy_data %>%
   mutate(label_ypos = cumsum(count) + 0.5) %>%
   mutate(percent = count / sum(count) * 100)
 
-embryo_types$category <- factor(embryo_types$category, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
+embryo_types$category <- factor(embryo_types$category,
+                                levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
 
 # calculate mean and standard deviations
 embryo_sum <- embryo_types %>%
   group_by(dispersal, category) %>%
   summarize(mean = mean(percent), std = sd(percent)) %>%
-  mutate(xpos = c(10, 75,40)) %>%
+  mutate(xpos = c(10, 75, 40)) %>%
   mutate(new_mean = cumsum(mean))
 
 # percentages
 # Horizontal percentage bar chart
-ggplot(embryo_sum, aes(
-  x = factor(
-    dispersal,
-    levels = c(1, 0.5, 0)),
+percent.bar <- ggplot(embryo_sum, aes(
+  x = factor(dispersal, levels = c(1, 0.5, 0)),
   y = mean,
   fill = factor(
     category,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid","Euploid")
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
   )
 )) +
   geom_bar(stat = "identity") +
-  geom_errorbar(aes(ymin = new_mean -std, ymax = new_mean + std), width = 0.2, color = "red") +
-  labs(
-       x = "Dispersal Level",
+  geom_errorbar(aes(ymin = new_mean - std, ymax = new_mean + std),
+                width = 0.2,
+                color = "red") +
+  labs(x = "Dispersal Level",
        y = "Percentage of Embryos",
-       fill = "Embryo Type") +
-  geom_label(aes(y = xpos, label = sprintf("%.1f%%", mean)),
-            color = "red",
-            fill = "white",
-            fontface = "bold",
-            size = 4) +
+       fill = "Embryo Type",
+       tag = "B") +
+  geom_label(
+    aes(y = xpos, label = sprintf("%.1f%%", mean)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  ) +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
   theme_classic() + coord_flip()
 
+prop.hist + percent.bar
+
 #### Table 1 #########################################################
 
-# need to do a "git lfs checkout inst/data/dispersal_ranges_0.1_tol.csv"
-dispersal_ranges <- read_csv("inst/data/dispersal_ranges.csv")
+data1 <- read.csv("inst/data/2024-08-16c/data.csv")
+data2 <- read.csv("inst/data/2024-08-16d/data.csv")
+data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+dispersal_ranges <- rbind(data1, data2, data3)
 
 disp_0 <- subset(dispersal_ranges, dispersal == 0)
 disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
@@ -545,7 +562,7 @@ stats_1 <- t(stats_1)
 stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
 
 # Add MAP and remove redundant rows
-stats_sum <- stats_sum[!(row.names(stats_sum) %in% c("N","Std. Dev.", "Min", "Max")),]
+stats_sum <- stats_sum[!(row.names(stats_sum) %in% c("N", "Std. Dev.", "Min", "Max")), ]
 
 data_melt <- melt(
   dispersal_ranges,
@@ -559,8 +576,11 @@ max_estimates <- data_melt %>%
   group_by(dispersal, variable) %>%
   summarise(map_estimate(value)[2])
 
-stats_sum <- rbind(c("Dispersal 0", "", "Dispersal 0.5", "", "Dispersal 1", ""),
-                   stats_sum, MAP = signif(max_estimates$MAP_Estimate, 2))
+stats_sum <- rbind(
+  c("Dispersal 0", "", "Dispersal 0.5", "", "Dispersal 1", ""),
+  stats_sum,
+  MAP = signif(max_estimates$MAP_Estimate, 2)
+)
 
 kbl(stats_sum, format = "markdown")
 
@@ -644,7 +664,7 @@ data <- read.csv(paste0("inst/data/", date, "/data.csv"))
 filtered_data <- data %>%
   filter(prop.aneu > 0 & prop.aneu < 1)
 mosaic_data <- filtered_data %>%  group_by(misdiagnosed.rates) %>%
-  summarise(proportion = n()/ nrow(data[data$misdiagnosed.rates == 0, ]))
+  summarise(proportion = n() / nrow(data[data$misdiagnosed.rates == 0, ]))
 
 ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
   geom_point(size = 1) +
@@ -652,10 +672,7 @@ ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
   #                                   scales = "free",
   #                                   axes = "all",
   #                                   axis.labels = "all_y") +
-  labs(
-    x = "Misdiagnosed Rate",
-    y = "Proportion of Mosaic Aneuploidy Embryos",
-  ) +
+  labs(x = "Misdiagnosed Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
@@ -671,4 +688,3 @@ ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
   # )) +
   # guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
   theme_bw()
-
