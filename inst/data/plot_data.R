@@ -10,6 +10,8 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
+# 08-16c, d, e -- 3000 ABC_seq Lenormand data for Viotti
+
 # 08-09, 08-09b, 08-10 -- Capalbo data, 1,000 combinations (0.01 tolerance) at 0, 0.5,
 # and 1 dispersal, 3,000 total.
 
@@ -79,7 +81,10 @@ if (!require("kableExtra")) {
   install.packages("kableExtra")
   library(kableExtra)
 }
-
+if(!require(bayestestR)) {
+  install.packages("bayestestR")
+}
+library(bayestestR)
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
 date <- "2024-08-06"
@@ -828,9 +833,10 @@ data_melt <- melt(
 
 variable_labels <- c(prob.meio = "Probability of Meiotic Error", prob.mito = "Probability of Mitotic Error")
 
-max_values <- data_melt %>%
+
+max_estimates <- data_melt %>%
   group_by(dispersal, variable) %>%
-  summarise(max_value = max(value, na.rm = TRUE))
+  summarise(map_estimate(value)[2])
 
 
 # Plot the histograms
@@ -844,14 +850,14 @@ ggplot(data_melt, aes(x = value)) +
   ) +
   geom_histogram(
     data = subset(data_melt, variable == "prob.meio"),
-    binwidth = 0.1,
+    binwidth = 0.005,
     boundary = 0,
     fill = "steelblue",
     color = "black"
   ) +
   geom_histogram(
     data = subset(data_melt, variable == "prob.mito"),
-    binwidth = 0.025,
+    binwidth = 0.001,
     boundary = 0,
     fill = "steelblue",
     color = "black"
@@ -868,10 +874,10 @@ ggplot(data_melt, aes(x = value)) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Error Rates", y = "Number of Embryos") +
   geom_vline(
-    data = max_values,
-    aes(xintercept = max_value),
+    data = max_estimates,
+    aes(xintercept = MAP_Estimate),
     color = "red",
-    linewidth = 1.25,
+    linewidth = 0.75,
     linetype = "dashed"
   ) +
   theme_bw()
@@ -899,192 +905,7 @@ grid.arrange(p1, p2)
 
 #### Figure 3 ##################################################
 
-##### Read data
-# dispersal = 0
-# Locate the folder to investigate
-date <- "2024-08-06"
-
-# Set column names
-my_data_cols <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             n_max  = 1,
-             col_names = FALSE)
-my_data_cols <- cbind('embryo', my_data_cols)
-
-# Read the first txt file
-prop_disp_0 <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             skip = 1,
-             col_names = FALSE)
-colnames(prop_disp_0) <- my_data_cols[1, ]
-
-# Read all the rest of the data
-for (i in 2:100) {
-  temp <-
-    read_table(paste0("inst/data/", date, "/", i, ".txt"),
-               skip = 1,
-               col_names = FALSE)
-  colnames(temp) <- my_data_cols[1, ]
-  prop_disp_0 <- rbind(prop_disp_0, temp)
-}
-
-prop_aneu_disp_0 <-
-  ggplot(data = prop_disp_0, aes(x = prop_disp_0$prop.aneu))  +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  )
-prop_aneu_disp_0 <- prop_aneu_disp_0 + geom_histogram(
-  binwidth = 0.05,
-  color = "#000000",
-  fill = "lightblue",
-) + labs(x = element_blank(), y = "Number of Embryos") +
-  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
-
-# Classification
-
-# Create the data for the chart
-barplot_disp_0 <- c(sum(prop_disp_0$prop.aneu <= 0),
-                    sum((prop_disp_0$prop.aneu > 0) &
-                          (prop_disp_0$prop.aneu < 1)),
-                    sum(prop_disp_0$prop.aneu >= 1))
-# 28742, 32352, 38906
-# True composition: 170, 61914, 37914
-
-
-# dispersal = 0.5
-# Locate the folder to investigate
-date <- "2024-08-07"
-
-# Set column names
-my_data_cols <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             n_max  = 1,
-             col_names = FALSE)
-my_data_cols <- cbind('embryo', my_data_cols)
-
-# Read the first txt file
-prop_disp_0.5 <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             skip = 1,
-             col_names = FALSE)
-colnames(prop_disp_0.5) <- my_data_cols[1, ]
-
-# Read all the rest of the data
-for (i in 2:100) {
-  temp <-
-    read_table(paste0("inst/data/", date, "/", i, ".txt"),
-               skip = 1,
-               col_names = FALSE)
-  colnames(temp) <- my_data_cols[1, ]
-  prop_disp_0.5 <- rbind(prop_disp_0.5, temp)
-}
-
-prop_aneu_disp_0.5 <-
-  ggplot(data = prop_disp_0.5, aes(x = prop_disp_0.5$prop.aneu))  +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  )
-prop_aneu_disp_0.5 <- prop_aneu_disp_0.5 + geom_histogram(
-  binwidth = 0.05,
-  color = "#000000",
-  fill = "lightblue",
-) + labs(x = element_blank(), y = "Number of Embryos") +
-  scale_y_continuous(expand = c(0, 0)) + theme_classic()
-
-# Classification
-
-# Create the data for the chart
-barplot_disp_0.5 <- c(sum(prop_disp_0.5$prop.aneu <= 0),
-                      sum((prop_disp_0.5$prop.aneu > 0) &
-                            (prop_disp_0.5$prop.aneu < 1)),
-                      sum(prop_disp_0.5$prop.aneu >= 1))
-# 42945, 11874, 45181
-# True composition: 1765, 53665, 44570
-
-# dispersal = 1
-# Locate the folder to investigate
-date <- "2024-08-07b"
-
-# Set column names
-my_data_cols <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             n_max  = 1,
-             col_names = FALSE)
-my_data_cols <- cbind('embryo', my_data_cols)
-
-# Read the first txt file
-prop_disp_1 <-
-  read_table(paste0("inst/data/", date, "/1.txt"),
-             skip = 1,
-             col_names = FALSE)
-colnames(prop_disp_1) <- my_data_cols[1, ]
-
-# Read all the rest of the data
-for (i in 2:100) {
-  temp <-
-    read_table(paste0("inst/data/", date, "/", i, ".txt"),
-               skip = 1,
-               col_names = FALSE)
-  colnames(temp) <- my_data_cols[1, ]
-  prop_disp_1 <- rbind(prop_disp_1, temp)
-}
-
-prop_aneu_disp_1 <-
-  ggplot(data = prop_disp_1, aes(x = prop_disp_1$prop.aneu))  +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold")
-  )
-prop_aneu_disp_1 <- prop_aneu_disp_1 + geom_histogram(
-  binwidth = 0.05,
-  color = "#000000",
-  fill = "lightblue",
-) + labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
-  scale_y_continuous(expand = c(0, 0), limits = c(NA, 45000)) + theme_classic()
-
-# Classification
-
-# Create the data for the chart
-barplot_disp_1 <- c(sum(prop_disp_1$prop.aneu <= 0),
-                    sum((prop_disp_1$prop.aneu > 0) &
-                          (prop_disp_1$prop.aneu < 1)),
-                    sum(prop_disp_1$prop.aneu >= 1))
-# 38906, 45181, 45279
-# True composition: 2744, 52448, 44808
-
-
-# ###### histograms
-# grid.arrange(prop_aneu_disp_0, prop_aneu_disp_0.5, prop_aneu_disp_1, top = "Proportion of Aneuploidy Distribution Across Different Dispersal Levels")
-#
-
-## In Same Panel
-dispersal_ranges <- rbind.data.frame(prop_disp_0, prop_disp_0.5, prop_disp_1)
-
-# Normal histogram
-ggplot(dispersal_ranges, aes(x = prop.aneu)) +
-  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))), scales = "fixed") +
-  geom_histogram(
-    data = dispersal_ranges,
-    binwidth = 0.025,
-    boundary = 0,
-    fill = "lightblue",
-    color = "black"
-  ) +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(
-    expand = c(0, 0),
-    sec.axis = sec_axis(
-      ~ . ,
-      name = "Dispersal",
-      breaks = NULL,
-      labels = NULL
-    )
-  ) +
-  labs(x = "Proportion of Aneuploidy", y = "Number of Embryos") +
-  theme_bw()
-
+# Read prop.aneu data to create dispersal_ranges
 
 # By cell (bar at 0% represents the number of euploid embryos only)
 euploid_heights <- dispersal_ranges %>%
@@ -1094,7 +915,7 @@ euploid_heights <- dispersal_ranges %>%
 total_count <- sum(dispersal_ranges$dispersal == 0)
 
 ggplot(dispersal_ranges, aes(x = prop.aneu)) +
-  facet_grid(rows = vars(factor(dispersal, levels = c("1", "0.5", "0"))), scales = "fixed") +
+  facet_grid(rows = vars(factor(dispersal, levels = c("0", "0.5", "1"))), scales = "fixed") +
   geom_histogram(
     data = dispersal_ranges,
     aes(y = ..count.. / total_count),
@@ -1144,141 +965,57 @@ ggplot(dispersal_ranges, aes(x = prop.aneu)) +
 
 
 ###### ggplot barplot
-# Summarize each type
-biopsy_data <- data.frame(barplot_disp_0, barplot_disp_0.5, barplot_disp_1)
-colnames(biopsy_data) <- c("1", "0.5", "0")
-rownames(biopsy_data) <- c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid")
 
-# Convert row names to a column
-biopsy_data$Condition <- rownames(biopsy_data)
-
-# Reshape the data to long format
-biopsy_long <- gather(biopsy_data, key = "Category", value = "Value", -Condition)
-
-# Create the bar chart
-# side-by-side
-ggplot(biopsy_long, aes(
-  x = Category,
-  y = Value,
-  fill = factor(Condition, levels = rownames(biopsy_data))
-)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Type of Embryos with Selected Error Rate Pairs",
-       x = "Dispersal Level",
-       y = "Number of Embryos",
-       fill = "Biopsy Type") +
-  geom_text(
-    aes(label = Value),
-    vjust = 1.6,
-    color = "white",
-    position = position_dodge(0.9),
-    size = 3.5
-  ) +
-  scale_fill_viridis(discrete = T) +
-  scale_y_continuous(expand = c(0, 0)) +
-  theme_classic()
-
-# stacked
-
-biopsy_long <- biopsy_long %>%
-  group_by(Category) %>%
-  mutate(label_ypos = cumsum(Value) - 0.5 * Value)
-
-# Create the stacked bar chart with labels
-ggplot(biopsy_long, aes(
-  x = Category,
-  y = Value,
-  fill = factor(
-    Condition,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+biopsy_data <- dispersal_ranges %>%
+  mutate(
+    category = case_when(
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
+    )
   )
-)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Type of Embryos with Selected Error Rate Pairs",
-       x = "Dispersal Level",
-       y = "Number of Embryos",
-       fill = "Biopsy Type") +
-  geom_text(aes(y = label_ypos, label = Value),
-            color = "white",
-            size = 5) +
-  scale_fill_viridis(discrete = TRUE) +
-  scale_y_continuous(expand = c(0, 0)) +
-  theme_classic()
+
+embryo_types <- biopsy_data %>%
+  group_by(dispersal, prob.meio, prob.mito, category) %>%
+  summarise(count = n()) %>%
+  mutate(label_ypos = cumsum(count) + 0.5) %>%
+  mutate(percent = count / sum(count) * 100)
+
+embryo_types$category <- factor(embryo_types$category, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
+
+# calculate mean and standard deviations
+embryo_sum <- embryo_types %>%
+  group_by(dispersal, category) %>%
+  summarize(mean = mean(percent), std = sd(percent)) %>%
+  mutate(xpos = c(10, 75,40)) %>%
+  mutate(new_mean = cumsum(mean))
 
 # percentages
-
-# Calculate the percentage values
-biopsy_long <- biopsy_long %>%
-  group_by(Category) %>%
-  mutate(Percent = Value / sum(Value) * 100,
-         Midpoint = cumsum(Percent) - 0.5 * Percent)
-
-# Create the percent stacked bar chart
-ggplot(biopsy_long, aes(
-  x = Category,
-  y = Percent,
+# Horizontal percentage bar chart
+ggplot(embryo_sum, aes(
+  x = factor(
+    dispersal,
+    levels = c(1, 0.5, 0)),
+  y = mean,
   fill = factor(
-    Condition,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+    category,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid","Euploid")
   )
 )) +
   geom_bar(stat = "identity") +
-  labs(# title = "Type of Embryos with Selected Error Rate Pairs",
-    x = "Dispersal Level", y = "Percentage of Embryos", fill = "Biopsy Type") +
-  geom_text(aes(y = Midpoint, label = sprintf("%.1f%%", Percent)),
-            color = "white",
-            size = 5) +
+  geom_errorbar(aes(ymin = new_mean -std, ymax = new_mean + std), width = 0.2, color = "red") +
+  labs(
+       x = "Dispersal Level",
+       y = "Percentage of Embryos",
+       fill = "Embryo Type") +
+  geom_label(aes(y = xpos, label = sprintf("%.1f%%", mean)),
+            color = "red",
+            fill = "white",
+            fontface = "bold",
+            size = 4) +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
-  theme_classic()
-
-# Horizontal percentage bar chart
-# Viridis Color Palette
-ggplot(biopsy_long, aes(
-  y = Category,
-  x = Percent,
-  fill = factor(
-    Condition,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
-  )
-)) +
-  geom_bar(stat = "identity") +
-  labs(# title = "Type of Embryos with Selected Error Rate Pairs",
-    y = "Dispersal Level", x = "Percentage of Embryos", fill = "Embryo Type") +
-  geom_label(
-    aes(x = Midpoint + 8, label = sprintf("%.1f%%", Percent)),
-    color = "red",
-    fill = "white",
-    fontface = "bold",
-    size = 4
-  ) +
-  scale_fill_viridis(discrete = TRUE) +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_classic()
-
-
-ggplot(biopsy_long, aes(
-  y = Category,
-  x = Percent,
-  fill = factor(
-    Condition,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
-  )
-)) +
-  geom_bar(stat = "identity") +
-  labs(# title = "Type of Embryos with Selected Error Rate Pairs",
-    y = "Dispersal Level", x = "Percentage of Embryos", fill = "Embryo Type") +
-  geom_label(
-    aes(x = Midpoint + 8, label = sprintf("%.1f%%", Percent)),
-    color = "red",
-    fill = "white",
-    fontface = "bold",
-    size = 4
-  ) +
-  scale_fill_brewer(palette = "Set3") +
-  scale_x_continuous(expand = c(0, 0)) +
-  theme_classic()
-
+  theme_classic() + coord_flip()
 
 #### Table 1 #########################################################
 # # using dispersal data from above
