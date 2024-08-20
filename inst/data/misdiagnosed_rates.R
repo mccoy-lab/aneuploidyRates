@@ -20,14 +20,17 @@ library(dplyr)
 #   df <- find_rates(num.trials= 1000,)
 # }
 
-args <- commandArgs(trailingOnly = TRUE)
-rate <- strtoi(args[1]) - 1
 
-# set number of steps
-steps = 10
-error = rate * (1/steps)
+
+
 
 rates_model <- function(probs) {
+  if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+  library(dplyr)
+
+  # set number of steps
+  steps <- 10
+  error <- 0 * (1/steps)
 
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
@@ -147,7 +150,7 @@ rates_model <- function(probs) {
     return(cells.affected)
   }
 
-  take_biopsy <- function(em, biop.size = 5) {
+  take_biopsy <- function(em, biop.size = 5, error = 0) {
     # error messages
     if (biop.size <= 0 || biop.size > nrow(em@ploidy)) {
       stop(paste(
@@ -194,7 +197,8 @@ rates_model <- function(probs) {
                                num.chr = 1,
                                dispersal = 0,
                                concordance = 0,
-                               hide.default.param = TRUE) {
+                               hide.default.param = TRUE,
+                               error_rate = 0) {
     # Error messages
     if (meio < 0 | mito < 0) {
       stop(paste0("The probabilities: ",
@@ -277,7 +281,7 @@ rates_model <- function(probs) {
       )
 
       # Take one biopsy of this embryo
-      type <- take_biopsy(em)
+      type <- take_biopsy(em, error = error_rate)
 
       # Add its type to categories in result
       if (type == 0) {
@@ -307,13 +311,14 @@ rates_model <- function(probs) {
     mito = probs[[3]],
     dispersal = probs[[4]],
     num.cell = 256,
-    hide.default.param = TRUE
+    hide.default.param = TRUE,
+    error_rate = error
   )
 
-
+  biopsy <- cbind(biopsy, misdiagnosed.rates = error)
   # Saves all data (used for displaying prop.aneu and other default params later)
   # remaining.data <<- rbind(remaining.data, biopsy)
-  write.csv(biopsy,paste0("temp/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
+  write.csv(biopsy,paste0("temp0/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
   # Returns only the biopsy types
   return(biopsy[1,5:7])
 }
@@ -321,13 +326,13 @@ rates_model <- function(probs) {
 
 meio.range = list(0, 1)
 mito.range = list(0, 1)
-disp = list(0, 0)
+disp.range = list(0, 0)
 expected = c(0.388, 0.186, 0.426)
 num.trials = 200
 hide.param = TRUE
 
 # Set up temp folder
-dir.create("temp/")
+dir.create("temp0/")
 
 # Choose the distribution to draw inputs. Assume uniform distributions.
 rates_prior <- list(
@@ -375,9 +380,9 @@ result<- cbind(result, rates_sim$weights)
 # collect prop.aneu
 result_prop_aneu <- c()
 for(i in 1:nrow(result)){
-  filename <- paste0("temp/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
+  filename <- paste0("temp0/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
   proportion <- read.csv(filename)
-  proportion <- proportion[,2:8]
+  proportion <- proportion[,2:9]
   #colnames(proportion) <- colnames(result_prop_aneu)
   result_prop_aneu <- rbind(result_prop_aneu, proportion)
 }
@@ -412,10 +417,9 @@ colnames(result_prop_aneu) <-
 
 # Write to file
 
-result <- result %>% mutate(misdiagnosed.rates = error)
-result_prop_aneu <- result_prop_aneu %>% mutate(misdiagnosed.rates = error)
-write.csv(result_prop_aneu, file = args[2])
-write.csv(result, file = args[3])
+args <- commandArgs(trailingOnly = TRUE)
+write.csv(result_prop_aneu, file = args[1])
+write.csv(result, file = args[2])
 
-unlink("temp/*", recursive = TRUE)
+unlink("temp0/*", recursive = TRUE)
 
