@@ -293,8 +293,8 @@ rates_model <- function(probs) {
 
   meio.range = list(0, 1)
   mito.range = list(0, 1)
-  disp = list(0, 0)
-  expected = c(0.388, 0.186, 0.426)
+  disp.range = list(0, 0)
+  expected = c(0.232, 0.187, 0.581)
   num.trials = 2000
   hide.param = TRUE
 
@@ -324,7 +324,7 @@ rates_model <- function(probs) {
       # stopping criterion, propotion of new particles accepted, default 0.05
       p_acc_min = 0.05,
       use_seed = TRUE,
-      n_cluster = 20,
+      n_cluster = 44,
       progress_bar = TRUE
     )
 
