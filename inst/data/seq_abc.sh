@@ -1,11 +1,11 @@
 #! /bin/bash
 #SBATCH --job-name="aneuploidy_rates_run_sequential_abc"
 #SBATCH --partition=parallel
-#SBATCH --time 00-08:30:00
+#SBATCH --time 00-60:00:00
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
-#SBATCH --array=1-11%11
+#SBATCH --array=1
 #SBATCH --account=rmccoy22
 
 
@@ -28,5 +28,5 @@ export basedir=${filepath}
 echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
 # Rscript ${basedir}/misdiagnosed_rates.R ${SLURM_ARRAY_TASK_ID}> $basedir/$outdir/${SLURM_ARRAY_TASK_ID}.csv
-output_file="${basedir}/${outdir}/${SLURM_ARRAY_TASK_ID}.csv"
+# output_file="${basedir}/${outdir}/${SLURM_ARRAY_TASK_ID}.csv"
 Rscript ${basedir}/sequential_abc.R  "${basedir}/${outdir}/full_data.csv" "${basedir}/${outdir}/data.csv"
