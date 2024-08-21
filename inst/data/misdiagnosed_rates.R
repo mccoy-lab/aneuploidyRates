@@ -30,7 +30,7 @@ rates_model <- function(probs) {
 
   # set number of steps
   steps <- 10
-  error <- 5 * (1/steps)
+  error <- 0 * (1/steps)
 
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
@@ -318,7 +318,7 @@ rates_model <- function(probs) {
   biopsy <- cbind(biopsy, misdiagnosed.rates = error)
   # Saves all data (used for displaying prop.aneu and other default params later)
   # remaining.data <<- rbind(remaining.data, biopsy)
-  write.csv(biopsy,paste0("temp5/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
+  write.csv(biopsy,paste0("temp0/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
   # Returns only the biopsy types
   return(biopsy[1,5:7])
 }
@@ -332,7 +332,8 @@ num.trials = 200
 hide.param = TRUE
 
 # Set up temp folder
-dir.create("temp5/")
+
+dir.create("temp0/")
 
 # Choose the distribution to draw inputs. Assume uniform distributions.
 rates_prior <- list(
@@ -380,7 +381,8 @@ result<- cbind(result, rates_sim$weights)
 # collect prop.aneu
 result_prop_aneu <- c()
 for(i in 1:nrow(result)){
-  filename <- paste0("temp5/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
+
+  filename <- paste0("temp0/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
   proportion <- read.csv(filename)
   proportion <- proportion[,2:9]
   #colnames(proportion) <- colnames(result_prop_aneu)
@@ -421,5 +423,5 @@ args <- commandArgs(trailingOnly = TRUE)
 write.csv(result_prop_aneu, file = args[1])
 write.csv(result, file = args[2])
 
-unlink("temp5/*", recursive = TRUE)
+unlink("temp0/*", recursive = TRUE)
 
