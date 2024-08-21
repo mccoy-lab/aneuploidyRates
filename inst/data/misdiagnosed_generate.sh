@@ -5,7 +5,7 @@
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
-#SBATCH --array=1-11%11
+#SBATCH --array=1%10
 #SBATCH --account=rmccoy22
 
 
@@ -19,7 +19,7 @@ conda activate ~/miniconda3/envs/aneuploidy_rates
 filepath=$(pwd)
 
 now=$(date +"%Y-%m-%d")
-outdir="${now}_${SLURM_ARRAY_TASK_ID}"
+outdir="${now}_5"
 mkdir -p $outdir
 
 export basedir=${filepath}
@@ -29,4 +29,4 @@ echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
 # Rscript ${basedir}/misdiagnosed_rates.R ${SLURM_ARRAY_TASK_ID}> $basedir/$outdir/${SLURM_ARRAY_TASK_ID}.csv
 # output_file="${basedir}/${outdir}/${SLURM_ARRAY_TASK_ID}.csv"
-Rscript ${basedir}/misdiagnosed_rates.R ${SLURM_ARRAY_TASK_ID} "${basedir}/${outdir}/full_data.csv" "${basedir}/${outdir}/data.csv"
+Rscript ${basedir}/misdiagnosed_rates.R "${basedir}/${outdir}/full_data.csv" "${basedir}/${outdir}/data.csv"
