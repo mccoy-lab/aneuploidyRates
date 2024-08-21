@@ -10,6 +10,10 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
+# 08-20 -- misdiagnosed rates for dispersal = 0
+
+# 08-17c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
+
 # 08-16c, d, e -- 3000 ABC_seq Lenormand data for Viotti
 
 # 08-09, 08-09b, 08-10 -- Capalbo data, 1,000 combinations (0.01 tolerance) at 0, 0.5,
@@ -508,7 +512,7 @@ embryo_types$category <- factor(embryo_types$category,
 embryo_sum <- embryo_types %>%
   group_by(dispersal, category) %>%
   summarize(mean = mean(percent), std = sd(percent)) %>%
-  mutate(xpos = c(10, 75, 40)) %>%
+  mutate(xpos = c(12, 40, 80)) %>%
   mutate(new_mean = cumsum(mean))
 
 # percentages
@@ -658,8 +662,14 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   theme_bw()
 
 #### Misdiagnosed Rates ##############
-date <- "2024-08-12c"
-data <- read.csv(paste0("inst/data/", date, "/data.csv"))
+date <- "2024-08-20"
+data <- c()
+for(i in 0:9) {
+  new_data <- read.csv(paste0("inst/data/", date, "_", i, "/full_data.csv"))
+  data <- rbind(data, new_data)
+}
+
+colnames(data)[9] <- "misdiagnosed.rates"
 
 filtered_data <- data %>%
   filter(prop.aneu > 0 & prop.aneu < 1)
@@ -672,7 +682,7 @@ ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
   #                                   scales = "free",
   #                                   axes = "all",
   #                                   axis.labels = "all_y") +
-  labs(x = "Misdiagnosed Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
+  labs(x = "Biopsy Misclassification Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
     axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
