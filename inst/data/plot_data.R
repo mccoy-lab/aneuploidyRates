@@ -10,7 +10,7 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
-# 08-20 -- misdiagnosed rates for dispersal = 0
+# 08-20, 21, 22_1-10 -- misdiagnosed rates for dispersal = 0, 0.5, and 1
 
 # 08-17c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
 
@@ -661,23 +661,112 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
   theme_bw()
 
+# Plotting with weights
+dispersal_ranges <- dispersal_ranges %>% mutate(euclidean = sqrt((euploid - 0.388) ^ 2 + (mosaic - 0.188) ^ 2 +
+                                                                   (aneuploid - 0.426) ^ 2))
+ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, size = weights, color = euclidean)) +
+  geom_point() + facet_grid(dispersal ~ .,
+                                    scales = "fixed",
+                                    axes = "all",
+                                    axis.labels = "all_y") +
+  labs(
+    x = "Probability of Meiotic Error",
+    y = "Probability of Mitotic Error",
+    size = "Weights",
+    color = "Distance",
+    shape = "Dispersal"
+  ) +
+  theme(
+    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
+    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
+    legend.position = c(.87, .8),
+    legend.background = element_rect(fill = "transparent"),
+    panel.grid = element_blank()
+  ) + scale_y_continuous(sec.axis = sec_axis(
+    ~ . ,
+    name = "Dispersal",
+    breaks = NULL,
+    labels = NULL
+  )) +
+  guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
+  theme_bw() + scale_size_area(max_size = 2)
+
+# Histogram with weights
+library(reshape2)
+data_melt <- melt(
+  dispersal_ranges,
+  id.vars = c("dispersal", "euploid", "mosaic", "aneuploid"),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+variable_labels <- c(prob.meio = "Probability of Meiotic Error", prob.mito = "Probability of Mitotic Error")
+
+
+max_estimates <- data_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(map_estimate(value)[2])
+
+
+# Plot the histograms
+ggplot(data_melt, aes(x = value)) +
+  facet_grid(
+    dispersal ~ variable,
+    scales = "free_x",
+    axes = "all",
+    axis.labels = "all_y",
+    labeller = labeller(variable = variable_labels)
+  ) +
+  geom_histogram(
+    data = subset(data_melt, variable == "prob.meio"),
+    aes(weight = weights),
+    binwidth = 0.005,
+    boundary = 0,
+    fill = "steelblue",
+    color = "black"
+  ) +
+  geom_histogram(
+    data = subset(data_melt, variable == "prob.mito"),
+    aes(weight = weights),
+    binwidth = 0.001,
+    boundary = 0,
+    fill = "steelblue",
+    color = "black"
+  ) +
+  scale_y_continuous(
+    expand = c(0, 0),
+    sec.axis = sec_axis(
+      ~ . ,
+      name = "Dispersal",
+      breaks = NULL,
+      labels = NULL
+    )
+  ) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(x = "Error Rates", y = "Number of Embryos") +
+  geom_vline(
+    data = max_estimates,
+    aes(xintercept = MAP_Estimate),
+    color = "red",
+    linewidth = 0.75,
+    linetype = "dashed"
+  ) +
+  theme_bw()
+
+
 #### Misdiagnosed Rates ##############
-date <- "2024-08-20"
+date <- "2024-08-22b"
 data <- c()
-for(i in 0:9) {
-  new_data <- read.csv(paste0("inst/data/", date, "_", i, "/full_data.csv"))
+for(i in 1:10) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
   data <- rbind(data, new_data)
 }
 
-colnames(data)[9] <- "misdiagnosed.rates"
+data$Mosaic.Aneuploid <- data$Mosaic.Aneuploid / 1000
+mosaic_data <- data %>%  group_by(misclassification) %>%
+  summarise(proportion =mean(Mosaic.Aneuploid), stdev = sd(Mosaic.Aneuploid))
 
-filtered_data <- data %>%
-  filter(prop.aneu > 0 & prop.aneu < 1)
-mosaic_data <- filtered_data %>%  group_by(misdiagnosed.rates) %>%
-  summarise(proportion = n() / nrow(data[data$misdiagnosed.rates == 0, ]))
-
-ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
-  geom_point(size = 1) +
+ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
+  geom_point(size = 3) +
   # facet_grid(dispersal ~ .,
   #                                   scales = "free",
   #                                   axes = "all",
@@ -690,11 +779,5 @@ ggplot(data = mosaic_data, aes(x = misdiagnosed.rates, y = proportion)) +
     legend.background = element_rect(fill = "transparent"),
     panel.grid = element_blank()
   ) +
-  # scale_y_continuous(sec.axis = sec_axis(
-  #   ~ . ,
-  #   name = "Dispersal",
-  #   breaks = NULL,
-  #   labels = NULL
-  # )) +
-  # guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
+ geom_errorbar(aes(ymin=proportion-stdev, ymax=proportion+stdev), width=.1) + 
   theme_bw()
