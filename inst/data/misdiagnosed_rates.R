@@ -9,11 +9,14 @@ if(!require(aneuploidyRates)){
 library(aneuploidyRates)
 if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
 library(dplyr)
-# expected = c(0.388, 0.186, 0.426)
-# # Set number of steps -- number of times to run find_rates
-# steps = 10
-# # calculate each increment
-# incr = 0.186/10
+
+args <- commandArgs(trailingOnly = TRUE)
+id <- strtoi(args[3]) - 1
+expected = c(0.388, 0.186, 0.426)
+# Set number of steps -- number of times to run find_rates
+steps = 10
+# calculate each increment
+incr = 0.186/10 * id
 #
 # datalist = vector("list", length = steps)
 # for (i in 1:steps) {
@@ -27,10 +30,10 @@ library(dplyr)
 rates_model <- function(probs) {
   if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
   library(dplyr)
-
-  # set number of steps
-  steps <- 10
-  error <- 0 * (1/steps)
+# 
+#   # set number of steps
+#   steps <- 10
+#   error <- 0 * (1/steps)
 
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
@@ -150,7 +153,7 @@ rates_model <- function(probs) {
     return(cells.affected)
   }
 
-  take_biopsy <- function(em, biop.size = 5, error = 0) {
+  take_biopsy <- function(em, biop.size = 5) {
     # error messages
     if (biop.size <= 0 || biop.size > nrow(em@ploidy)) {
       stop(paste(
@@ -167,23 +170,14 @@ rates_model <- function(probs) {
     # assign types based on results
     if (biopsy.result == 0) {
       # no aneuploid cells -- an euploid embryo
-      # set error rates:
-      if (runif(1) < error) {
-        # an misdiagnosis appeared
-        # was classified as mosaic
-        return(1)
-      } else {
+     
         return(0)
-      }
+
     } else if (biopsy.result == biop.size) {
       # all aneuploid cells -- an aneuploid embryo
-      if (runif(1) < error) {
-        # an misdiagnosis appeared
-        # was classified as mosaic
-        return(1)
-      } else {
+
         return(2)
-      }
+      
     } else{
       # mosaic
       return(1)
@@ -197,8 +191,7 @@ rates_model <- function(probs) {
                                num.chr = 1,
                                dispersal = 0,
                                concordance = 0,
-                               hide.default.param = TRUE,
-                               error_rate = 0) {
+                               hide.default.param = TRUE) {
     # Error messages
     if (meio < 0 | mito < 0) {
       stop(paste0("The probabilities: ",
@@ -281,7 +274,7 @@ rates_model <- function(probs) {
       )
 
       # Take one biopsy of this embryo
-      type <- take_biopsy(em, error = error_rate)
+      type <- take_biopsy(em)
 
       # Add its type to categories in result
       if (type == 0) {
@@ -311,11 +304,10 @@ rates_model <- function(probs) {
     mito = probs[[3]],
     dispersal = probs[[4]],
     num.cell = 256,
-    hide.default.param = TRUE,
-    error_rate = error
+    hide.default.param = TRUE
   )
 
-  biopsy <- cbind(biopsy, misdiagnosed.rates = error)
+  biopsy <- cbind(biopsy)
   # Saves all data (used for displaying prop.aneu and other default params later)
   # remaining.data <<- rbind(remaining.data, biopsy)
   write.csv(biopsy,paste0("temp0/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
@@ -327,8 +319,8 @@ rates_model <- function(probs) {
 meio.range = list(0, 1)
 mito.range = list(0, 1)
 disp.range = list(0, 0)
-expected = c(0.388, 0.186, 0.426)
-num.trials = 200
+expected = c(0.388+incr/2, 0.186-incr, 0.426+incr/2)
+num.trials = 2000
 hide.param = TRUE
 
 # Set up temp folder
@@ -372,7 +364,7 @@ print(rates_sim)
 #                  &
 #                    remaining.data[, 3] %in% rates_sim$param[, 2], ]
 # print(result)
-result <- cbind(rates_sim$param[,1:2], 0, rates_sim$stats)
+result <- cbind(rates_sim$param[,1:2], 1, rates_sim$stats)
 
 # keeping the weights
 result<- cbind(result, rates_sim$weights)
@@ -384,7 +376,8 @@ for(i in 1:nrow(result)){
 
   filename <- paste0("temp0/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
   proportion <- read.csv(filename)
-  proportion <- proportion[,2:9]
+  proportion <- proportion[,2:8]
+  proportion <- cbind(proportion, misdiagnosed = incr)
   #colnames(proportion) <- colnames(result_prop_aneu)
   result_prop_aneu <- rbind(result_prop_aneu, proportion)
 }
@@ -423,5 +416,5 @@ args <- commandArgs(trailingOnly = TRUE)
 write.csv(result_prop_aneu, file = args[1])
 write.csv(result, file = args[2])
 
-unlink("temp0/*", recursive = TRUE)
+# unlink("temp0/*", recursive = TRUE)
 

@@ -1,7 +1,7 @@
 #! /bin/bash
 #SBATCH --job-name="aneuploidy_rates_run_sequential_abc"
 #SBATCH --partition=parallel
-#SBATCH --time 00-48:30:00
+#SBATCH --time 00-60:00:00
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
