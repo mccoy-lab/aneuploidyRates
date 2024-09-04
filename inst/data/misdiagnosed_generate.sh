@@ -19,7 +19,7 @@ conda activate ~/miniconda3/envs/aneuploidy_rates
 filepath=$(pwd)
 
 now=$(date +"%Y-%m-%d")
-outdir="${now}"
+outdir="${now}b"
 mkdir -p "${outdir}_${SLURM_ARRAY_TASK_ID}"
 export basedir=${filepath}
 # export workdir=${filepath}

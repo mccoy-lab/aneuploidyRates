@@ -5,7 +5,7 @@
 #SBATCH --mem=100G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=qyang40@jhu.edu
-#SBATCH --array=1-10%10
+#SBATCH --array=1-11%11
 #SBATCH --account=rmccoy22
 
 
@@ -19,7 +19,7 @@ conda activate ~/miniconda3/envs/aneuploidy_rates
 filepath=$(pwd)
 
 now=$(date +"%Y-%m-%d")
-outdir="${now}"
+outdir="${now}b"
 mkdir -p $outdir
 
 export basedir=${filepath}

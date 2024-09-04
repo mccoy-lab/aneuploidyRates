@@ -10,6 +10,8 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
+# 08-22, 22b, 23 -- generated embryos for misdiaenosed rates data 0, 0.5, and 1
+
 # 08-20, 21, 22_1-10 -- misdiagnosed rates for dispersal = 0, 0.5, and 1
 
 # 08-17c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
@@ -529,7 +531,7 @@ percent.bar <- ggplot(embryo_sum, aes(
   geom_errorbar(aes(ymin = new_mean - std, ymax = new_mean + std),
                 width = 0.2,
                 color = "red") +
-  labs(x = "Dispersal Level",
+  labs(x = "Dispersal",
        y = "Percentage of Embryos",
        fill = "Embryo Type",
        tag = "B") +
@@ -754,23 +756,38 @@ ggplot(data_melt, aes(x = value)) +
 
 
 #### Misdiagnosed Rates ##############
-date <- "2024-08-22b"
+date <- "2024-08-30"
 data <- c()
 for(i in 1:10) {
   new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
   data <- rbind(data, new_data)
 }
+data <- cbind(data, dispersal = 0)
+
+date <- "2024-08-30b"
+for(i in 1:10) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- cbind(new_data, dispersal = 0.5)
+  data <- rbind(data, new_data)
+}
+
+date <- "2024-08-30c"
+for(i in 1:10) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- cbind(new_data, dispersal = 1)
+  data <- rbind(data, new_data)
+}
 
 data$Mosaic.Aneuploid <- data$Mosaic.Aneuploid / 1000
-mosaic_data <- data %>%  group_by(misclassification) %>%
+mosaic_data <- data %>%  group_by(misclassification, dispersal) %>%
   summarise(proportion =mean(Mosaic.Aneuploid), stdev = sd(Mosaic.Aneuploid))
 
 ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
   geom_point(size = 3) +
-  # facet_grid(dispersal ~ .,
-  #                                   scales = "free",
-  #                                   axes = "all",
-  #                                   axis.labels = "all_y") +
+  facet_grid(dispersal ~ .,
+                                    scales = "fixed",
+                                    axes = "all",
+                                    axis.labels = "all_y") +
   labs(x = "Biopsy Misclassification Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
   theme(
     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
