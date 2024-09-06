@@ -10,7 +10,12 @@
 ## Relevant data info in the inst/data/ folder ##
 
 # Currently in use:
-# 08-22, 22b, 23 -- generated embryos for misdiaenosed rates data 0, 0.5, and 1
+
+# 08-30 -- generated embryos based on distributions in 08-29
+
+# 08-29 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1
+
+# 08-22, 22b, 23 -- generated embryos for misdiagnosed rates data 0, 0.5, and 1
 
 # 08-20, 21, 22_1-10 -- misdiagnosed rates for dispersal = 0, 0.5, and 1
 
@@ -758,21 +763,21 @@ ggplot(data_melt, aes(x = value)) +
 #### Misdiagnosed Rates ##############
 date <- "2024-08-30"
 data <- c()
-for(i in 1:10) {
+for(i in 1:11) {
   new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
   data <- rbind(data, new_data)
 }
 data <- cbind(data, dispersal = 0)
 
 date <- "2024-08-30b"
-for(i in 1:10) {
+for(i in 1:11) {
   new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 0.5)
   data <- rbind(data, new_data)
 }
 
 date <- "2024-08-30c"
-for(i in 1:10) {
+for(i in 1:11) {
   new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 1)
   data <- rbind(data, new_data)
@@ -798,3 +803,65 @@ ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
   ) +
  geom_errorbar(aes(ymin=proportion-stdev, ymax=proportion+stdev), width=.1) + 
   theme_bw()
+
+
+
+# percent stacked barplots
+date <- "2024-08-30"
+data <- c()
+for(i in 1:11) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  data <- rbind(data, new_data)
+}
+data <- cbind(data, dispersal = 0)
+
+date <- "2024-08-30b"
+for(i in 1:11) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- cbind(new_data, dispersal = 0.5)
+  data <- rbind(data, new_data)
+}
+
+date <- "2024-08-30c"
+for(i in 1:11) {
+  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- cbind(new_data, dispersal = 1)
+  data <- rbind(data, new_data)
+}
+
+# make these percentages
+data[4:6] <- data[4:6]/1000
+
+reshaped_data <- data %>%
+  group_by(dispersal, misclassification) %>%
+  summarise(
+    category = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"),
+    mean = c(mean(Euploid), mean(Mosaic.Aneuploid), mean(Fully.Aneuploid)),
+    stdev = c(sd(Euploid), sd(Mosaic.Aneuploid), sd(Fully.Aneuploid))
+  )
+
+# percentages
+# Horizontal percentage bar chart
+percent.bar <- ggplot(reshaped_data, aes(
+  x = factor(misclassification),
+  y = mean,
+  fill = factor(
+    category,
+    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
+  )
+)) +
+  geom_bar(stat = "identity") +
+  facet_grid(rows = vars(factor(dispersal, levels = c("0", "0.5", "1"))), scales = "fixed") +
+  labs(x = "Misclassification Rate",
+       y = "Proportion of Embryos",
+       fill = "Embryo Type") +
+  scale_y_continuous(expand = c(0, 0),
+    sec.axis = sec_axis(
+    ~ . ,
+    name = "Dispersal",
+    breaks = NULL,
+    labels = NULL
+  )) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_classic()
+
