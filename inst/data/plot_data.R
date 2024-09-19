@@ -90,6 +90,10 @@ if (!require(patchwork)) {
   install.packages("patchwork")
 }
 library(patchwork)
+if (!require(smplot2)) {
+  install.packages("smplot2")
+}
+library(smplot2)
 # -------------Load and Process Data-------------------------
 # Locate the folder to investigate
 date <- "2024-08-06"
@@ -362,7 +366,7 @@ if (!require(reshape2)) {
   install.packages("reshape2")
 }
 library(reshape2)
-#### Figure 2 #############################################################
+#### Figure 3 #############################################################
 
 data1 <- read.csv("inst/data/2024-08-16c/data.csv")
 data2 <- read.csv("inst/data/2024-08-16d/data.csv")
@@ -447,7 +451,7 @@ ggplot(data_melt, aes(x = value)) +
 # grid.arrange(p1, p2)
 
 
-#### Figure 3 ##################################################
+#### Figure 4 ##################################################
 
 # Read prop.aneu data to create dispersal_ranges
 data1 <- read.csv("inst/data/2024-08-16c/full_data.csv")
@@ -567,7 +571,7 @@ percent.bar <- ggplot(embryo_sum, aes(
 
 prop.hist + percent.bar
 
-#### Table 1 #########################################################
+#### Table S1 & S2 #########################################################
 
 data1 <- read.csv("inst/data/2024-08-16c/data.csv")
 data2 <- read.csv("inst/data/2024-08-16d/data.csv")
@@ -622,7 +626,7 @@ stats_sum <- rbind(c("Dispersal 0", "", "", "Dispersal 0.5", "", "", "Dispersal 
                    stats_sum)
 kbl(stats_sum, format = "markdown")
 
-#### Figure 4 ###################################
+#### Figure 2 ###################################
 # import dispersal_ranges
 data1 <- read.csv("inst/data/2024-08-16c/data.csv")
 data2 <- read.csv("inst/data/2024-08-16d/data.csv")
@@ -635,7 +639,8 @@ dispersal_ranges <- dispersal_ranges %>% mutate(euclidean = sqrt((euploid - 0.38
                                                                    (aneuploid - 0.426) ^ 2))
 ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclidean)) +
   geom_point(size = 1) + facet_grid(dispersal ~ .,
-                                    scales = "fixed") +
+                                    scales = "fixed") + 
+  stat_cor(method = "pearson", label.x = 0.35, label.y = 0.019) +
   labs(
     x = "Probability of Meiotic Error",
     y = "Probability of Mitotic Error",
