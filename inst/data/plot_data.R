@@ -752,7 +752,7 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, size = weights
 #   theme_bw()
 
 
-#### Misdiagnosed Rates ##############
+#### Figure 5 ##############
 date <- "2024-08-30"
 data <- c()
 for(i in 1:11) {
@@ -885,3 +885,73 @@ ggplot(reshaped_data, aes(
   scale_fill_viridis(discrete = TRUE) +
   theme_classic()
 
+#### Figure S1 ##############
+
+data1 <- read.csv("inst/data/2024-08-16c/data.csv")
+data2 <- read.csv("inst/data/2024-08-16d/data.csv")
+data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+dispersal_ranges <- rbind(data1, data2, data3)
+
+biopsy_types <- dispersal_ranges %>%
+  group_by(dispersal) %>%
+  summarise(
+    category = c("Euploid", "Mosaic", "Aneuploid"),
+    mean = c(mean(euploid), mean(mosaic), mean(aneuploid)),
+            stdev = c(sd(euploid), sd(mosaic), sd(aneuploid))) %>%
+  mutate(ypos = cumsum(mean)-0.05)
+
+biopsy <- ggplot(biopsy_types, aes(
+  x = factor(dispersal, levels = c(1, 0.5, 0)),
+  y = mean,
+  fill = factor(
+    category,
+    levels = c("Euploid", "Mosaic", "Aneuploid")
+  )
+)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Dispersal",
+       y = "Proportions of Biopsies",
+       fill = "Biopsy Type",
+       tag = "B") +
+  geom_label(
+    aes(y = ypos, label = sprintf("%.1f%%", mean*100)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  ) +
+  scale_fill_viridis(discrete = TRUE)+
+  scale_y_continuous(expand = c(0, 0),labels = scales::percent_format()) +
+  theme_classic()
+
+data <- data.frame(
+  category = c("Euploid", "Mosaic", "Aneuploid"),
+  value = c(0.388, 0.186, 0.426)
+)
+
+data <- data %>%
+  mutate(ypos = cumsum(value) - 0.1)
+
+# Plot the single stacked bar chart
+ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
+  category,
+  levels = c("Euploid", "Mosaic", "Aneuploid")
+))) + 
+  geom_bar(stat = "identity", width = 0.05) +
+  labs(x = "", y = "Percentage", fill = "Category", tag = "A") + 
+  ggtitle("Reference Proportions from Viotti et al. 2021")  +
+  geom_label(
+    aes(y = ypos, label = sprintf("%.1f%%", value*100)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  )   +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_void()+
+  theme(    axis.text = element_blank(),         # Hide text on both axes
+            axis.ticks = element_blank(),        # Hide ticks on both axes
+            axis.title = element_blank(),        # Hide axis titles
+            panel.grid = element_blank(),
+            legend.position = "none")
+ref + biopsy
