@@ -569,7 +569,53 @@ percent.bar <- ggplot(embryo_sum, aes(
   scale_y_continuous(expand = c(0, 0)) +
   theme_classic() + coord_flip()
 
-prop.hist + percent.bar
+
+# Plot the single stacked bar chart
+
+data <- data.frame(
+  category = c("Euploid", "Mosaic", "Aneuploid"),
+  value = c(0.388, 0.186, 0.426)
+)
+
+data <- data %>%
+  mutate(ypos = c(0.20, 0.50, 0.80))
+
+ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
+  category,
+  levels = c("Aneuploid", "Mosaic", "Euploid")
+))) + 
+  geom_bar(stat = "identity", width = 0.5) +
+  labs(x = "", y = "Percentage", fill = "Biopsy Type") + 
+  ggtitle("Reference Proportions from Viotti et al. 2021")  +
+  geom_label(
+    aes(y = ypos, label = sprintf("%.1f%%", value*100)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  )   +
+  scale_fill_viridis(discrete = TRUE) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_void()+
+  theme(    axis.text = element_blank(),         # Hide text on both axes
+            # axis.ticks = element_blank(),        # Hide ticks on both axes
+            # axis.title = element_blank(),        # Hide axis titles
+            # panel.grid = element_blank(),
+            # legend.position = "none"
+            )+ coord_flip()
+
+# prop.hist + percent.bar
+# grid.arrange(prop.hist, percent.bar, ref)
+# (prop.hist | (percent.bar / ref)) 
+layout <- "
+AABB
+AACC
+AACC
+AACC
+"
+prop.hist + ref + percent.bar +
+  plot_layout(design = layout)
+
 
 #### Table S1 & S2 #########################################################
 
