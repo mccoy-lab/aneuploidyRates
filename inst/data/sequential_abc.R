@@ -1,15 +1,19 @@
 # This file runs the aneuploidyRates package and writes the generated data to a csv file
 #
 # source("R/find_rates.R")
-if(!require(aneuploidyRates)){
-  if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
-  library(devtools)
-  install_github("mccoy-lab/aneuploidyRates")
-}
-library(aneuploidyRates)
+# if(!require(aneuploidyRates)){
+#   if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
+#   library(devtools)
+#   install_github("mccoy-lab/aneuploidyRates")
+# }
+# library(aneuploidyRates)
 
 if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
 library(dplyr)
+
+if(!require(EasyABC)) install.packages("EasyABC", repos = "http://cran.us.r-project.org")
+library(EasyABC)
+
 
 # Set the model for biopsy summary
 rates_model <- function(probs) {
@@ -329,15 +333,9 @@ rates_model <- function(probs) {
     )
 
   print(rates_sim)
-  # print(remaining.data)
 
   # Set up return format: from the saved data, select the rows with ABC_rej's
   # returned parameters
-  # result <-
-  #   remaining.data[remaining.data[, 2] %in% rates_sim$param[, 1]
-  #                  &
-  #                    remaining.data[, 3] %in% rates_sim$param[, 2], ]
-  # print(result)
   result <- cbind(rates_sim$param[,1:2], 0, rates_sim$stats)
 
   # keeping the weights
@@ -350,7 +348,6 @@ rates_model <- function(probs) {
     filename <- paste0("temp/", round(result[i,1], 3), "_", round(result[i,2],3), ".csv")
     proportion <- read.csv(filename)
     proportion <- proportion[,2:8]
-    #colnames(proportion) <- colnames(result_prop_aneu)
     result_prop_aneu <- rbind(result_prop_aneu, proportion)
   }
 
@@ -378,9 +375,6 @@ rates_model <- function(probs) {
         "aneuploid"
       )
 
-  # print(result)
-  #
-  # print(result_prop_aneu)
 
   # Write to file
   args <- commandArgs(trailingOnly = TRUE)

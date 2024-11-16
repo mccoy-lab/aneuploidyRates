@@ -27,6 +27,4 @@ export basedir=${filepath}
 
 echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
-# Rscript ${basedir}/misdiagnosed_rates.R ${SLURM_ARRAY_TASK_ID}> $basedir/$outdir/${SLURM_ARRAY_TASK_ID}.csv
-# output_file="${basedir}/${outdir}/${SLURM_ARRAY_TASK_ID}.csv"
 Rscript ${basedir}/embryo_generate.R  ${SLURM_ARRAY_TASK_ID} ${basedir} "${basedir}/${outdir}/data_${SLURM_ARRAY_TASK_ID}.csv"

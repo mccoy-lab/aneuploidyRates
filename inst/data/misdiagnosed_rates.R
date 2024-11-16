@@ -17,23 +17,12 @@ expected = c(0.388, 0.186, 0.426)
 steps = 10
 # calculate each increment
 incr = 0.186/10 * id
-#
-# datalist = vector("list", length = steps)
-# for (i in 1:steps) {
-#   df <- find_rates(num.trials= 1000,)
-# }
-
-
 
 
 
 rates_model <- function(probs) {
   if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
   library(dplyr)
-# 
-#   # set number of steps
-#   steps <- 10
-#   error <- 0 * (1/steps)
 
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
@@ -309,7 +298,6 @@ rates_model <- function(probs) {
 
   biopsy <- cbind(biopsy)
   # Saves all data (used for displaying prop.aneu and other default params later)
-  # remaining.data <<- rbind(remaining.data, biopsy)
   write.csv(biopsy,paste0("temp0.5/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
   # Returns only the biopsy types
   return(biopsy[1,5:7])
@@ -355,15 +343,7 @@ rates_sim <-
   )
 
 print(rates_sim)
-# print(remaining.data)
 
-# Set up return format: from the saved data, select the rows with ABC_rej's
-# returned parameters
-# result <-
-#   remaining.data[remaining.data[, 2] %in% rates_sim$param[, 1]
-#                  &
-#                    remaining.data[, 3] %in% rates_sim$param[, 2], ]
-# print(result)
 result <- cbind(rates_sim$param[,1:2], 0.5, rates_sim$stats)
 
 # keeping the weights
@@ -406,15 +386,10 @@ colnames(result_prop_aneu) <-
     "aneuploid"
   )
 
-# print(result)
-#
-# print(result_prop_aneu)
-
 # Write to file
 
 args <- commandArgs(trailingOnly = TRUE)
 write.csv(result_prop_aneu, file = args[1])
 write.csv(result, file = args[2])
 
-# unlink("temp0.5/*", recursive = TRUE)
 
