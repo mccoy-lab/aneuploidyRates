@@ -13,6 +13,8 @@
 
 # 08-29 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1
 
+# 08-23c, d, e -- 3000 ABC_seq Lenormand data for Munne 2017
+
 # 08-22, 22b, 23 -- generated embryos for misdiagnosed rates data 0, 0.5, and 1
 
 # 08-20, 21, 22_1-10 -- misdiagnosed rates applied through biopsy setup, 
@@ -295,29 +297,19 @@ disp_0 <- subset(dispersal_ranges, dispersal == 0)
 disp_0.5 <- subset(dispersal_ranges, dispersal == 0.5)
 disp_1 <- subset(dispersal_ranges, dispersal == 1)
 
-stats_0 <- st(disp_0[, c('prob.meio', 'prob.mito')], out = "return")
+stats_0 <- st(disp_0[, c('prob.meio', 'prob.mito')], out = "return", 
+              summ = c('mean(x)','pctile(x)[2.5]', 'pctile(x)[25]', 'median(x)', 'pctile(x)[75]','pctile(x)[97.5]','max(x)'))
 stats_0 <- t(stats_0)
-stats_0.5 <- st(disp_0.5[, c('prob.meio', 'prob.mito')], out = "return")
+stats_0.5 <- st(disp_0.5[, c('prob.meio', 'prob.mito')], out = "return", 
+                summ = c('mean(x)','pctile(x)[2.5]', 'pctile(x)[25]', 'median(x)','pctile(x)[75]','pctile(x)[97.5]','max(x)'))
 stats_0.5 <- t(stats_0.5)
-stats_1 <- st(disp_1[, c('prob.meio', 'prob.mito')], out = "return")
+stats_1 <- st(disp_1[, c('prob.meio', 'prob.mito')], out = "return", 
+              summ = c('mean(x)','pctile(x)[2.5]', 'pctile(x)[25]', 'median(x)','pctile(x)[75]','pctile(x)[97.5]','max(x)'))
 stats_1 <- t(stats_1)
 stats_sum <- (cbind(stats_0, stats_0.5, stats_1))
 
-# Calculate medians (Pctl. 50) for each dispersal
-median_0 <- apply(disp_0[, c('prob.meio', 'prob.mito')], 2, median, na.rm = TRUE)
-median_0.5 <- apply(disp_0.5[, c('prob.meio', 'prob.mito')], 2, median, na.rm = TRUE)
-median_1 <- apply(disp_1[, c('prob.meio', 'prob.mito')], 2, median, na.rm = TRUE)
-
-# Add medians to the stats data
-stats_sum <- cbind(stats_0, stats_0.5, stats_1)
+# Add MAP and remove redundant rows
 stats_sum <- stats_sum[!(row.names(stats_sum) %in% c("N", "Std. Dev.", "Min", "Max")), ]
-
-# Add the median row (Pctl. 50) after Pctl. 25 and before Pctl. 75
-stats_sum <- rbind(
-  stats_sum[1:3, ],
-  "Pctl. 50" = c(signif(median_0, 2), signif(median_0.5, 2), signif(median_1, 2)),
-  stats_sum[4:nrow(stats_sum), ]
-)
 
 data_melt <- melt(
   dispersal_ranges,
@@ -338,7 +330,6 @@ stats_sum <- rbind(
 )
 
 kbl(stats_sum, format = "markdown")
-
 
 
 stats_0 <- st(disp_0[, c('euploid', 'mosaic', 'aneuploid')], out = "return")
@@ -566,7 +557,7 @@ ggplot(reshaped_data, aes(
   scale_fill_viridis(discrete = TRUE) +
   theme_classic()
 
-#### Figure S1 ##############
+#### Figure S2 ##############
 
 data1 <- read.csv("inst/data/2024-08-16c/data.csv")
 data2 <- read.csv("inst/data/2024-08-16d/data.csv")
