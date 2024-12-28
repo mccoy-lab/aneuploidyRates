@@ -15,11 +15,6 @@
 
 # 08-23c, d, e -- 3000 ABC_seq Lenormand data for Munne 2017
 
-# 08-22, 22b, 23 -- generated embryos for misdiagnosed rates data 0, 0.5, and 1
-
-# 08-20, 21, 22_1-10 -- misdiagnosed rates applied through biopsy setup, 
-# for dispersal = 0, 0.5, and 1
-
 # 08-17c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
 
 # 08-16c, d, e -- 3000 ABC_seq Lenormand data for Viotti
