@@ -298,7 +298,7 @@ rates_model <- function(probs) {
   meio.range = list(0, 1)
   mito.range = list(0, 1)
   disp.range = list(0, 0)
-  expected = c(0.4287, 0.3532, 0.2181)
+  expected = c(0.388, 0.186, 0.426)
   num.trials = 2000
   hide.param = TRUE
 
