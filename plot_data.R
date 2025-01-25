@@ -5,7 +5,7 @@
 
 # All figures for the paper are under each specific section titles. 
 
-## Relevant data info in the inst/data/ folder ##
+## Relevant data info in the folder ##
 
 # Currently in use:
 
@@ -59,9 +59,9 @@ if (!require(reshape2)) {
 library(reshape2)
 #### Figure 3 #############################################################
 
-data1 <- read.csv("inst/data/2024-08-16c/data.csv")
-data2 <- read.csv("inst/data/2024-08-16d/data.csv")
-data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+data1 <- read.csv("2024-08-16c/data.csv")
+data2 <- read.csv("2024-08-16d/data.csv")
+data3 <- read.csv("2024-08-16e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 # Together
@@ -125,9 +125,9 @@ ggplot(data_melt, aes(x = value)) +
 #### Figure 4 ##################################################
 
 # Read prop.aneu data to create dispersal_ranges
-data1 <- read.csv("inst/data/2024-08-16c/full_data.csv")
-data2 <- read.csv("inst/data/2024-08-16d/full_data.csv")
-data3 <- read.csv("inst/data/2024-08-16e/full_data.csv")
+data1 <- read.csv("2024-08-16c/full_data.csv")
+data2 <- read.csv("2024-08-16d/full_data.csv")
+data3 <- read.csv("2024-08-16e/full_data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 # By cell (bar at 0% represents the number of euploid embryos only)
@@ -283,9 +283,9 @@ prop.hist + ref + percent.bar +
 
 #### Table S1 & S2 #########################################################
 
-data1 <- read.csv("inst/data/2024-08-16c/data.csv")
-data2 <- read.csv("inst/data/2024-08-16d/data.csv")
-data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+data1 <- read.csv("2024-08-16c/data.csv")
+data2 <- read.csv("2024-08-16d/data.csv")
+data3 <- read.csv("2024-08-16e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 disp_0 <- subset(dispersal_ranges, dispersal == 0)
@@ -356,9 +356,9 @@ kbl(stats_sum, format = "markdown")
 
 #### Figure 2 ###################################
 # import dispersal_ranges
-data1 <- read.csv("inst/data/2024-08-16c/data.csv")
-data2 <- read.csv("inst/data/2024-08-16d/data.csv")
-data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+data1 <- read.csv("2024-08-16c/data.csv")
+data2 <- read.csv("2024-08-16d/data.csv")
+data3 <- read.csv("2024-08-16e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 
@@ -423,21 +423,21 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, size = weights
 date <- "2024-08-30"
 data <- c()
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   data <- rbind(data, new_data)
 }
 data <- cbind(data, dispersal = 0)
 
 date <- "2024-08-30b"
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 0.5)
   data <- rbind(data, new_data)
 }
 
 date <- "2024-08-30c"
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 1)
   data <- rbind(data, new_data)
 }
@@ -467,21 +467,21 @@ ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
 date <- "2024-08-30"
 data <- c()
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   data <- rbind(data, new_data)
 }
 data <- cbind(data, dispersal = 0)
 
 date <- "2024-08-30b"
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 0.5)
   data <- rbind(data, new_data)
 }
 
 date <- "2024-08-30c"
 for(i in 1:11) {
-  new_data <- read.csv(paste0("inst/data/", date, "/data_" , i, ".csv"))
+  new_data <- read.csv(paste0(date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 1)
   data <- rbind(data, new_data)
 }
@@ -554,9 +554,9 @@ ggplot(reshaped_data, aes(
 
 #### Figure S2 ##############
 
-data1 <- read.csv("inst/data/2024-08-16c/data.csv")
-data2 <- read.csv("inst/data/2024-08-16d/data.csv")
-data3 <- read.csv("inst/data/2024-08-16e/data.csv")
+data1 <- read.csv("2024-08-16c/data.csv")
+data2 <- read.csv("2024-08-16d/data.csv")
+data3 <- read.csv("2024-08-16e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 biopsy_types <- dispersal_ranges %>%
