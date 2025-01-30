@@ -70,7 +70,7 @@ mito_aneu_cells <- function(cells.affected = 0,
 # For each misclassification error level
 embryos <- c()
   # Extract the posterior distribution
-  data <- read.csv(paste0(args[2],"/", date, "_", strtoi(args[1]), "/data.csv"))
+  data <- read.csv(paste0(args[2],"/data/", date, "_", strtoi(args[1]), "/data.csv"))
   data <- cbind(data, misdiagnosed.rates = id * (1/10))
   posterior <- data[colnames(data) %in% c("prob.meio", "prob.mito")]
   
