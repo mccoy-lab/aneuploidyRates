@@ -1,30 +1,31 @@
+# Aneuploidy Rates Simulation 
 
-# aneuploidyRates
+This is a repository for the code used to produce data in the paper...
 
-<!-- badges: start -->
-<!-- badges: end -->
+## File Explanation
 
-The goal of aneuploidyRates is to infer the error rates of early human embryo development based on the in vitro fertilization (IVF) clinic biopsy data. Using an approximate Bayesian computation approach that identifies the parameters with best-matching results to the observed data, this package investigates the rate of meiotic and mitotic error as well as the dispersal of aneuploid cells within the embryo. 
+The `data/` folder contains generated data organized by date. Below is an overview of the contents:
 
-## Installation
+### Folders
 
-You can install the development version of aneuploidyRates from [GitHub](https://github.com/) with:
+The main data files supporting the paper are: 
 
-``` r
-# install.packages("devtools", repos = "http://cran.us.r-project.org")
-devtools::install_github("mccoy-lab/aneuploidyRates")
-```
+- **08-16c, 08-16d, 08-16e**  
+  Contains 3000 ABC_seq Lenormand data for [**Viotti**](https://doi.org/10.1016/j.fertnstert.2020.11.041).
 
-## Example
+- **08-29**  
+  Includes misdiagnosed rates applied to expected values with dispersal levels of 0, 0.5, and 1.
 
-This is a basic example which shows you how to deduce the most fitting 3 pairs of error rates from 50 trials of simulation:
+- **08-30**  
+  Contains generated embryos based on distributions from `08-29`.
 
-``` r
-library(aneuploidyRates)
-## basic example code
-find_rates(num.trials = 50)
-```
+The same procedure has been carried out in other literature data. Below is an updating
+list of these data files:
 
-Note that the above example runs 50 trials of simulations, which randomly selects 50 sets of parameters (pairs of error rates and dispersals) within the approximate Bayesian computation model. Each pair of error rate is converted to the proportion of aneuploidy (prop.aneu) cells 100 times and creates 100 embryos. They are very likely to have unique prop.aneu, but all 100 embryos within the same set share the same meiotic and mitotic error rates and dispersal. 
+- **08-17c, 08-17d, 08-17e**  
+  Contains 3000 ABC_seq Lenormand data for [**Capalbo**](https://doi.org/10.1016/j.ajhg.2021.11.002).
 
-Overall, a 50-trial simulation creates 5,000 embryos and, with a tolerance of 0.05, selects the 3 sets of parameters that deduces the closest result to the referencing data.
+- **08-23c, 08-23d, 08-23e**  
+  Contains 3000 ABC_seq Lenormand data for [**Munne 2017**](https://doi.org/10.1016/j.fertnstert.2017.05.002).
+
+## Usage
