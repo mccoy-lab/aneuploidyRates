@@ -6,11 +6,11 @@ library(dplyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 id <- strtoi(args[3]) - 1
-expected = c(0.388, 0.186, 0.426)
+expected = c(0.232, 0.181, 0.587)
 # Set number of steps -- number of times to run find_rates
 steps = 10
 # calculate each increment
-incr = 0.186/10 * id
+incr = 0.181/10 * id
 
 
 
@@ -151,16 +151,12 @@ rates_model <- function(probs) {
       tessera::takeBiopsy(embryo = em, biopsy.size = biop.size)
 
     # assign types based on results
-    if (biopsy.result == 0) {
+    if (biopsy.result < biop.size * 0.3) {
       # no aneuploid cells -- an euploid embryo
-     
-        return(0)
-
-    } else if (biopsy.result == biop.size) {
-      # all aneuploid cells -- an aneuploid embryo
-
-        return(2)
-      
+      return(0)
+    } else if (biopsy.result > biop.size * 0.7) {
+      # more than 80% aneuploid cells -- an aneuploid embryo
+      return(2)
     } else{
       # mosaic
       return(1)
@@ -283,7 +279,7 @@ rates_model <- function(probs) {
 meio.range = list(0, 1)
 mito.range = list(0, 1)
 disp.range = list(0, 0)
-expected = c(0.388+incr/2, 0.186-incr, 0.426+incr/2)
+expected = c(0.232+incr/2, 0.181-incr, 0.587+incr/2)
 num.trials = 2000
 hide.param = TRUE
 
