@@ -20,9 +20,10 @@
 
 # 04-19c, d, e -- 3000 ABC_seq Lenormand data for Clarke
 
-# 04-21 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1, for Capalbo
+# 04-21 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1, 
+# for Capalbo
 
-# 04-22, b, c -- generated embryos based on distributions in 04-21
+# 04-22 -- generated embryos based on distributions in 04-21
 
 
 #------For Paper-----------------------------------------------------
@@ -136,7 +137,7 @@ ggplot(data_melt, aes(x = value)) +
   theme_bw()
 
 # Save space
-rm(dispersal_ranges)
+rm(dispersal_ranges, data_melt)
 
 #### Figure 4 ##################################################
 
@@ -261,13 +262,6 @@ percent.bar <- ggplot(embryo_sum, aes(
        y = "Percentage of Embryos",
        fill = "Embryo Type",
        tag = "B") +
-  # geom_label(
-  #   aes(y = xpos, label = sprintf("%.1f%%", mean)),
-  #   color = "red",
-  #   fill = "white",
-  #   fontface = "bold",
-  #   size = 4
-  # ) +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
   theme_classic() + coord_flip()
@@ -290,13 +284,6 @@ ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
   geom_bar(stat = "identity", width = 0.5) +
   labs(x = "", y = "Percentage", fill = "Biopsy Type") + 
   ggtitle("Reference Proportions from Capalbo et al. 2021")  +
-  # geom_label(
-  #   aes(y = ypos, label = sprintf("%.1f%%", value*100)),
-  #   color = "red",
-  #   fill = "white",
-  #   fontface = "bold",
-  #   size = 4
-  # )   +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
   theme_void()+
@@ -390,7 +377,7 @@ stats_sum <- rbind(c("Dispersal 0", "", "", "Dispersal 0.5", "", "", "Dispersal 
 kbl(stats_sum, format = "markdown")
 
 # Save space
-rm(dispersal_ranges)
+rm(dispersal_ranges, data_melt)
 
 #### Table 1-3  #########################################################
 # Clarke ----- 
@@ -881,82 +868,10 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
   theme_bw()
 
-# # Plotting with weights
-# dispersal_ranges <- dispersal_ranges %>% mutate(euclidean = sqrt((euploid - 0.388) ^ 2 + (mosaic - 0.188) ^ 2 +
-#                                                                    (aneuploid - 0.426) ^ 2))
-# ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, size = weights, color = euclidean)) +
-#   geom_point() + facet_grid(dispersal ~ .,
-#                                     scales = "fixed") +
-#   labs(
-#     x = "Probability of Meiotic Error",
-#     y = "Probability of Mitotic Error",
-#     size = "Weights",
-#     color = "Distance",
-#     shape = "Dispersal"
-#   ) +
-#   theme(
-#     axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-#     axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
-#     legend.position = c(.87, .8),
-#     legend.background = element_rect(fill = "transparent"),
-#     panel.grid = element_blank()
-#   ) + scale_y_continuous(sec.axis = sec_axis(
-#     ~ . ,
-#     name = "Dispersal",
-#     breaks = NULL,
-#     labels = NULL
-#   )) +
-#   guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
-#   theme_bw() + scale_size_area(max_size = 2)
-# 
-
 # Save space
 rm(dispersal_ranges)
 
 #### Figure 5 ##############
-date <- "2025-04-22"
-data <- c()
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  data <- rbind(data, new_data)
-}
-data <- cbind(data, dispersal = 0)
-
-date <- "2025-04-22b"
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  new_data <- cbind(new_data, dispersal = 0.5)
-  data <- rbind(data, new_data)
-}
-
-date <- "2025-04-22c"
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  new_data <- cbind(new_data, dispersal = 1)
-  data <- rbind(data, new_data)
-}
-
-data$Mosaic.Aneuploid <- data$Mosaic.Aneuploid / 1000
-mosaic_data <- data %>%  group_by(misclassification, dispersal) %>%
-  summarise(proportion =mean(Mosaic.Aneuploid), stdev = sd(Mosaic.Aneuploid))
-
-ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
-  geom_point(size = 3) +
-  facet_grid(dispersal ~ .,
-                                    scales = "fixed") +
-  labs(x = "Biopsy Misclassification Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
-    legend.position = c(.87, .8),
-    legend.background = element_rect(fill = "transparent"),
-    panel.grid = element_blank()
-  ) +
- geom_errorbar(aes(ymin=proportion-stdev, ymax=proportion+stdev), width=.1) + 
-  theme_bw()
-
-
-
 # percent stacked barplots
 date <- "2025-04-22"
 data <- c()
@@ -1018,33 +933,6 @@ ggplot(reshaped_data, aes(
 
 reshaped_data <- reshaped_data %>%
   mutate(new_mean = cumsum(mean))
-
-# With error bars
-ggplot(reshaped_data, aes(
-  x = factor(misclassification),
-  y = mean,
-  fill = factor(
-    category,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
-  )
-)) +
-  geom_bar(stat = "identity") +
-  facet_grid(rows = vars(factor(dispersal, levels = c("0", "0.5", "1"))), scales = "fixed") +
-  labs(x = "Misclassification Rate",
-       y = "Proportion of Embryos",
-       fill = "Embryo Type") +
-  scale_y_continuous(expand = c(0, 0),
-                     sec.axis = sec_axis(
-                       ~ . ,
-                       name = "Dispersal",
-                       breaks = NULL,
-                       labels = NULL
-                     )) +
-  geom_errorbar(aes(ymin = new_mean - stdev, ymax = new_mean + stdev),
-                width = 0.2,
-                color = "red") +
-  scale_fill_viridis(discrete = TRUE) +
-  theme_classic()
 
 #### Figure S2 ##############
 
