@@ -1,4 +1,4 @@
-# Aneuploidy Rates Simulation 
+# Aneuploidy Rates Simulation
 
 This is a repository for the code used to produce data in the paper...
 
@@ -8,24 +8,27 @@ The `data/` folder contains generated data organized by date. Below is an overvi
 
 ### Folders
 
-The main data files supporting the paper are: 
+The main data files supporting the paper are:
 
-- **08-16c, 08-16d, 08-16e**  
-  Contains 3000 ABC_seq Lenormand data for [**Viotti**](https://doi.org/10.1016/j.fertnstert.2020.11.041).
+-   **04-04c, 04-04d, 04-04e**\
+    Contains 3000 ABC_seq Lenormand data for [**Capalbo**](https://doi.org/10.1016/j.ajhg.2021.11.002).
 
-- **08-29**  
-  Includes misdiagnosed rates applied to expected values with dispersal levels of 0, 0.5, and 1.
+-   **04-08c, 04-08d, 04-08e**\
+    Contains 3000 ABC_seq Lenormand data for [**Munne 2017**](https://doi.org/10.1016/j.fertnstert.2017.05.002).
 
-- **08-30**  
-  Contains generated embryos based on distributions from `08-29`.
+-   **04-16c, 04-16d, 04-16e**\
+    Contains 3000 ABC_seq Lenormand data for [**Walters-Sen**](https://doi.org/10.1016/j.rbmo.2021.06.022).
 
-The same procedure has been carried out in other literature data. Below is an updating
-list of these data files:
+-   **04-18c, 04-18d, 04-18e**\
+    Contains 3000 ABC_seq Lenormand data for [**Rodrigo**](https://doi.org/10.3390/genes11101151).
 
-- **08-17c, 08-17d, 08-17e**  
-  Contains 3000 ABC_seq Lenormand data for [**Capalbo**](https://doi.org/10.1016/j.ajhg.2021.11.002).
+-   **04-19c, 04-19d, 04-19e**\
+    Contains 3000 ABC_seq Lenormand data for [**Clarke**](https://doi.org/10.1007/s10815-023-02941-6).
 
-- **08-23c, 08-23d, 08-23e**  
-  Contains 3000 ABC_seq Lenormand data for [**Munne 2017**](https://doi.org/10.1016/j.fertnstert.2017.05.002).
+-   **04-21**\
+    Includes misdiagnosed rates applied to expected values with dispersal levels of 0, 0.5, and 1 for **Capalbo**.
+
+-   **04-22**\
+    Contains generated embryos based on distributions from `04-21`.
 
 ## Usage

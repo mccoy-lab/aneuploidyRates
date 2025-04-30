@@ -10,15 +10,21 @@
 
 # Currently in use:
 
-# 08-30 -- generated embryos based on distributions in 08-29
+# 04-04c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
 
-# 08-29 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1
+# 04-08c, d, e -- 3000 ABC_seq Lenormand data for Munne 2017
 
-# 08-23c, d, e -- 3000 ABC_seq Lenormand data for Munne 2017
+# 04-16c, d, e -- 3000 ABC_seq Lenormand data for Walters-Sen
 
-# 08-17c, d, e -- 3000 ABC_seq Lenormand data for Capalbo
+# 04-18c, d, e -- 3000 ABC_seq Lenormand data for Rodrigo
 
-# 08-16c, d, e -- 3000 ABC_seq Lenormand data for Viotti
+# 04-19c, d, e -- 3000 ABC_seq Lenormand data for Clarke
+
+# 04-21 -- misdiagnosed rates applied in expected values, dispersal 0, 0.5, 1, 
+# for Capalbo
+
+# 04-22 -- generated embryos based on distributions in 04-21
+
 
 #------For Paper-----------------------------------------------------
 if (!require(dplyr))
@@ -58,11 +64,19 @@ if (!require(reshape2)) {
   install.packages("reshape2")
 }
 library(reshape2)
+if(!require(knitr)){
+  install.packages("knitr")
+}
+library(knitr)
+if(!require(tidyr)){
+  install.packages("tidyr")
+}
+library(tidyr)
 #### Figure 3 #############################################################
 
-data1 <- read.csv("data/2024-08-16c/data.csv")
-data2 <- read.csv("data/2024-08-16d/data.csv")
-data3 <- read.csv("data/2024-08-16e/data.csv")
+data1 <- read.csv("data/2025-04-04c/data.csv")
+data2 <- read.csv("data/2025-04-04d/data.csv")
+data3 <- read.csv("data/2025-04-04e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 # Together
@@ -113,22 +127,24 @@ ggplot(data_melt, aes(x = value)) +
   ) +
   scale_x_continuous(expand = c(0, 0)) +
   labs(x = "Error Rates", y = "Number of Embryos") +
-  geom_vline(
-    data = max_estimates,
-    aes(xintercept = MAP_Estimate),
-    color = "red",
-    linewidth = 0.75,
-    linetype = "dashed"
-  ) +
+  # geom_vline(
+  #   data = max_estimates,
+  #   aes(xintercept = MAP_Estimate),
+  #   color = "red",
+  #   linewidth = 0.75,
+  #   linetype = "dashed"
+  # ) +
   theme_bw()
 
+# Save space
+rm(dispersal_ranges, data_melt)
 
 #### Figure 4 ##################################################
 
 # Read prop.aneu data to create dispersal_ranges
-data1 <- read.csv("data/2024-08-16c/full_data.csv")
-data2 <- read.csv("data/2024-08-16d/full_data.csv")
-data3 <- read.csv("data/2024-08-16e/full_data.csv")
+data1 <- read.csv("data/2025-04-04c/full_data.csv")
+data2 <- read.csv("data/2025-04-04d/full_data.csv")
+data3 <- read.csv("data/2025-04-04e/full_data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 # By cell (bar at 0% represents the number of euploid embryos only)
@@ -170,7 +186,7 @@ prop.hist <- ggplot(dispersal_ranges, aes(x = prop.aneu)) +
       yend = euploid_height
     ),
     arrow = arrow(length = unit(0.3, 'cm')),
-    size = 0.5,
+    linewidth = 0.5,
     color = "red"
   ) +
   geom_text(
@@ -211,8 +227,24 @@ embryo_types$category <- factor(embryo_types$category,
 # calculate mean and standard deviations
 embryo_sum <- embryo_types %>%
   group_by(dispersal, category) %>%
-  summarize(mean = mean(percent), std = sd(percent)) %>%
-  mutate(xpos = c(12, 40, 80)) %>%
+  summarize(mean = mean(percent), std = sd(percent)) 
+
+# Check if Euploid at dispersal 0 exists
+euploid_missing <- embryo_sum %>%
+  filter(dispersal == 0, category == "Euploid") %>%
+  nrow() == 0
+
+# Add a filler for the missing row
+if (euploid_missing) {
+  embryo_sum <- embryo_sum %>%
+    ungroup() %>%
+    add_row(dispersal = 0, category = "Euploid", mean = 0, std = 0)
+}
+
+
+embryo_sum <- embryo_sum %>%
+  mutate(xpos = c(12, 40, 80)[match(category, c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))]) %>%
+  arrange(dispersal, category) %>%
   mutate(new_mean = cumsum(mean))
 
 # percentages
@@ -230,13 +262,6 @@ percent.bar <- ggplot(embryo_sum, aes(
        y = "Percentage of Embryos",
        fill = "Embryo Type",
        tag = "B") +
-  geom_label(
-    aes(y = xpos, label = sprintf("%.1f%%", mean)),
-    color = "red",
-    fill = "white",
-    fontface = "bold",
-    size = 4
-  ) +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
   theme_classic() + coord_flip()
@@ -246,7 +271,7 @@ percent.bar <- ggplot(embryo_sum, aes(
 
 data <- data.frame(
   category = c("Euploid", "Mosaic", "Aneuploid"),
-  value = c(0.388, 0.186, 0.426)
+  value = c(0.232, 0.187, 0.581)
 )
 
 data <- data %>%
@@ -258,14 +283,7 @@ ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
 ))) + 
   geom_bar(stat = "identity", width = 0.5) +
   labs(x = "", y = "Percentage", fill = "Biopsy Type") + 
-  ggtitle("Reference Proportions from Viotti et al. 2021")  +
-  geom_label(
-    aes(y = ypos, label = sprintf("%.1f%%", value*100)),
-    color = "red",
-    fill = "white",
-    fontface = "bold",
-    size = 4
-  )   +
+  ggtitle("Reference Proportions from Capalbo et al. 2021")  +
   scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(expand = c(0, 0)) +
   theme_void()+
@@ -281,12 +299,15 @@ AACC
 prop.hist + ref + percent.bar +
   plot_layout(design = layout)
 
+# Save space
+rm(dispersal_ranges)
 
 #### Table S1 & S2 #########################################################
+# For Capalbo
 
-data1 <- read.csv("data/2024-08-16c/data.csv")
-data2 <- read.csv("data/2024-08-16d/data.csv")
-data3 <- read.csv("data/2024-08-16e/data.csv")
+data1 <- read.csv("data/2025-04-04c/data.csv")
+data2 <- read.csv("data/2025-04-04d/data.csv")
+data3 <- read.csv("data/2025-04-04e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 disp_0 <- subset(dispersal_ranges, dispersal == 0)
@@ -355,11 +376,467 @@ stats_sum <- rbind(c("Dispersal 0", "", "", "Dispersal 0.5", "", "", "Dispersal 
                    stats_sum)
 kbl(stats_sum, format = "markdown")
 
+# Save space
+rm(dispersal_ranges, data_melt)
+
+#### Table 1-3  #########################################################
+# Clarke ----- 
+Clarke1 <- read.csv("data/2025-04-19c/full_data.csv")
+Clarke2 <- read.csv("data/2025-04-19d/full_data.csv")
+Clarke3 <- read.csv("data/2025-04-19e/full_data.csv")
+Clarke_dispersal_ranges <- rbind(Clarke1, Clarke2, Clarke3)
+
+# Save space
+rm(Clarke1, Clarke2, Clarke3)
+
+# extract embryo data from sampling posterior error rate parameters
+Clarke_error_rate_melt <- melt(
+  Clarke_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+Clarke_max_estimates <- Clarke_error_rate_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(MAP_Estimate = signif(map_estimate(value)[2], 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = MAP_Estimate) 
+
+
+# extract biopsy data
+Clarke_biopsy_melt <- melt(
+  Clarke_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("euploid", "mosaic", "aneuploid")
+)
+
+# Compute the mean of biopsy data at each dispersal level
+Clarke_mean_estimates <- Clarke_biopsy_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(Mean = signif(mean(value), 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = Mean)
+
+# extract embryo data
+Clarke_biopsy_data <- Clarke_dispersal_ranges %>%
+  mutate(
+    category = case_when(
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
+    )
+  )
+
+Clarke_proportions <- Clarke_biopsy_data %>%
+  group_by(dispersal, category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(dispersal) %>%
+  mutate(Proportion = signif(Count / sum(Count), 2)) %>%
+  select(dispersal, category, Proportion) %>%
+  pivot_wider(names_from = category, values_from = Proportion)
+
+
+# Save space
+rm(Clarke_dispersal_ranges, Clarke_error_rate_melt, Clarke_biopsy_melt, Clarke_biopsy_data)
+
+# Add data to a table by dispersal
+dispersal_0_stats_sum <- rbind(
+  c("", "", "Euploid", "Mosaic", "Aneuploid", 
+    "Prob. Meio", "Prob. Mito", 
+    "Euploid Embryo", "Mosaic Aneuploid", 
+    "Fully Aneuploid"),
+  c("Clarke", 0, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Clarke_mean_estimates %>% filter(dispersal == 0) %>% pull(euploid),
+    Clarke_mean_estimates %>% filter(dispersal == 0) %>% pull(mosaic),
+    Clarke_mean_estimates %>% filter(dispersal == 0) %>% pull(aneuploid),
+    Clarke_max_estimates %>% filter(dispersal == 0) %>% pull(prob.meio),
+    Clarke_max_estimates %>% filter(dispersal == 0) %>% pull(prob.mito),
+    Clarke_proportions %>% filter(dispersal == 0) %>% pull(Euploid),
+    Clarke_proportions %>% filter(dispersal == 0) %>% pull("Mosaic Aneuploid"),
+    Clarke_proportions %>% filter(dispersal == 0) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_0.5_stats_sum <- rbind(
+  c("", "", "Euploid", "Mosaic", "Aneuploid", 
+    "Prob. Meio", "Prob. Mito",
+    "Euploid Embryo", "Mosaic Aneuploid", 
+    "Fully Aneuploid"),
+  c("Clarke", 0.5, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Clarke_mean_estimates %>% filter(dispersal == 0.5) %>% pull(euploid),
+    Clarke_mean_estimates %>% filter(dispersal == 0.5) %>% pull(mosaic),
+    Clarke_mean_estimates %>% filter(dispersal == 0.5) %>% pull(aneuploid),
+    Clarke_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.meio),
+    Clarke_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.mito),
+    Clarke_proportions %>% filter(dispersal == 0.5) %>% pull(Euploid),
+    Clarke_proportions %>% filter(dispersal == 0.5) %>% pull("Mosaic Aneuploid"),
+    Clarke_proportions %>% filter(dispersal == 0.5) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_1_stats_sum <- rbind(
+  c("", "", "Euploid", "Mosaic", "Aneuploid", 
+    "Prob. Meio", "Prob. Mito",
+    "Euploid Embryo", "Mosaic Aneuploid", 
+    "Fully Aneuploid"),
+  c("Clarke", 1, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Clarke_mean_estimates %>% filter(dispersal == 1) %>% pull(euploid),
+    Clarke_mean_estimates %>% filter(dispersal == 1) %>% pull(mosaic),
+    Clarke_mean_estimates %>% filter(dispersal == 1) %>% pull(aneuploid),
+    Clarke_max_estimates %>% filter(dispersal == 1) %>% pull(prob.meio),
+    Clarke_max_estimates %>% filter(dispersal == 1) %>% pull(prob.mito),
+    Clarke_proportions %>% filter(dispersal == 1) %>% pull(Euploid),
+    Clarke_proportions %>% filter(dispersal == 1) %>% pull("Mosaic Aneuploid"),
+    Clarke_proportions %>% filter(dispersal == 1) %>% pull("Fully Aneuploid")
+  )
+)
+
+
+# Capalbo ----
+Cap1 <- read.csv("data/2025-04-04c/full_data.csv")
+Cap2 <- read.csv("data/2025-04-04d/full_data.csv")
+Cap3 <- read.csv("data/2025-04-04e/full_data.csv")
+Cap_dispersal_ranges <- rbind(Cap1, Cap2, Cap3)
+
+# Save space
+rm(Cap1, Cap2, Cap3)
+
+# extract embryo data from sampling posterior error rate parameters
+Cap_error_rate_melt <- melt(
+  Cap_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+Cap_max_estimates <- Cap_error_rate_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(MAP_Estimate = signif(map_estimate(value)[2], 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = MAP_Estimate) 
+
+
+# extract biopsy data
+Cap_biopsy_melt <- melt(
+  Cap_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("euploid", "mosaic", "aneuploid")
+)
+
+# Compute the mean of biopsy data at each dispersal level
+Cap_mean_estimates <- Cap_biopsy_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(Mean = signif(mean(value), 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = Mean)
+
+# extract embryo data
+Cap_biopsy_data <- Cap_dispersal_ranges %>%
+  mutate(
+    category = case_when(
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
+    )
+  )
+
+Cap_proportions <- Cap_biopsy_data %>%
+  group_by(dispersal, category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(dispersal) %>%
+  mutate(Proportion = signif(Count / sum(Count), 2)) %>%
+  select(dispersal, category, Proportion) %>%
+  pivot_wider(names_from = category, values_from = Proportion)
+
+# Save space
+rm(Cap_dispersal_ranges, Cap_error_rate_melt, Cap_biopsy_melt, Cap_biopsy_data)
+
+# Add data to a table by dispersal
+dispersal_0_stats_sum <- rbind(
+  dispersal_0_stats_sum,
+  c("Capalbo", 0, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Cap_mean_estimates %>% filter(dispersal == 0) %>% pull(euploid),
+    Cap_mean_estimates %>% filter(dispersal == 0) %>% pull(mosaic),
+    Cap_mean_estimates %>% filter(dispersal == 0) %>% pull(aneuploid),
+    Cap_max_estimates %>% filter(dispersal == 0) %>% pull(prob.meio),
+    Cap_max_estimates %>% filter(dispersal == 0) %>% pull(prob.mito),
+    Cap_proportions %>% filter(dispersal == 0) %>% pull(Euploid),
+    Cap_proportions %>% filter(dispersal == 0) %>% pull("Mosaic Aneuploid"),
+    Cap_proportions %>% filter(dispersal == 0) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_0.5_stats_sum <- rbind(
+  dispersal_0.5_stats_sum,
+  c("Capalbo", 0.5, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Cap_mean_estimates %>% filter(dispersal == 0.5) %>% pull(euploid),
+    Cap_mean_estimates %>% filter(dispersal == 0.5) %>% pull(mosaic),
+    Cap_mean_estimates %>% filter(dispersal == 0.5) %>% pull(aneuploid),
+    Cap_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.meio),
+    Cap_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.mito),
+    Cap_proportions %>% filter(dispersal == 0.5) %>% pull(Euploid),
+    Cap_proportions %>% filter(dispersal == 0.5) %>% pull("Mosaic Aneuploid"),
+    Cap_proportions %>% filter(dispersal == 0.5) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_1_stats_sum <- rbind(
+  dispersal_1_stats_sum,
+  c("Capalbo", 1, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Cap_mean_estimates %>% filter(dispersal == 1) %>% pull(euploid),
+    Cap_mean_estimates %>% filter(dispersal == 1) %>% pull(mosaic),
+    Cap_mean_estimates %>% filter(dispersal == 1) %>% pull(aneuploid),
+    Cap_max_estimates %>% filter(dispersal == 1) %>% pull(prob.meio),
+    Cap_max_estimates %>% filter(dispersal == 1) %>% pull(prob.mito),
+    Cap_proportions %>% filter(dispersal == 1) %>% pull(Euploid),
+    Cap_proportions %>% filter(dispersal == 1) %>% pull("Mosaic Aneuploid"),
+    Cap_proportions %>% filter(dispersal == 1) %>% pull("Fully Aneuploid")
+  )
+)
+
+
+
+# Munne----
+Mun1 <- read.csv("data/2025-04-08c/full_data.csv")
+Mun2 <- read.csv("data/2025-04-08d/full_data.csv")
+Mun3 <- read.csv("data/2025-04-08e/full_data.csv")
+Mun_dispersal_ranges <- rbind(Mun1, Mun2, Mun3)
+
+# Save space
+rm(Mun1, Mun2, Mun3)
+
+# extract embryo data from sampling posterior error rate parameters
+Mun_error_rate_melt <- melt(
+  Mun_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+Mun_max_estimates <- Mun_error_rate_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(MAP_Estimate = signif(map_estimate(value)[2], 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = MAP_Estimate) 
+
+
+# extract biopsy data
+Mun_biopsy_melt <- melt(
+  Mun_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("euploid", "mosaic", "aneuploid")
+)
+
+# Compute the mean of biopsy data at each dispersal level
+Mun_mean_estimates <- Mun_biopsy_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(Mean = signif(mean(value), 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = Mean)
+
+# extract embryo data
+Mun_biopsy_data <- Mun_dispersal_ranges %>%
+  mutate(
+    category = case_when(
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
+    )
+  )
+
+Mun_proportions <- Mun_biopsy_data %>%
+  group_by(dispersal, category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(dispersal) %>%
+  mutate(Proportion = signif(Count / sum(Count), 2)) %>%
+  select(dispersal, category, Proportion) %>%
+  pivot_wider(names_from = category, values_from = Proportion)
+
+# Save space
+rm(Mun_dispersal_ranges, Mun_error_rate_melt, Mun_biopsy_melt, Mun_biopsy_data)
+
+# Add data to a table by dispersal
+dispersal_0_stats_sum <- rbind(
+  dispersal_0_stats_sum,
+  c("Munne", 0, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Mun_mean_estimates %>% filter(dispersal == 0) %>% pull(euploid),
+    Mun_mean_estimates %>% filter(dispersal == 0) %>% pull(mosaic),
+    Mun_mean_estimates %>% filter(dispersal == 0) %>% pull(aneuploid),
+    Mun_max_estimates %>% filter(dispersal == 0) %>% pull(prob.meio),
+    Mun_max_estimates %>% filter(dispersal == 0) %>% pull(prob.mito),
+    Mun_proportions %>% filter(dispersal == 0) %>% pull(Euploid),
+    Mun_proportions %>% filter(dispersal == 0) %>% pull("Mosaic Aneuploid"),
+    Mun_proportions %>% filter(dispersal == 0) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_0.5_stats_sum <- rbind(
+  dispersal_0.5_stats_sum,
+  c("Munne", 0.5, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Mun_mean_estimates %>% filter(dispersal == 0.5) %>% pull(euploid),
+    Mun_mean_estimates %>% filter(dispersal == 0.5) %>% pull(mosaic),
+    Mun_mean_estimates %>% filter(dispersal == 0.5) %>% pull(aneuploid),
+    Mun_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.meio),
+    Mun_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.mito),
+    Mun_proportions %>% filter(dispersal == 0.5) %>% pull(Euploid),
+    Mun_proportions %>% filter(dispersal == 0.5) %>% pull("Mosaic Aneuploid"),
+    Mun_proportions %>% filter(dispersal == 0.5) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_1_stats_sum <- rbind(
+  dispersal_1_stats_sum,
+  c("Munne", 1, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Mun_mean_estimates %>% filter(dispersal == 1) %>% pull(euploid),
+    Mun_mean_estimates %>% filter(dispersal == 1) %>% pull(mosaic),
+    Mun_mean_estimates %>% filter(dispersal == 1) %>% pull(aneuploid),
+    Mun_max_estimates %>% filter(dispersal == 1) %>% pull(prob.meio),
+    Mun_max_estimates %>% filter(dispersal == 1) %>% pull(prob.mito),
+    Mun_proportions %>% filter(dispersal == 1) %>% pull(Euploid),
+    Mun_proportions %>% filter(dispersal == 1) %>% pull("Mosaic Aneuploid"),
+    Mun_proportions %>% filter(dispersal == 1) %>% pull("Fully Aneuploid")
+  )
+)
+
+
+# Rodrigo----
+Rodrigo1 <- read.csv("data/2025-04-18c/full_data.csv")
+Rodrigo2 <- read.csv("data/2025-04-18d/full_data.csv")
+Rodrigo3 <- read.csv("data/2025-04-18e/full_data.csv")
+Rodrigo_dispersal_ranges <- rbind(Rodrigo1, Rodrigo2, Rodrigo3)
+
+# Save space
+rm(Rodrigo1, Rodrigo2, Rodrigo3)
+
+# extract embryo data from sampling posterior error rate parameters
+Rodrigo_error_rate_melt <- melt(
+  Rodrigo_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("prob.meio", "prob.mito")
+)
+
+Rodrigo_max_estimates <- Rodrigo_error_rate_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(MAP_Estimate = signif(map_estimate(value)[2], 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = MAP_Estimate) 
+
+
+# extract biopsy data
+Rodrigo_biopsy_melt <- melt(
+  Rodrigo_dispersal_ranges,
+  id.vars = c("dispersal"),
+  measure.vars = c("euploid", "mosaic", "aneuploid")
+)
+
+# Compute the mean of biopsy data at each dispersal level
+Rodrigo_mean_estimates <- Rodrigo_biopsy_melt %>%
+  group_by(dispersal, variable) %>%
+  summarise(Mean = signif(mean(value), 2), .groups = "drop") %>%
+  pivot_wider(names_from = variable, values_from = Mean)
+
+# extract embryo data
+Rodrigo_biopsy_data <- Rodrigo_dispersal_ranges %>%
+  mutate(
+    category = case_when(
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
+    )
+  )
+
+Rodrigo_proportions <- Rodrigo_biopsy_data %>%
+  group_by(dispersal, category) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(dispersal) %>%
+  mutate(Proportion = signif(Count / sum(Count), 2)) %>%
+  select(dispersal, category, Proportion) %>%
+  pivot_wider(names_from = category, values_from = Proportion)
+
+# Save space
+rm(Rodrigo_dispersal_ranges, Rodrigo_error_rate_melt, Rodrigo_biopsy_melt, Rodrigo_biopsy_data)
+
+# Add data to a table by dispersal
+dispersal_0_stats_sum <- rbind(
+  dispersal_0_stats_sum,
+  c("Rodrigo", 0, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Rodrigo_mean_estimates %>% filter(dispersal == 0) %>% pull(euploid),
+    Rodrigo_mean_estimates %>% filter(dispersal == 0) %>% pull(mosaic),
+    Rodrigo_mean_estimates %>% filter(dispersal == 0) %>% pull(aneuploid),
+    Rodrigo_max_estimates %>% filter(dispersal == 0) %>% pull(prob.meio),
+    Rodrigo_max_estimates %>% filter(dispersal == 0) %>% pull(prob.mito),
+    Rodrigo_proportions %>% filter(dispersal == 0) %>% pull(Euploid),
+    Rodrigo_proportions %>% filter(dispersal == 0) %>% pull("Mosaic Aneuploid"),
+    Rodrigo_proportions %>% filter(dispersal == 0) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_0.5_stats_sum <- rbind(
+  dispersal_0.5_stats_sum,
+  c("Rodrigo", 0.5, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Rodrigo_mean_estimates %>% filter(dispersal == 0.5) %>% pull(euploid),
+    Rodrigo_mean_estimates %>% filter(dispersal == 0.5) %>% pull(mosaic),
+    Rodrigo_mean_estimates %>% filter(dispersal == 0.5) %>% pull(aneuploid),
+    Rodrigo_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.meio),
+    Rodrigo_max_estimates %>% filter(dispersal == 0.5) %>% pull(prob.mito),
+    Rodrigo_proportions %>% filter(dispersal == 0.5) %>% pull(Euploid),
+    Rodrigo_proportions %>% filter(dispersal == 0.5) %>% pull("Mosaic Aneuploid"),
+    Rodrigo_proportions %>% filter(dispersal == 0.5) %>% pull("Fully Aneuploid")
+  )
+)
+
+dispersal_1_stats_sum <- rbind(
+  dispersal_1_stats_sum,
+  c("Rodrigo", 1, 
+    # biopsy parameters
+    # should be approximately the same biopsy set across all
+    Rodrigo_mean_estimates %>% filter(dispersal == 1) %>% pull(euploid),
+    Rodrigo_mean_estimates %>% filter(dispersal == 1) %>% pull(mosaic),
+    Rodrigo_mean_estimates %>% filter(dispersal == 1) %>% pull(aneuploid),
+    Rodrigo_max_estimates %>% filter(dispersal == 1) %>% pull(prob.meio),
+    Rodrigo_max_estimates %>% filter(dispersal == 1) %>% pull(prob.mito),
+    Rodrigo_proportions %>% filter(dispersal == 1) %>% pull(Euploid),
+    Rodrigo_proportions %>% filter(dispersal == 1) %>% pull("Mosaic Aneuploid"),
+    Rodrigo_proportions %>% filter(dispersal == 1) %>% pull("Fully Aneuploid")
+  )
+)
+
+
+
+# Print table
+kable(dispersal_0_stats_sum, format = "markdown", col.names = c(
+  "Data set", "Dispersal", "", "Published Biopsy Data", "", "Inferred Error Rates",
+  "", "", "Inferred Embryo Types",""
+))
+
+kable(dispersal_0.5_stats_sum, format = "markdown", col.names = c(
+  "Data set", "Dispersal", "", "Published Biopsy Data", "", "Inferred Error Rates",
+  "", "", "Inferred Embryo Types",""
+))
+
+kable(dispersal_1_stats_sum, format = "markdown", col.names = c(
+  "Data set", "Dispersal", "", "Published Biopsy Data", "", "Inferred Error Rates",
+  "", "", "Inferred Embryo Types",""
+))
+
 #### Figure 2 ###################################
 # import dispersal_ranges
-data1 <- read.csv("data/2024-08-16c/data.csv")
-data2 <- read.csv("data/2024-08-16d/data.csv")
-data3 <- read.csv("data/2024-08-16e/data.csv")
+data1 <- read.csv("data/2025-04-04c/data.csv")
+data2 <- read.csv("data/2025-04-04d/data.csv")
+data3 <- read.csv("data/2025-04-04e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 
@@ -391,81 +868,12 @@ ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, color = euclid
   guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
   theme_bw()
 
-# Plotting with weights
-dispersal_ranges <- dispersal_ranges %>% mutate(euclidean = sqrt((euploid - 0.388) ^ 2 + (mosaic - 0.188) ^ 2 +
-                                                                   (aneuploid - 0.426) ^ 2))
-ggplot(data = dispersal_ranges, aes(x = prob.meio, y = prob.mito, size = weights, color = euclidean)) +
-  geom_point() + facet_grid(dispersal ~ .,
-                                    scales = "fixed") +
-  labs(
-    x = "Probability of Meiotic Error",
-    y = "Probability of Mitotic Error",
-    size = "Weights",
-    color = "Distance",
-    shape = "Dispersal"
-  ) +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
-    legend.position = c(.87, .8),
-    legend.background = element_rect(fill = "transparent"),
-    panel.grid = element_blank()
-  ) + scale_y_continuous(sec.axis = sec_axis(
-    ~ . ,
-    name = "Dispersal",
-    breaks = NULL,
-    labels = NULL
-  )) +
-  guides(color = guide_colorsteps())  + scale_color_viridis_c(oob = scales::squish) + geom_rug() +
-  theme_bw() + scale_size_area(max_size = 2)
-
+# Save space
+rm(dispersal_ranges)
 
 #### Figure 5 ##############
-date <- "2024-08-30"
-data <- c()
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  data <- rbind(data, new_data)
-}
-data <- cbind(data, dispersal = 0)
-
-date <- "2024-08-30b"
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  new_data <- cbind(new_data, dispersal = 0.5)
-  data <- rbind(data, new_data)
-}
-
-date <- "2024-08-30c"
-for(i in 1:11) {
-  new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
-  new_data <- cbind(new_data, dispersal = 1)
-  data <- rbind(data, new_data)
-}
-
-data$Mosaic.Aneuploid <- data$Mosaic.Aneuploid / 1000
-mosaic_data <- data %>%  group_by(misclassification, dispersal) %>%
-  summarise(proportion =mean(Mosaic.Aneuploid), stdev = sd(Mosaic.Aneuploid))
-
-ggplot(data = mosaic_data, aes(x = misclassification, y = proportion)) +
-  geom_point(size = 3) +
-  facet_grid(dispersal ~ .,
-                                    scales = "fixed") +
-  labs(x = "Biopsy Misclassification Rate", y = "Proportion of Mosaic Aneuploidy Embryos", ) +
-  theme(
-    axis.title.x = element_text(vjust = 0, size = 10, face = "bold"),
-    axis.title.y = element_text(vjust = 2, size = 10, face = "bold"),
-    legend.position = c(.87, .8),
-    legend.background = element_rect(fill = "transparent"),
-    panel.grid = element_blank()
-  ) +
- geom_errorbar(aes(ymin=proportion-stdev, ymax=proportion+stdev), width=.1) + 
-  theme_bw()
-
-
-
 # percent stacked barplots
-date <- "2024-08-30"
+date <- "2025-04-22"
 data <- c()
 for(i in 1:11) {
   new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
@@ -473,14 +881,14 @@ for(i in 1:11) {
 }
 data <- cbind(data, dispersal = 0)
 
-date <- "2024-08-30b"
+date <- "2025-04-22b"
 for(i in 1:11) {
   new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 0.5)
   data <- rbind(data, new_data)
 }
 
-date <- "2024-08-30c"
+date <- "2025-04-22c"
 for(i in 1:11) {
   new_data <- read.csv(paste0("data/", date, "/data_" , i, ".csv"))
   new_data <- cbind(new_data, dispersal = 1)
@@ -526,38 +934,11 @@ ggplot(reshaped_data, aes(
 reshaped_data <- reshaped_data %>%
   mutate(new_mean = cumsum(mean))
 
-# With error bars
-ggplot(reshaped_data, aes(
-  x = factor(misclassification),
-  y = mean,
-  fill = factor(
-    category,
-    levels = c("Fully Aneuploid", "Mosaic Aneuploid", "Euploid")
-  )
-)) +
-  geom_bar(stat = "identity") +
-  facet_grid(rows = vars(factor(dispersal, levels = c("0", "0.5", "1"))), scales = "fixed") +
-  labs(x = "Misclassification Rate",
-       y = "Proportion of Embryos",
-       fill = "Embryo Type") +
-  scale_y_continuous(expand = c(0, 0),
-                     sec.axis = sec_axis(
-                       ~ . ,
-                       name = "Dispersal",
-                       breaks = NULL,
-                       labels = NULL
-                     )) +
-  geom_errorbar(aes(ymin = new_mean - stdev, ymax = new_mean + stdev),
-                width = 0.2,
-                color = "red") +
-  scale_fill_viridis(discrete = TRUE) +
-  theme_classic()
-
 #### Figure S2 ##############
 
-data1 <- read.csv("data/2024-08-16c/data.csv")
-data2 <- read.csv("data/2024-08-16d/data.csv")
-data3 <- read.csv("data/2024-08-16e/data.csv")
+data1 <- read.csv("data/2025-04-04c/data.csv")
+data2 <- read.csv("data/2025-04-04d/data.csv")
+data3 <- read.csv("data/2025-04-04e/data.csv")
 dispersal_ranges <- rbind(data1, data2, data3)
 
 biopsy_types <- dispersal_ranges %>%
@@ -594,7 +975,7 @@ biopsy <- ggplot(biopsy_types, aes(
 
 data <- data.frame(
   category = c("Euploid", "Mosaic", "Aneuploid"),
-  value = c(0.388, 0.186, 0.426)
+  value = c(0.232, 0.181, 0.587)
 )
 
 data <- data %>%
@@ -607,7 +988,7 @@ ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
 ))) + 
   geom_bar(stat = "identity", width = 0.05) +
   labs(x = "", y = "Percentage", fill = "Category", tag = "A") + 
-  ggtitle("Reference Proportions from Viotti et al. 2021")  +
+  ggtitle("Reference Proportions from Capalbo et al. 2021")  +
   geom_label(
     aes(y = ypos, label = sprintf("%.1f%%", value*100)),
     color = "red",
@@ -623,3 +1004,6 @@ ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
             panel.grid = element_blank(),
             legend.position = "none")
 ref + biopsy
+
+# Save space
+rm(dispersal_ranges)

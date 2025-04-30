@@ -19,7 +19,7 @@ conda activate ~/miniconda3/envs/aneuploidy_rates
 filepath=$(pwd)
 
 now=$(date +"%Y-%m-%d")
-outdir="${now}"
+outdir="${now}c"
 mkdir -p $outdir
 
 export basedir=${filepath}
