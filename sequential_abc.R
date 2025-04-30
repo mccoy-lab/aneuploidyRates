@@ -143,10 +143,10 @@ rates_model <- function(probs) {
       tessera::takeBiopsy(embryo = em, biopsy.size = biop.size)
 
     # assign types based on results
-    if (biopsy.result < biop.size * 0.3) {
+    if (biopsy.result < biop.size * 0.2) {
       # no aneuploid cells -- an euploid embryo
       return(0)
-    } else if (biopsy.result > biop.size * 0.7) {
+    } else if (biopsy.result > biop.size * 0.8) {
       # more than 80% aneuploid cells -- an aneuploid embryo
       return(2)
     } else{
@@ -290,7 +290,7 @@ rates_model <- function(probs) {
   meio.range = list(0, 1)
   mito.range = list(0, 1)
   disp.range = list(0, 0)
-  expected = c(0.512, 0.062, 0.426)
+  expected = c(0.49, 0.18, 0.33)
   num.trials = 2000
   hide.param = TRUE
 
