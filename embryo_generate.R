@@ -6,6 +6,11 @@ data <- c()
 args <- commandArgs(trailingOnly = TRUE)
 id <- strtoi(args[1]) - 1
 
+# Convert the error rates to proportion of aneuploidy cells within an embryo.
+# First, affect the cell with meiotic aneuploidy based on error rate. If the cell is
+# affected, return the proportion of aneuploidy as 1. Else, simulate cell division
+# with random mitotic errors based on the probability and calculate the number of
+# aneuploid cells by the end of the simulation. Return the proportion.
 prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
   cells.affected <- 0
   total.cells <- 2 ^ num.division
@@ -25,6 +30,10 @@ prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
   }
 }
 
+# Simulate cell division and count the number of affected (aneuploid) cells.
+# Since the derived cells of an aneuploid cell will all be aneuploids, the
+# function recursively tallies the number of affected cells after a certain
+# number of cell divisions.
 mito_aneu_cells <- function(cells.affected = 0,
                             n.division = 8,
                             prob.affected = 0.5,

@@ -18,6 +18,11 @@ rates_model <- function(probs) {
   if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
   library(dplyr)
 
+  # Convert the error rates to proportion of aneuploidy cells within an embryo.
+  # First, affect the cell with meiotic aneuploidy based on error rate. If the cell is
+  # affected, return the proportion of aneuploidy as 1. Else, simulate cell division
+  # with random mitotic errors based on the probability and calculate the number of
+  # aneuploid cells by the end of the simulation. Return the proportion.
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
     if (prob.meio < 0 | prob.mito < 0) {
@@ -64,6 +69,10 @@ rates_model <- function(probs) {
     }
   }
 
+  # Simulate cell division and count the number of affected (aneuploid) cells.
+  # Since the derived cells of an aneuploid cell will all be aneuploids, the
+  # function recursively tallies the number of affected cells after a certain
+  # number of cell divisions.
   mito_aneu_cells <- function(cells.affected = 0,
                               n.division = 8,
                               prob.affected = 0.5,
@@ -136,6 +145,7 @@ rates_model <- function(probs) {
     return(cells.affected)
   }
 
+  # Takes a biopsy of an embryo object
   take_biopsy <- function(em, biop.size = 5) {
     # error messages
     if (biop.size <= 0 || biop.size > nrow(em@ploidy)) {
@@ -163,6 +173,9 @@ rates_model <- function(probs) {
     }
   }
 
+  # Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.
+  # Counts the proportions of euploid, mosaic, and aneuploid biopsy results out of 
+  # sampling a batch of embryos with the same error rates and dispersal.
   summarize_biopsy <- function(num.em = 1000,
                                meio,
                                mito,
@@ -260,6 +273,7 @@ rates_model <- function(probs) {
 
   set.seed(probs[[1]])
 
+  # obtain biopsy proportions given a set of error rates and dispersal level
   biopsy <- summarize_biopsy(
     meio = probs[[2]],
     mito = probs[[3]],
@@ -275,6 +289,7 @@ rates_model <- function(probs) {
   return(biopsy[1,5:7])
 }
 
+### Using the model while considering misclassification
 
 meio.range = list(0, 1)
 mito.range = list(0, 1)
@@ -293,6 +308,8 @@ rates_prior <- list(
   c("unif", disp.range[[1]], disp.range[[2]])
 )
 
+# Run simulations to select the error rates producing the closest biopsy proportion
+# results comparing to the expected values from clinical data.
 rates_sim <-
   EasyABC::ABC_sequential(
     method = "Lenormand",
@@ -330,7 +347,6 @@ for(i in 1:nrow(result)){
   proportion <- read.csv(filename)
   proportion <- proportion[,2:8]
   proportion <- cbind(proportion, misdiagnosed = incr)
-  #colnames(proportion) <- colnames(result_prop_aneu)
   result_prop_aneu <- rbind(result_prop_aneu, proportion)
 }
 

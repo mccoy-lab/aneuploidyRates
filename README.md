@@ -32,3 +32,36 @@ The main data files supporting the paper are:
     Contains generated embryos based on distributions from `04-21`.
 
 ## Usage
+
+### `sequential_abc.R`
+
+Implements the sequential ABC algorithm, estimating posterior distributions of meiotic and mitotic error rates by comparing simulated and observed data.
+
+### `seq_abc.sh`
+
+A shell script that runs the sequential ABC pipeline in `sequential_abc.R`.
+
+### `misdiagnosed_rates.R`
+
+Simulates misclassification of biopsies and generates datasets with the newly adjusted
+biopsy proportions, providing insights into the reliability of ABC inference under various conditions.
+
+
+### `misdiagnosed_generate.sh`
+
+A shell script that runs the misdiagnosis scenarios in `misdiagnosed_rates.R`.
+
+### `embryo_generate.R`
+
+Simulates embryo aneuploidy profiles based on specified meiotic and mitotic error rates.  Generates datasets for posterior distribution analysis.
+
+### `embryo_generate.sh`
+
+A shell script that runs `embryo_generate.R`.
+
+### `plot_data.R`
+
+Generates visualizations from the simulation results for the paper.
+
+
+

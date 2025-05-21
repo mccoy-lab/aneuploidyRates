@@ -10,6 +10,11 @@ library(EasyABC)
 # Set the model for biopsy summary
 rates_model <- function(probs) {
 
+  # Convert the error rates to proportion of aneuploidy cells within an embryo.
+  # First, affect the cell with meiotic aneuploidy based on error rate. If the cell is
+  # affected, return the proportion of aneuploidy as 1. Else, simulate cell division
+  # with random mitotic errors based on the probability and calculate the number of
+  # aneuploid cells by the end of the simulation. Return the proportion.
   prob_to_prop <- function(prob.meio, prob.mito, num.division = 8) {
     # Error messages
     if (prob.meio < 0 | prob.mito < 0) {
@@ -56,6 +61,10 @@ rates_model <- function(probs) {
     }
   }
 
+  # Simulate cell division and count the number of affected (aneuploid) cells.
+  # Since the derived cells of an aneuploid cell will all be aneuploids, the
+  # function recursively tallies the number of affected cells after a certain
+  # number of cell divisions.
   mito_aneu_cells <- function(cells.affected = 0,
                               n.division = 8,
                               prob.affected = 0.5,
@@ -100,7 +109,7 @@ rates_model <- function(probs) {
     }
 
 
-    # The current cell is euploid
+    # The current cell is euploid:
     # If the cell is still dividing
     if (n.division != 0) {
       # For the next two cells it splits into, randomly set if the next cell is affected
@@ -128,6 +137,7 @@ rates_model <- function(probs) {
     return(cells.affected)
   }
 
+  # Takes a biopsy of an embryo object
   take_biopsy <- function(em, biop.size = 5) {
     # error messages
     if (biop.size <= 0 || biop.size > nrow(em@ploidy)) {
@@ -139,6 +149,7 @@ rates_model <- function(probs) {
       ))
     }
 
+    # this function is provided by tessera R-package
     biopsy.result <-
       tessera::takeBiopsy(embryo = em, biopsy.size = biop.size)
 
@@ -155,6 +166,9 @@ rates_model <- function(probs) {
     }
   }
 
+  # Returns a biopsy summary for a set of meiotic and mitotic error rates and dispersal.
+  # Counts the proportions of euploid, mosaic, and aneuploid biopsy results out of 
+  # sampling a batch of embryos with the same error rates and dispersal.
   summarize_biopsy <- function(num.em = 1000,
                                meio,
                                mito,
@@ -190,16 +204,6 @@ rates_model <- function(probs) {
     }
 
     # Set up result file, filing in the inputs
-    # result <- c(
-    #   prop.aneu,
-    #   prob.meio,
-    #   prob.mito,
-    #   dispersal,
-    #   euploid,
-    #   mosaic,
-    #   aneuploid
-    # )
-    # c(0, meio, mito, dispersal, 0, 0, 0)
     result <- matrix(nrow = num.em, ncol = 7)
     euploid <- 0
     mosaic <- 0
@@ -226,14 +230,6 @@ rates_model <- function(probs) {
       result[i, 1] <- prop.aneu
 
       # Create an embryo
-      # em <- create_embryo(
-      #   prop.aneuploid = prop.aneu,
-      #   n.cells = num.cell,
-      #   n.chrs = num.chr,
-      #   dispersal = dispersal,
-      #   concordance = concordance
-      # )
-
       em <- tessera::Embryo(
         n.cells = num.cell,
         n.chrs = num.chr,
@@ -270,6 +266,7 @@ rates_model <- function(probs) {
 
   set.seed(probs[[1]])
 
+  # obtain biopsy proportions given a set of error rates and dispersal level
   biopsy <- summarize_biopsy(
     meio = probs[[2]],
     mito = probs[[3]],
@@ -280,12 +277,13 @@ rates_model <- function(probs) {
 
 
   # Saves all data (used for displaying prop.aneu and other default params later)
-  # remaining.data <<- rbind(remaining.data, biopsy)
   write.csv(biopsy,paste0("temp/", round(probs[[2]],3), "_", round(probs[[3]],3), ".csv"))
   # Returns only the biopsy types
   return(biopsy[1,5:7])
 }
 
+
+### Using the model
 
   meio.range = list(0, 1)
   mito.range = list(0, 1)
@@ -304,6 +302,8 @@ rates_model <- function(probs) {
     c("unif", disp.range[[1]], disp.range[[2]])
   )
 
+  # Run simulations to select the error rates producing the closest biopsy proportion
+  # results comparing to the expected values from clinical data.
   rates_sim <-
     EasyABC::ABC_sequential(
       method = "Lenormand",
@@ -342,8 +342,6 @@ rates_model <- function(probs) {
     proportion <- proportion[,2:8]
     result_prop_aneu <- rbind(result_prop_aneu, proportion)
   }
-
-
 
     colnames(result) <-
       c(
