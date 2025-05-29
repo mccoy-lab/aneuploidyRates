@@ -33,6 +33,8 @@ The main data files supporting the paper are:
 
 ## Usage
 
+All shell scripts in this repository are written for computing clusters that use the SLURM job scheduler. They utilize SLURM's parallelization features to efficiently run simulations and analyses across multiple compute nodes.
+
 ### `sequential_abc.R`
 
 Implements the sequential ABC algorithm, estimating posterior distributions of meiotic and mitotic error rates by comparing simulated and observed data.

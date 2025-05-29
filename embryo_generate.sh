@@ -9,22 +9,19 @@
 #SBATCH --account=rmccoy22
 
 
-# module load r
-# conda activate aneuploidy_rates
+# shell script specific to user's directory paths
 source ~/.bashrc
 conda init --all
 conda activate ~/miniconda3/envs/aneuploidy_rates
-# cd /home/qyang40/scratch16-rmccoy22/qyang40/aneuploidyRates/
-# cd ..
 filepath=$(pwd)
 
+# create folders for storing results, named based on dates
 now=$(date +"%Y-%m-%d")
 outdir="${now}"
 mkdir -p $outdir
-
 export basedir=${filepath}
-# export workdir=${filepath}
 
 echo ${basedir}
 echo ${SLURM_ARRAY_TASK_ID}
+# arguments: array task ID, base directory, and output CSV file path
 Rscript ${basedir}/embryo_generate.R  ${SLURM_ARRAY_TASK_ID} ${basedir} "${basedir}/${outdir}/data_${SLURM_ARRAY_TASK_ID}.csv"
