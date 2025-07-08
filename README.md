@@ -1,6 +1,6 @@
 # Aneuploidy Rates Simulation
 
-This is a repository for the code used to produce data in the paper...
+This is a repository for the code used to produce data in the paper. 
 
 ## File Explanation
 
@@ -34,6 +34,9 @@ The main data files supporting the paper are:
 ## Usage
 
 All shell scripts in this repository are written for computing clusters that use the SLURM job scheduler. They utilize SLURM's parallelization features to efficiently run simulations and analyses across multiple compute nodes.
+
+Note that all the embryo create and biopsy simulation are done by functions included
+in the Tessera package, developed by [**Skinner et al.**](https://doi.org/10.7554/eLife.94506.1). The code is published here: [**Tessera**](https://github.com/bmskinner/tessera)
 
 ### `sequential_abc.R`
 
