@@ -1,3 +1,7 @@
+# This file creates embryos based on the stored proportion of aneuploidy and dispersal,
+# and takes a biopsy for each embryo. It outputs a summary file filtered by the 
+# biopsy and embryo type
+
 library(dplyr)
 library(readr)
 library(stringr)
@@ -14,27 +18,32 @@ data1 <- read.csv("data/2025-04-04c/full_data.csv")
 data2 <- read.csv("data/2025-04-04d/full_data.csv")
 data3 <- read.csv("data/2025-04-04e/full_data.csv")
 
-# Combine and find the corresponding rows
+# Combine and find the corresponding rows for the group
 all_data <- bind_rows(data1, data2, data3)
 
 current_data <- all_data %>%
   slice(start_row:end_row)
 
 # Process this group of data
-cat("Processing group ", task_id, "\n")
+cat("Processing group ", task_id, "\n") # signal to start
 
 processed_data <- current_data %>%
-  rowwise() %>%
+  rowwise() %>% # row-by-row operation
   mutate(
-    embryo = list(tessera::Embryo(
-      n.cells = 256,
-      prop.aneuploid = prop.aneu,
-      dispersal = dispersal,
-      rng.seed = NULL
-    )),
+    embryo = list(tryCatch({ # error catching to avoid restarting the whole procedure
+      tessera::Embryo(
+        n.cells = 256,
+        prop.aneuploid = prop.aneu,
+        dispersal = dispersal,
+        rng.seed = NULL
+      )
+    }, error = function(e) {
+      warning(paste("Embryo creation failed on task", task_id, "row with prop.aneu =", prop.aneu))
+      NULL
+    })),
     biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5)
   ) %>%
-  ungroup() %>%
+  ungroup() %>% # Categorize
   mutate(
     biopsy_type = case_when(
       biopsy_cell < 5 * 0.3 ~ "Euploid",
@@ -42,14 +51,14 @@ processed_data <- current_data %>%
       biopsy_cell > 5 * 0.7 ~ "Aneuploid"
     ),
     embryo_type = case_when(
-      prop.aneuploid == 0 ~ "Euploid",
-      prop.aneuploid > 0 & prop.aneuploid < 1 ~ "Mosaic Aneuploid",
-      prop.aneuploid == 1 ~ "Fully Aneuploid"
+      prop.aneu == 0 ~ "Euploid",
+      prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
+      prop.aneu == 1 ~ "Fully Aneuploid"
     )
-  ) %>%
+  ) %>% # Summarize biopsy results compared to embryo types
   group_by(dispersal, biopsy_type, embryo_type, biopsy_cell) %>%
   summarise(count = n(), .groups = "drop")
 
-# Write output to file
+# Output to file
 out_path <- file.path(outdir, paste0("group_", task_id, ".csv"))
 write_csv(processed_data, out_path)

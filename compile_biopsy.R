@@ -1,7 +1,11 @@
+# This file combines results from all parallel jobs and evaluates the percentage 
+# of aneuploid biopsies that are from mosaic embryos.
+# Namely, the proportion of discarded embryos that could be viable for transfer.
 library(readr)
 library(dplyr)
 
-results <- list.files("2025-07-09_results", full.names = TRUE, pattern = "*.csv")
+# Compile results
+results <- list.files("2025-07-10_results", full.names = TRUE, pattern = "*.csv")
 combined <- bind_rows(lapply(results, read_csv))
 
 final_summary <- combined %>%

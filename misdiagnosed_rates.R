@@ -15,9 +15,6 @@ incr = 0.181/10 * id
 
 
 rates_model <- function(probs) {
-  if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
-  library(dplyr)
-
   # Convert the error rates to proportion of aneuploidy cells within an embryo.
   # First, affect the cell with meiotic aneuploidy based on error rate. If the cell is
   # affected, return the proportion of aneuploidy as 1. Else, simulate cell division
