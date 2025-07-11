@@ -9,7 +9,7 @@ results <- list.files("2025-07-10_results", full.names = TRUE, pattern = "*.csv"
 combined <- bind_rows(lapply(results, read_csv))
 
 final_summary <- combined %>%
-  group_by(dispersal, biopsy_type, embryo_type, biopsy_cell) %>%
+  group_by(dispersal, embryo_type, first_biopsy_type, second_biopsy_type) %>%
   summarise(total = sum(count), .groups = "drop") %>%
   arrange(desc(total))
 

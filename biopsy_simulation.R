@@ -40,15 +40,21 @@ processed_data <- current_data %>%
     }, error = function(e) {
       warning(paste("Embryo creation failed on task", task_id, "row with prop.aneu =", prop.aneu))
       NULL
-    })),
-    biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5)
+    })), # pick a random cell as the start of biopsy
+    first_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5, index.cell = sample(1:256, 1)),
+    second_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5, index.cell = sample(1:256, 1)),
   ) %>%
   ungroup() %>% # Categorize
   mutate(
-    biopsy_type = case_when(
-      biopsy_cell < 5 * 0.3 ~ "Euploid",
-      biopsy_cell >= 5 * 0.3 & biopsy_cell <= 5 * 0.7 ~ "Mosaic",
-      biopsy_cell > 5 * 0.7 ~ "Aneuploid"
+    first_biopsy_type = case_when(
+      first_biopsy_cell < 5 * 0.3 ~ "Euploid",
+      first_biopsy_cell >= 5 * 0.3 & first_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
+      first_biopsy_cell > 5 * 0.7 ~ "Aneuploid"
+    ),
+    second_biopsy_type = case_when(
+      second_biopsy_cell < 5 * 0.3 ~ "Euploid",
+      second_biopsy_cell >= 5 * 0.3 & second_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
+      second_biopsy_cell > 5 * 0.7 ~ "Aneuploid"
     ),
     embryo_type = case_when(
       prop.aneu == 0 ~ "Euploid",
@@ -56,7 +62,7 @@ processed_data <- current_data %>%
       prop.aneu == 1 ~ "Fully Aneuploid"
     )
   ) %>% # Summarize biopsy results compared to embryo types
-  group_by(dispersal, biopsy_type, embryo_type, biopsy_cell) %>%
+  group_by(dispersal, first_biopsy_type, second_biopsy_type, embryo_type, first_biopsy_cell, second_biopsy_cell) %>%
   summarise(count = n(), .groups = "drop")
 
 # Output to file
