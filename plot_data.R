@@ -72,6 +72,10 @@ if(!require(tidyr)){
   install.packages("tidyr")
 }
 library(tidyr)
+if(!require(ggalluvial)){
+  install.packages("ggalluvial")
+}
+library(ggalluvial)
 #### Figure 3 #############################################################
 
 data1 <- read.csv("data/2025-04-04c/data.csv")
@@ -1085,3 +1089,46 @@ ref + biopsy
 
 # Save space
 rm(dispersal_ranges)
+
+
+#### Figure S3 ###########################
+# Load data
+df <- read.csv("final_summary.csv")
+
+# Summarize total counts by embryo → biopsy type
+biopsy_summary <- df %>%
+  group_by(embryo_type, biopsy_type) %>%
+  summarise(flow = sum(total), .groups = "drop") 
+
+# All possible combinations
+all_combos <- expand.grid(
+  embryo_type = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"),
+  biopsy_type = c("Euploid", "Mosaic", "Aneuploid"),
+  stringsAsFactors = FALSE
+)
+
+# Merge with actual data, replacing NAs with 0
+biopsy_summary_full <- all_combos %>%
+  left_join(biopsy_summary, by = c("embryo_type", "biopsy_type")) %>%
+  mutate(
+    flow = ifelse(is.na(flow), 0, flow)
+  )
+
+# Sankey plot
+ggplot(biopsy_summary_full,
+       aes(
+         axis1 = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid")),
+          axis2 = factor(biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
+         y = flow)) +
+  geom_alluvium(aes(
+    fill = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))), 
+    width = 1/12, alpha = 0.8) +
+  geom_stratum(width = 1/12, fill = "grey90", color = "black") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 4) +
+  scale_x_discrete(limits = c("Embryo Type", "Biopsy Type"), expand = c(.1, .1)) +
+  labs(title = "Mapping Embryo Type to Biopsy Type",
+       y = "Embryo Count",
+       fill = "Biopsy Type",
+       x = NULL) +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::comma)
