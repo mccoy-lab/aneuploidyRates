@@ -80,6 +80,11 @@ if(!require(readr)){
   install.packages("readr")
 }
 library(readr)
+if(!require(remotes)){
+  install.packages("remotes")
+}
+remotes::install_github("davidsjoberg/ggsankey")
+library(ggsankey)
 #### Figure 3 #############################################################
 
 data1 <- read.csv("data/2025-04-04c/data.csv")
@@ -1114,7 +1119,9 @@ biopsy_summary <- df %>%
     first_biopsy_type = factor(first_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
     second_biopsy_type = factor(second_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid"))
   ) %>%
-  # select(dispersal, everything()) %>%
+  group_by(dispersal, first_biopsy_type) %>%
+  mutate(percentage = round(flow / sum(flow) * 100, 1)) %>%
+  ungroup() %>%
   arrange(dispersal, embryo_type, first_biopsy_type, second_biopsy_type)
 
 # Print in Markdown
@@ -1135,8 +1142,23 @@ result <- biopsy_summary %>%
 # Print in Markdown
 kable(result, format = "markdown")
 
+##### euploid biopsy from mosaic embryos ####
+result <- biopsy_summary %>%
+  filter(first_biopsy_type == "Euploid") %>%
+  mutate(is_mosaic = embryo_type == "Mosaic Aneuploid") %>%
+  group_by(dispersal) %>%
+  summarise(
+    total_euploid_biopsy = sum(flow),
+    from_mosaic_embryo = sum(flow[is_mosaic]),
+    percent = round(100 * from_mosaic_embryo / total_euploid_biopsy, 1),
+    .groups = "drop"
+  )
 
-##### First to second biospy ######
+# Print in Markdown
+kable(result, format = "markdown")
+
+
+##### First to second biopsy ######
 # All possible combinations
 all_combos <- expand.grid(
   dispersal = c(0, 0.5, 1),
@@ -1146,38 +1168,117 @@ all_combos <- expand.grid(
 )
 
 # Merge with actual data, replacing NAs with 0
-biopsy_summary_full <- all_combos %>%
-  left_join(biopsy_summary, by = c("first_biopsy_type", "second_biopsy_type", "dispersal")) %>%
+# biopsy_summary_full <- all_combos %>%
+#   left_join(biopsy_summary, by = c("first_biopsy_type", "second_biopsy_type", "dispersal")) %>%
+#   mutate(
+#     flow = ifelse(is.na(flow), 0, flow)
+#   )
+# 
+# total_flow <- sum(biopsy_summary_full$flow)
+
+# library(forcats)
+# plot_df <- biopsy_summary_full %>%
+#   mutate(
+#     first_biopsy_type = paste0("First_", first_biopsy_type),
+#     second_biopsy_type = paste0("Second_", second_biopsy_type),
+#     first_biopsy_type = fct_relevel(factor(first_biopsy_type),
+#                                     "First_Euploid", "First_Mosaic", "First_Aneuploid"),
+#     second_biopsy_type = fct_relevel(factor(second_biopsy_type),
+#                                      "Second_Euploid", "Second_Mosaic", "Second_Aneuploid"),
+#     embryo_type = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
+#   )
+
+plot_df <- biopsy_summary %>%
   mutate(
-    flow = ifelse(is.na(flow), 0, flow)
+    first_biopsy_type = factor(first_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
+    second_biopsy_type = factor(second_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
+    embryo_type = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
   )
 
-total_flow <- sum(biopsy_summary_full$flow)
-
-# Sankey plot
-ggplot(biopsy_summary_full %>% filter(flow > 0),
+ggplot(plot_df,
        aes(
-         axis1 = factor(first_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
-         axis2 = factor(second_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
-         y = flow)) +
-  geom_alluvium(aes(fill = embryo_type), width = 1/12, alpha = 0.8) +
-  geom_stratum(width = 1/12, fill = "grey90", color = "black") +
-  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3.5) +
-  geom_text(stat = "alluvium",
-            aes(label = ifelse(flow > 0, scales::comma(flow), "")),
-            x = 1.5,
-            size = 3,
-            color = "black") +
-  facet_wrap(~ dispersal, labeller = label_both) +
-  scale_x_discrete(limits = c("First Biopsy Type", "Second Biopsy Type"), expand = c(.1, .1)) +
+         axis1 = first_biopsy_type,
+         axis2 = second_biopsy_type,
+         y = flow,
+         fill = embryo_type)) +
+  geom_alluvium(width = 1/12, alpha = 0.8) +
+  geom_stratum(width = 1/6, fill = "gray80", color = "black") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3, color = "black") +
+  # geom_text(stat = "alluvium",
+  #           aes(x = 1.5, label = percentage),
+  #           size = 3,
+  #           color = "black") +
+  facet_wrap(~ dispersal, labeller = label_both, nrow = 1,  scales = "free_y") +
+  scale_x_discrete(limits = c("First Biopsy", "Second Biopsy"), expand = c(.1, .1)) +
   labs(title = "Biopsy Pair Type Flows by Embryo Dispersal Level",
        y = "Embryo Count",
-       x = NULL,
        fill = "Embryo Type") +
   theme_minimal() +
   theme(
+    panel.grid = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
-    panel.grid.major.y = element_blank()
-  ) +
+    axis.text.x = element_text(size = 12, face = "bold", color = "black"),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10)
+  )+
   scale_y_continuous(trans = "log1p")
+
+# Convert to ggsankey format (long format from wide)
+# Split the data by embryo_type to preserve grouping
+# biopsy_long_by_embryo <- biopsy_summary %>%
+#   select(embryo_type, dispersal, first_biopsy_type, second_biopsy_type, flow) %>%
+#   group_by(embryo_type, dispersal) %>%
+#   group_split() %>%
+#   lapply(function(df) {
+#     make_long(df, first_biopsy_type, second_biopsy_type, value = flow) %>%
+#       mutate(embryo_type = df$embryo_type[1],
+#              dispersal = df$dispersal[1])  # assign embryo_type to all rows from this group
+#   }) %>%
+#   bind_rows()
+
+# biopsy_long_by_embryo <- biopsy_summary_full %>%
+#   # filter(dispersal == 0) %>%
+#   select(embryo_type, dispersal, first_biopsy_type, second_biopsy_type, flow) %>%
+#   group_by(embryo_type, dispersal) %>%
+#   group_split() %>%
+#   lapply(function(df) {
+#     make_long(df, first_biopsy_type, second_biopsy_type, value = flow) %>%
+#       mutate(embryo_type = df$embryo_type[1],
+#              dispersal = df$dispersal[1])  # assign embryo_type to all rows from this group
+#   }) %>%
+#   bind_rows()%>%
+#   mutate(
+#     node = factor(node, 
+#                   levels = c("Euploid", "Mosaic", "Aneuploid")),
+#     next_node = factor(next_node, 
+#                   levels = c("Euploid", "Mosaic", "Aneuploid"))) %>%
+#   arrange(node, next_node)
+#   
+# 
+# ggplot(biopsy_long_by_embryo, 
+#        aes(x = x, 
+#            next_x = next_x, 
+#            node = node, 
+#            next_node = next_node,
+#            value = value, 
+#            fill = embryo_type)) +
+#   geom_sankey(flow.alpha = 0.7, node.color = "gray40") +
+#   geom_sankey_label(aes(label = node), size = 5, label.size = 0.3, color = "white", fill = "black") +
+#   labs(title = "First Biopsy to Second Biopsy Type",
+#        x = NULL,
+#        y = "Embryo Count",
+#        fill = "Embryo Type") +
+#   facet_wrap(~ dispersal, nrow = 1, labeller = label_both) +
+#   scale_x_discrete(labels = c("First Biopsy", "Second Biopsy")) +
+#   theme_minimal() +
+#   theme(
+#     panel.grid = element_blank(),
+#     axis.text.y = element_blank(),
+#     axis.ticks.y = element_blank(),
+#     axis.text.x = element_text(size = 12, face = "bold", color = "black", vjust = 3),
+#     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+#     legend.title = element_text(size = 12),
+#     legend.text = element_text(size = 10)
+#   )
