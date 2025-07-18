@@ -25,6 +25,9 @@
 
 # 04-22 -- generated embryos based on distributions in 04-21
 
+# 07-18_results -- 3,000,000 embryos created based on 04-04 data with two 
+# biopsies taken 
+
 
 #------For Paper-----------------------------------------------------
 if (!require(dplyr))
@@ -80,11 +83,6 @@ if(!require(readr)){
   install.packages("readr")
 }
 library(readr)
-if(!require(remotes)){
-  install.packages("remotes")
-}
-remotes::install_github("davidsjoberg/ggsankey")
-library(ggsankey)
 #### Figure 3 #############################################################
 
 data1 <- read.csv("data/2025-04-04c/data.csv")
@@ -1102,13 +1100,37 @@ rm(dispersal_ranges)
 
 #### Figure S3 ###########################
 # Compile results
-results <- list.files("2025-07-11_results", full.names = TRUE, pattern = "*.csv")
+results <- list.files("2025-07-18_results", full.names = TRUE, pattern = "*.csv")
 combined <- bind_rows(lapply(results, read_csv))
+
+# if those columns exist
+combined <- combined %>% select(-embryo)
+
+# Save this file
+write.csv(combined, "embryo_biopsy_complete_data.csv")
 
 df <- combined %>%
   group_by(dispersal, embryo_type, first_biopsy_type, second_biopsy_type) %>%
-  summarise(total = sum(count), .groups = "drop") %>%
+  summarise(total = n(), .groups = "drop") %>%
   arrange(desc(total))
+
+
+
+##### Summarize total count of biopsy types #####
+biopsy_total_count <- df %>%
+  group_by(dispersal, first_biopsy_type) %>%
+  summarise(count = sum(total), .groups = "drop") %>%
+  mutate(percent = round((count / 1e6) * 100, 1)) 
+
+biopsy_totals_pivot <- biopsy_total_count %>%
+  pivot_wider(
+    names_from = dispersal,
+    values_from = c(count, percent),
+    names_glue = "{.value}_dispersal_{dispersal}"
+  ) %>%
+  mutate(first_biopsy_type = factor(first_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")))%>%
+  arrange(first_biopsy_type)
+kable(biopsy_totals_pivot, format = "markdown")
 
 # Summarize total counts by embryo → biopsy type
 biopsy_summary <- df %>%
@@ -1126,6 +1148,16 @@ biopsy_summary <- df %>%
 
 # Print in Markdown
 kable(biopsy_summary, format = "markdown")
+
+# Compress the data 
+biopsy_summary_pivot <- biopsy_summary %>%
+  pivot_wider(
+    names_from = dispersal,
+    values_from = c(flow, percentage),
+    names_glue = "Dispersal {dispersal} {.value}"
+  )
+# Print in Markdown
+kable(biopsy_summary_pivot, format = "markdown")
 
 ##### aneupoid biopsy from mosaic embryos ####
 result <- biopsy_summary %>%
@@ -1159,35 +1191,7 @@ kable(result, format = "markdown")
 
 
 ##### First to second biopsy ######
-# All possible combinations
-all_combos <- expand.grid(
-  dispersal = c(0, 0.5, 1),
-  first_biopsy_type = c("Euploid", "Mosaic", "Aneuploid"),
-  second_biopsy_type = c("Euploid", "Mosaic", "Aneuploid"),
-  stringsAsFactors = FALSE
-)
-
-# Merge with actual data, replacing NAs with 0
-# biopsy_summary_full <- all_combos %>%
-#   left_join(biopsy_summary, by = c("first_biopsy_type", "second_biopsy_type", "dispersal")) %>%
-#   mutate(
-#     flow = ifelse(is.na(flow), 0, flow)
-#   )
-# 
-# total_flow <- sum(biopsy_summary_full$flow)
-
-# library(forcats)
-# plot_df <- biopsy_summary_full %>%
-#   mutate(
-#     first_biopsy_type = paste0("First_", first_biopsy_type),
-#     second_biopsy_type = paste0("Second_", second_biopsy_type),
-#     first_biopsy_type = fct_relevel(factor(first_biopsy_type),
-#                                     "First_Euploid", "First_Mosaic", "First_Aneuploid"),
-#     second_biopsy_type = fct_relevel(factor(second_biopsy_type),
-#                                      "Second_Euploid", "Second_Mosaic", "Second_Aneuploid"),
-#     embryo_type = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
-#   )
-
+# Arrange biopsy types by order
 plot_df <- biopsy_summary %>%
   mutate(
     first_biopsy_type = factor(first_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
@@ -1195,6 +1199,7 @@ plot_df <- biopsy_summary %>%
     embryo_type = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
   )
 
+# Sankey plot
 ggplot(plot_df,
        aes(
          axis1 = first_biopsy_type,
@@ -1204,10 +1209,6 @@ ggplot(plot_df,
   geom_alluvium(width = 1/12, alpha = 0.8) +
   geom_stratum(width = 1/6, fill = "gray80", color = "black") +
   geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3, color = "black") +
-  # geom_text(stat = "alluvium",
-  #           aes(x = 1.5, label = percentage),
-  #           size = 3,
-  #           color = "black") +
   facet_wrap(~ dispersal, labeller = label_both, nrow = 1,  scales = "free_y") +
   scale_x_discrete(limits = c("First Biopsy", "Second Biopsy"), expand = c(.1, .1)) +
   labs(title = "Biopsy Pair Type Flows by Embryo Dispersal Level",
@@ -1222,63 +1223,108 @@ ggplot(plot_df,
     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 10)
-  )+
-  scale_y_continuous(trans = "log1p")
+  ) 
 
-# Convert to ggsankey format (long format from wide)
-# Split the data by embryo_type to preserve grouping
-# biopsy_long_by_embryo <- biopsy_summary %>%
-#   select(embryo_type, dispersal, first_biopsy_type, second_biopsy_type, flow) %>%
-#   group_by(embryo_type, dispersal) %>%
-#   group_split() %>%
-#   lapply(function(df) {
-#     make_long(df, first_biopsy_type, second_biopsy_type, value = flow) %>%
-#       mutate(embryo_type = df$embryo_type[1],
-#              dispersal = df$dispersal[1])  # assign embryo_type to all rows from this group
-#   }) %>%
-#   bind_rows()
+## Reference Plots ##############
 
-# biopsy_long_by_embryo <- biopsy_summary_full %>%
-#   # filter(dispersal == 0) %>%
-#   select(embryo_type, dispersal, first_biopsy_type, second_biopsy_type, flow) %>%
-#   group_by(embryo_type, dispersal) %>%
-#   group_split() %>%
-#   lapply(function(df) {
-#     make_long(df, first_biopsy_type, second_biopsy_type, value = flow) %>%
-#       mutate(embryo_type = df$embryo_type[1],
-#              dispersal = df$dispersal[1])  # assign embryo_type to all rows from this group
-#   }) %>%
-#   bind_rows()%>%
-#   mutate(
-#     node = factor(node, 
-#                   levels = c("Euploid", "Mosaic", "Aneuploid")),
-#     next_node = factor(next_node, 
-#                   levels = c("Euploid", "Mosaic", "Aneuploid"))) %>%
-#   arrange(node, next_node)
-#   
-# 
-# ggplot(biopsy_long_by_embryo, 
-#        aes(x = x, 
-#            next_x = next_x, 
-#            node = node, 
-#            next_node = next_node,
-#            value = value, 
-#            fill = embryo_type)) +
-#   geom_sankey(flow.alpha = 0.7, node.color = "gray40") +
-#   geom_sankey_label(aes(label = node), size = 5, label.size = 0.3, color = "white", fill = "black") +
-#   labs(title = "First Biopsy to Second Biopsy Type",
-#        x = NULL,
-#        y = "Embryo Count",
-#        fill = "Embryo Type") +
-#   facet_wrap(~ dispersal, nrow = 1, labeller = label_both) +
-#   scale_x_discrete(labels = c("First Biopsy", "Second Biopsy")) +
-#   theme_minimal() +
-#   theme(
-#     panel.grid = element_blank(),
-#     axis.text.y = element_blank(),
-#     axis.ticks.y = element_blank(),
-#     axis.text.x = element_text(size = 12, face = "bold", color = "black", vjust = 3),
-#     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
-#     legend.title = element_text(size = 12),
-#     legend.text = element_text(size = 10)
-#   )
+##### Biopsy Summary ##############
+
+data1 <- read.csv("data/2025-04-04c/data.csv")
+data2 <- read.csv("data/2025-04-04d/data.csv")
+data3 <- read.csv("data/2025-04-04e/data.csv")
+dispersal_ranges <- rbind(data1, data2, data3)
+
+biopsy_types <- dispersal_ranges %>%
+  group_by(dispersal) %>%
+  summarise(
+    category = c("Euploid", "Mosaic", "Aneuploid"),
+    mean = c(mean(euploid), mean(mosaic), mean(aneuploid)),
+    stdev = c(sd(euploid), sd(mosaic), sd(aneuploid))) %>%
+  mutate(ypos = cumsum(mean)-0.05)
+
+biopsy <- ggplot(biopsy_types, aes(
+  x = factor(dispersal, levels = c(1, 0.5, 0)),
+  y = mean,
+  fill = factor(
+    category,
+    levels = c("Euploid", "Mosaic", "Aneuploid")
+  )
+)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Dispersal",
+       y = "Proportions of Biopsies",
+       fill = "Biopsy Type",
+       tag = "B") +
+  geom_label(
+    aes(y = ypos, label = sprintf("%.1f%%", mean*100)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  ) +
+  scale_fill_viridis(discrete = TRUE)+
+  scale_y_continuous(expand = c(0, 0),labels = scales::percent_format()) +
+  theme_classic()
+
+data <- data.frame(
+  category = c("Euploid", "Mosaic", "Aneuploid"),
+  value = c(0.23, 0.19, 0.58)
+)
+
+data <- data %>%
+  mutate(ypos = cumsum(value) - 0.1)
+
+# Plot the single stacked bar chart
+ref <- ggplot(data, aes(x = 1, y = value, fill = factor(
+  category,
+  levels = c("Euploid", "Mosaic", "Aneuploid")
+))) + 
+  geom_bar(stat = "identity", width = 0.05) +
+  labs(x = "", y = "Percentage", fill = "Category", tag = "A") + 
+  ggtitle("Reference Proportions from Viotti et al. 2021")  +
+  geom_label(
+    aes(y = ypos, label = sprintf("%.1f%%", value*100)),
+    color = "red",
+    fill = "white",
+    fontface = "bold",
+    size = 4
+  )   +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_void()+
+  theme(    axis.text = element_blank(),         # Hide text on both axes
+            axis.ticks = element_blank(),        # Hide ticks on both axes
+            axis.title = element_blank(),        # Hide axis titles
+            panel.grid = element_blank(),
+            legend.position = "none")
+ref + biopsy
+
+##### Check for biopsy summary compared to initial summaries #####
+# Compile results
+results <- list.files("2025-07-18_results", full.names = TRUE, pattern = "*.csv")
+combined <- bind_rows(lapply(results, read_csv))
+
+# if those columns exist
+combined <- combined %>% select(-embryo)
+# first biopsy
+tally_by_meio_mito <- combined %>%
+  group_by(dispersal, prob.meio, prob.mito, , euploid, mosaic, aneuploid, first_biopsy_type) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(dispersal, prob.meio, prob.mito, euploid, mosaic, aneuploid) %>%
+  mutate(prop = count / sum(count)) %>%
+  select(-count) %>%
+  pivot_wider(names_from = first_biopsy_type, values_from = prop, values_fill = 0) %>%
+  ungroup() %>%
+  relocate(Mosaic, .before = Aneuploid) %>%
+  relocate(Euploid, .before = Mosaic)
+
+# second biopsy
+tally_by_meio_mito_2 <- combined %>%
+  group_by(dispersal, prob.meio, prob.mito, , euploid, mosaic, aneuploid, second_biopsy_type) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(dispersal, prob.meio, prob.mito, euploid, mosaic, aneuploid) %>%
+  mutate(prop = count / sum(count)) %>%
+  select(-count) %>%
+  pivot_wider(names_from = second_biopsy_type, values_from = prop, values_fill = 0) %>%
+  ungroup() %>%
+  relocate(Mosaic, .before = Aneuploid) %>%
+  relocate(Euploid, .before = Mosaic)

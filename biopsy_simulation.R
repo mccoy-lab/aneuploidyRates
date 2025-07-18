@@ -33,27 +33,30 @@ processed_data <- current_data %>%
     embryo = list(tryCatch({ # error catching to avoid restarting the whole procedure
       tessera::Embryo(
         n.cells = 256,
+        n.chr = 1,
         prop.aneuploid = prop.aneu,
         dispersal = dispersal,
+        concordance = 0,
+        euploidy = 2,
         rng.seed = NULL
       )
     }, error = function(e) {
       warning(paste("Embryo creation failed on task", task_id, "row with prop.aneu =", prop.aneu))
       NULL
-    })), # pick a random cell as the start of biopsy
-    first_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5, index.cell = sample(1:256, 1)),
+    })), 
+    first_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5),
     second_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5, index.cell = sample(1:256, 1)),
   ) %>%
   ungroup() %>% # Categorize
   mutate(
     first_biopsy_type = case_when(
-      first_biopsy_cell < 5 * 0.3 ~ "Euploid",
-      first_biopsy_cell >= 5 * 0.3 & first_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
+      first_biopsy_cell < 5 * 0.2 ~ "Euploid",
+      first_biopsy_cell >= 5 * 0.2 & first_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
       first_biopsy_cell > 5 * 0.7 ~ "Aneuploid"
     ),
     second_biopsy_type = case_when(
-      second_biopsy_cell < 5 * 0.3 ~ "Euploid",
-      second_biopsy_cell >= 5 * 0.3 & second_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
+      second_biopsy_cell < 5 * 0.2 ~ "Euploid",
+      second_biopsy_cell >= 5 * 0.2 & second_biopsy_cell <= 5 * 0.7 ~ "Mosaic",
       second_biopsy_cell > 5 * 0.7 ~ "Aneuploid"
     ),
     embryo_type = case_when(
@@ -61,9 +64,7 @@ processed_data <- current_data %>%
       prop.aneu > 0 & prop.aneu < 1 ~ "Mosaic Aneuploid",
       prop.aneu == 1 ~ "Fully Aneuploid"
     )
-  ) %>% # Summarize biopsy results compared to embryo types
-  group_by(dispersal, first_biopsy_type, second_biopsy_type, embryo_type, first_biopsy_cell, second_biopsy_cell) %>%
-  summarise(count = n(), .groups = "drop")
+  ) 
 
 # Output to file
 out_path <- file.path(outdir, paste0("group_", task_id, ".csv"))
