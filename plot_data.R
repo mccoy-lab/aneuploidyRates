@@ -1100,7 +1100,7 @@ rm(dispersal_ranges)
 
 #### Figure S3 ###########################
 # Compile results
-results <- list.files("2025-07-18_results", full.names = TRUE, pattern = "*.csv")
+results <- list.files("data/2025-07-18_results", full.names = TRUE, pattern = "*.csv")
 combined <- bind_rows(lapply(results, read_csv))
 
 # if those columns exist
@@ -1198,7 +1198,6 @@ plot_df <- biopsy_summary %>%
     second_biopsy_type = factor(second_biopsy_type, levels = c("Euploid", "Mosaic", "Aneuploid")),
     embryo_type = factor(embryo_type, levels = c("Euploid", "Mosaic Aneuploid", "Fully Aneuploid"))
   )
-
 # Sankey plot
 ggplot(plot_df,
        aes(
@@ -1211,8 +1210,7 @@ ggplot(plot_df,
   geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3, color = "black") +
   facet_wrap(~ dispersal, labeller = label_both, nrow = 1,  scales = "free_y") +
   scale_x_discrete(limits = c("First Biopsy", "Second Biopsy"), expand = c(.1, .1)) +
-  labs(title = "Biopsy Pair Type Flows by Embryo Dispersal Level",
-       y = "Embryo Count",
+  labs(y = "Embryo Count",
        fill = "Embryo Type") +
   theme_minimal() +
   theme(
@@ -1223,7 +1221,14 @@ ggplot(plot_df,
     plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
     legend.title = element_text(size = 12),
     legend.text = element_text(size = 10)
-  ) 
+  )  + 
+  scale_fill_manual( # to hide NA from the legend
+    values = c("Euploid" = "#F28C28", 
+               "Mosaic Aneuploid" = "#2B7A78", 
+               "Fully Aneuploid" = "#BA2BE2"),
+    drop = TRUE,
+    na.translate = FALSE  
+  )
 
 ## Reference Plots ##############
 
