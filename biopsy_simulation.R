@@ -1,5 +1,5 @@
 # This file creates embryos based on the stored proportion of aneuploidy and dispersal,
-# and takes a biopsy for each embryo. It outputs a summary file filtered by the 
+# and takes two biopsies for each embryo. It outputs a summary file filtered by the 
 # biopsy and embryo type
 
 library(dplyr)
@@ -27,11 +27,12 @@ current_data <- all_data %>%
 # Process this group of data
 cat("Processing group ", task_id, "\n") # signal to start
 
+# Simulate re-biopsy
 processed_data <- current_data %>%
   rowwise() %>% # row-by-row operation
   mutate(
     embryo = list(tryCatch({ # error catching to avoid restarting the whole procedure
-      tessera::Embryo(
+      tessera::Embryo( # create an embryo
         n.cells = 256,
         n.chr = 1,
         prop.aneuploid = prop.aneu,
@@ -43,8 +44,9 @@ processed_data <- current_data %>%
     }, error = function(e) {
       warning(paste("Embryo creation failed on task", task_id, "row with prop.aneu =", prop.aneu))
       NULL
-    })), 
-    first_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5),
+    })), # first biopsy: starting from default index cell
+    first_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5), 
+    # second biopsy: starting form a random cell
     second_biopsy_cell = tessera::takeBiopsy(embryo, biopsy.size = 5, index.cell = sample(1:256, 1)),
   ) %>%
   ungroup() %>% # Categorize
